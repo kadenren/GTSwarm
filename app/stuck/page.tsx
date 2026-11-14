@@ -20,7 +20,7 @@ export default async function StuckPage({ searchParams }: { searchParams: Promis
         initial={sp.q ? 'web' : 'scout'}
         scout={<ScoutPanel webAvailable={!!process.env.ANTHROPIC_API_KEY} evidenceAi={geminiEnabled()} initialNeed={sp.scout ?? ''} />}
         web={
-          <SearchClient kind="stuck" aiPolish={!!process.env.ANTHROPIC_API_KEY} viewerName={me.name} viewerProjects={projects}
+          <SearchClient kind="stuck" aiPolish={geminiEnabled() || !!process.env.ANTHROPIC_API_KEY} viewerName={me.name} viewerProjects={projects}
             suggestions={[{ q: "Bluetooth drops when the sensor sleeps" }]}
             initial={{ q: sp.q ?? '', role: 'Helper', audience: sp.aud ?? 'both', log: '' }} />
         }

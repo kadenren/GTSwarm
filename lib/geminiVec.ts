@@ -31,8 +31,22 @@ export function geminiDocText(s: Snapshot, id: string): string {
 const client = () => new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY, httpOptions: { timeout: 30_000 } });
 const toUnit = (v: number[]) => { const a = Float32Array.from(v); let n = 0; for (const x of a) n += x * x; n = Math.sqrt(n) || 1; for (let i = 0; i < a.length; i++) a[i] /= n; return a; };
 
-async function embedBatch(texts: string[], taskType: 'RETRIEVAL_DOCUMENT' | 'RETRIEVAL_QUERY'): Promise<Float32Array[]> {
-  const res = await client().models.embedContent({ model: EMBED_MODEL, contents: texts, config: { taskType, outputDimensionality: DIM } });
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+async function embedBatch(texts: string[], taskType: 'RETRIEVAL_DOCUMENT' | 'RETRIEVAL_QUERY', patient = false): Promise<Float32Array[]> {
+  let res;
+  for (let attempt = 0; ; attempt++) {
+    try {
+      res = await client().models.embedContent({ model: EMBED_MODEL, contents: texts, config: { taskType, outputDimensionality: DIM } });
+      break;
+    } catch (e) {
+      // free-tier keys are rate limited per minute: wait as long as Gemini asks, then continue (batch jobs only)
+      const msg = e instanceof Error ? e.message : String(e);
+      const wait = Number(msg.match(/retry in ([\d.]+)s/i)?.[1] ?? msg.match(/"retryDelay":"(\d+)s"/)?.[1] ?? 0);
+      if (!patient || !/429|RESOURCE_EXHAUSTED/.test(msg) || attempt >= 8) throw e;
+      await sleep(Math.min(70, Math.max(5, wait + 1)) * 1000);
+    }
+  }
   const out = (res.embeddings ?? []).map((e) => toUnit(e.values ?? []));
   if (out.length !== texts.length || out.some((v) => v.length !== DIM)) throw new Error('unexpected embedding response');
   return out;
@@ -46,9 +60,9 @@ export async function embedMissing(s: Snapshot, onProgress?: (done: number, tota
   const ids = [...s.people.filter((p) => p.claimed).map((p) => p.id), ...s.projects.map((p) => p.id), ...s.problems.map((p) => p.id)];
   const todo = ids.map((id) => ({ id, text: geminiDocText(s, id) })).filter((d) => stored.get(d.id) !== hash(d.text));
   const put = db.prepare('INSERT OR REPLACE INTO gemini_vec (id, text_hash, vec) VALUES (?,?,?)');
-  for (let i = 0; i < todo.length; i += 90) {
+  for (let i = 0; i < todo.length; i += 90) { // free tier: 100 embedding requests per minute
     const chunk = todo.slice(i, i + 90);
-    const vecs = await embedBatch(chunk.map((d) => d.text), 'RETRIEVAL_DOCUMENT');
+    const vecs = await embedBatch(chunk.map((d) => d.text), 'RETRIEVAL_DOCUMENT', true);
     db.transaction(() => chunk.forEach((d, j) => put.run(d.id, hash(d.text), Buffer.from(vecs[j].buffer))))();
     onProgress?.(Math.min(i + 90, todo.length), todo.length);
   }

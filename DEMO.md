@@ -5,7 +5,7 @@ All people, projects and files in this demo are fictional. Sample files live in 
 ## Before the judges arrive (5 minutes)
 
 1. Open a terminal in the **GT Swarm** folder and run `npm run dev`. Open http://localhost:3000 in a full-size browser window.
-2. **Optional, for Gemini:** put your key in `.env.local` (`GEMINI_API_KEY=...`), then run `npm run ai:warm` once and restart `npm run dev`. This embeds the swarm with Gemini and pre-runs every demo search, so nothing waits on the network on stage. The footer then reads "Matching: Gemini embeddings + Gemini matchmaker".
+2. **Gemini:** the key is already in `.env.local`. After any re-seed, run `npm run ai:warm` once (about 7 minutes on the free tier) and restart `npm run dev`. It embeds the swarm with Gemini and pre-runs every demo search, so nothing waits on the network on stage. The footer should read "Matching: Gemini embeddings + Gemini matchmaker".
 3. Click the gold **Demo guide** button (bottom right) → **Reset data**. You are now viewing as **Leo Martinez**, a student cofounder of PulseBand.
 4. Keep the **demo-files** folder open next to the browser so you can drag files in.
 

@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import Anthropic from '@anthropic-ai/sdk';
 import { getDb } from './db';
+import { geminiJson, geminiEnabled } from './gemini';
 
 /**
  * Optional wording polish for connection descriptions. The deterministic template stays the source of truth:
@@ -35,6 +36,15 @@ export async function polishDescription(template: string): Promise<{ text: strin
   const k = key(template);
   const cached = db.prepare('SELECT value FROM cache WHERE key = ?').get(k) as { value: string } | undefined;
   if (cached) return { text: cached.value, source: 'polished' };
+  if (geminiEnabled()) {
+    const out = await geminiJson<{ text: string }>({ system: SYSTEM, text: template, schema: { type: 'object', required: ['text'], properties: { text: { type: 'string', description: 'The rewritten description' } } }, timeoutMs: 15_000 });
+    const text = out?.text?.trim() ?? '';
+    if (text && factCheck(template, text)) {
+      db.prepare('INSERT OR REPLACE INTO cache (key, value) VALUES (?, ?)').run(k, text);
+      return { text, source: 'polished' };
+    }
+    return { text: template, source: 'template' };
+  }
   if (!process.env.ANTHROPIC_API_KEY) return { text: template, source: 'template' };
   try {
     const client = new Anthropic({ timeout: 15_000, maxRetries: 1 });

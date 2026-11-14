@@ -31,9 +31,11 @@ Open http://localhost:3000.
 
 ## Gemini (optional, recommended for the demo)
 
-Put `GEMINI_API_KEY=...` in `.env.local`, then run `npm run ai:warm` and restart `npm run dev`. With a key:
+Gemini is the product's AI. Put `GEMINI_API_KEY=...` in `.env.local` (git-ignored; Next.js loads it automatically), then run `npm run ai:warm` and restart `npm run dev`. The default model is `gemini-3.5-flash-lite` with automatic fallback to `gemini-3.5-flash` and `gemini-3.8-flash` when a model is busy (override with `GEMINI_MODEL` and `GEMINI_FALLBACK_MODELS`). On a free-tier key, the first `ai:warm` takes about 7 minutes because embeddings are limited to 100 per minute. With a key:
 
 - **Matching is done by Gemini.** Every person, project and solved problem gets a Gemini embedding, so search matches meaning rather than keywords. The graph then shortlists about 16 candidates, and a Gemini matchmaker reads each candidate's record against the request and scores the fit, with a one-sentence reason shown in the panel. Shared ties, role fit and availability still count. `ai:warm` pre-computes the embeddings and every demo search, so the live demo never waits on the network.
+- **Gemini runs the scout** in I'm stuck: it reads the request, plans the searches, and writes the report from the people the graph returns.
+- **Gemini polishes** connection descriptions (fact-checked against the original and cached).
 - **Gemini reads messy input:** a phone photo of a poster or a scanned PDF in **Add project**, a resume (or LinkedIn's Save to PDF) in **Join / Profile**, and a screenshot of an error in **I'm stuck**.
 
 Without a key, all of this falls back to the graph plus keyword matching and local file parsing, and is covered by the tests.

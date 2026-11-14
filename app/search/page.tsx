@@ -1,5 +1,6 @@
 import SearchClient from '@/components/SearchClient';
 import PageHero from '@/components/PageHero';
+import { geminiEnabled } from '@/lib/gemini';
 import { viewerContext } from '@/lib/context';
 import { suggestIntros } from '@/lib/graph/circles';
 import { snapshot, personLabel } from '@/lib/data';
@@ -22,7 +23,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     <>
       <PageHero eyebrow="Find expertise" title="Who at GT has built what you need?"
         subtitle={`Search ${s.projects.length} projects and ${s.people.filter((p) => p.claimed).length} builders by what they actually did. Pick the role you are filling and see how you are connected.`} />
-      <SearchClient kind="expertise" aiPolish={!!process.env.ANTHROPIC_API_KEY} intros={intros} viewerName={me.name} viewerProjects={projects} suggestions={suggestions}
+      <SearchClient kind="expertise" aiPolish={geminiEnabled() || !!process.env.ANTHROPIC_API_KEY} intros={intros} viewerName={me.name} viewerProjects={projects} suggestions={suggestions}
         initial={{ q: sp.q ?? '', role: sp.role ?? 'Cofounder', audience: sp.aud ?? 'both', log: '' }} />
     </>
   );

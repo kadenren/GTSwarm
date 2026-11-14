@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { rankForExpertise, rankForProblem } from './graph/rank';
 import { snapshot, ROLES, type Audience, type Role } from './data';
+import { geminiJson, geminiEnabled } from './gemini';
 
 /**
  * GT Swarm Scout: an agent that takes a plain-language need and searches
@@ -169,7 +170,9 @@ const SYSTEM_NO_WEB = SYSTEM
 export async function runScout(need: string, viewerId: string, emit: Emit, opts: { web?: boolean } = {}) {
   const text = need.trim().slice(0, 3000);
   if (!text) { emit({ type: 'step', kind: 'error', label: 'Describe what you need first.' }); return; }
-  // Default: search only the indexed GT Swarm network (no live web calls). Claude plans the search when a key is set.
+  // Gemini is the product's AI: it plans the searches over the indexed GT Swarm network and writes the report.
+  if (geminiEnabled()) return geminiScout(text, viewerId, emit);
+  // Without Gemini: Claude plans the search when its key is set, otherwise the deterministic scout runs.
   if (!process.env.ANTHROPIC_API_KEY) {
     emit({ type: 'mode', ai: false, note: 'Searching the indexed GT Swarm network.' });
     return graphOnlyScout(text, viewerId, emit, null);
@@ -263,4 +266,76 @@ export async function runScout(need: string, viewerId: string, emit: Emit, opts:
     emit({ type: 'step', kind: 'error', label: 'The AI scout hit a problem, so it switched to a graph-only search', detail: msg });
     await graphOnlyScout(text, viewerId, emit, null);
   }
+}
+
+// ---------- Gemini scout ----------
+const PLAN_SCHEMA = {
+  type: 'object',
+  required: ['role', 'audience', 'problem_query', 'expertise_query', 'understanding'],
+  properties: {
+    understanding: { type: 'string', description: 'One short sentence restating what the builder needs' },
+    role: { type: 'string', enum: [...ROLES] },
+    audience: { type: 'string', enum: ['students', 'alumni', 'both'] },
+    problem_query: { type: 'string', description: 'The underlying technical problem in plain words, for searching solved problems; empty if not a problem' },
+    expertise_query: { type: 'string', description: 'Skills and experience to search builders for' },
+  },
+};
+const REPORT_SCHEMA = {
+  type: 'object',
+  required: ['summary', 'picks', 'next_steps'],
+  properties: {
+    summary: { type: 'string', description: 'Two sentences answering the need, naming the best person and why' },
+    picks: { type: 'array', items: { type: 'object', required: ['person_id', 'why'], properties: { person_id: { type: 'string' }, why: { type: 'string', description: 'One sentence from their record' } } } },
+    next_steps: { type: 'array', items: { type: 'string' } },
+  },
+};
+
+async function geminiScout(need: string, viewerId: string, emit: Emit) {
+  const s = snapshot();
+  emit({ type: 'mode', ai: true, note: 'Gemini plans the searches over the indexed GT Swarm network and writes the report.' });
+  emit({ type: 'step', kind: 'think', label: 'Gemini is reading your request', detail: need.length > 140 ? need.slice(0, 137) + '…' : need });
+  const plan = await geminiJson<{ role: Role; audience: Audience; problem_query: string; expertise_query: string; understanding: string }>({
+    system: 'You help Georgia Tech builders find the right person. Turn the request into searches over a database of Georgia Tech students, alumni, their projects and the problems they solved.',
+    text: need,
+    schema: PLAN_SCHEMA,
+    timeoutMs: 15_000,
+  });
+  if (!plan) return graphOnlyScout(need, viewerId, emit, null);
+  const role: Role = ROLES.includes(plan.role) ? plan.role : 'Helper';
+  const audience: Audience = (['students', 'alumni', 'both'] as const).includes(plan.audience) ? plan.audience : 'both';
+  emit({ type: 'step', kind: 'think', label: `Gemini: ${plan.understanding || `looking for a ${role.toLowerCase()}`}`, detail: `Role ${role}${audience !== 'both' ? `, ${audience} only` : ''}` });
+
+  let problems: ScoutProblem[] = [];
+  const pool = new Map<string, ScoutPerson>();
+  if (plan.problem_query?.trim()) {
+    emit({ type: 'step', kind: 'graph', label: `Searching ${s.problems.length} solved problems: "${plan.problem_query}"` });
+    const r = await searchProblems(viewerId, plan.problem_query);
+    problems = r.problems;
+    emit({ type: 'problems', problems });
+    r.people.forEach((p) => pool.set(p.id, p));
+  }
+  const q = plan.expertise_query?.trim() || need;
+  emit({ type: 'step', kind: 'graph', label: `Ranking ${s.people.filter((p) => p.claimed).length} builders for "${q}"`, detail: 'Gemini scores each shortlisted record' });
+  const experts = await searchPeople(viewerId, q, role, audience);
+  experts.forEach((p) => { if (!pool.has(p.id)) pool.set(p.id, p); });
+  const people = [...pool.values()].filter((p) => audience === 'both' || (audience === 'students' ? p.type === 'student' : p.type === 'alum')).slice(0, 8);
+  emit({ type: 'step', kind: 'graph', label: 'Checking warm paths from you', detail: `${people.filter((p) => p.hops !== null && p.hops <= 3).length} of the top matches are within 3 hops` });
+  emit({ type: 'people', source: 'GT Swarm network', people });
+
+  emit({ type: 'step', kind: 'think', label: 'Gemini is choosing who to talk to' });
+  const report = await geminiJson<{ summary: string; picks: { person_id: string; why: string }[]; next_steps: string[] }>({
+    system: 'Recommend who the builder should talk to, using only the candidates and solved problems provided. Never invent facts. Use first names; no pronouns.',
+    text: `Request: ${need}\n\nSolved problems found:\n${problems.map((p) => `- "${p.description}" solved by ${p.solver} (${p.solverId}) on ${p.project}. Fix: ${p.solution}`).join('\n') || '(none)'}\n\nCandidates:\n${people.map((p) => `[${p.id}] ${p.name}, ${p.label}${p.hops !== null ? `, ${p.hops} hops from the builder` : ''}: ${p.why}`).join('\n')}`,
+    schema: REPORT_SCHEMA,
+    timeoutMs: 15_000,
+  });
+  const byId = new Map(people.map((p) => [p.id, p]));
+  const picks = (report?.picks ?? []).flatMap((x) => { const p = byId.get(x.person_id); return p ? [{ ...p, why: x.why || p.why }] : []; });
+  emit({
+    type: 'report',
+    report: report && picks.length
+      ? { source: 'ai', summary: report.summary, swarm: picks.slice(0, 6), web: [], nextSteps: (report.next_steps ?? []).slice(0, 4) }
+      : { source: 'graph', summary: people.length ? `Found ${people.length} people whose documented work matches.` : 'No strong matches yet.', swarm: people.slice(0, 6), web: [], nextSteps: [] },
+  });
+  emit({ type: 'step', kind: 'done', label: 'Scout finished' });
 }
