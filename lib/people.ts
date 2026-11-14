@@ -5,6 +5,7 @@ import { tokenize, similarity } from './search';
 import { membershipOf, audienceOf, isVerifiedAlum } from './access';
 import { requestMentorship } from './community';
 import { warmPath } from './graph/path';
+import { edgesAmong } from './graph/edges';
 
 /**
  * Find People: purpose-based discovery with consent built in.
@@ -200,4 +201,41 @@ export function sendConnectRequest(viewerId: string, personId: string, purpose: 
   }
   const r = sendRequest({ from: viewerId, to: personId, kind: 'expertise', role: purposeLabel(purpose) as never, message, projectId: null });
   return { kind: 'connection', id: r.id, duplicate: r.duplicate };
+}
+
+/**
+ * The connection web for a Find People search: the people found (closer to the center = more relevant) plus the
+ * confirmed ties that link them to each other and to the viewer. Lines are only shared projects and accepted
+ * connections; similar interests never draw a line. Paths through anyone the viewer may not see are left out.
+ */
+export function peopleWeb(viewerId: string, results: PersonResult[], limit = 12) {
+  const s = snapshot();
+  const top = results.slice(0, limit);
+  const hi = Math.max(...top.map((r) => r.score), 0.0001), lo = Math.min(...top.map((r) => r.score), 0);
+  type N = { id: string; name: string; label: string; type: 'student' | 'alum' | 'project'; score: number; rank: number; ring: 1 | 2 | 3; short: string; kind?: 'person' | 'project' };
+  const nodes = new Map<string, N>();
+  top.forEach((r, i) => nodes.set(r.id, { id: r.id, name: r.name, label: r.name, type: r.type, rank: i + 1, ring: i < 3 ? 1 : i < 8 ? 2 : 3,
+    score: hi > lo ? 0.35 + 0.65 * ((r.score - lo) / (hi - lo)) : 0.8, short: r.reason }));
+  const edges = new Map<string, { source: string; target: string; kind: string; label: string }>();
+  const addEdge = (a: string, b: string, label: string) => { const k = a < b ? `${a}|${b}` : `${b}|${a}`; if (!edges.has(k)) edges.set(k, { source: a, target: b, kind: 'built', label }); };
+  for (const e of edgesAmong(top.map((r) => r.id))) addEdge(e.source, e.target, e.label);
+
+  const paths: Record<string, string | null> = {};
+  let extra = 0;
+  for (const r of top) {
+    const p = warmPath(viewerId, r.id);
+    const inner = p ? p.ids.slice(1, -1) : [];
+    const ok = p && p.hops > 0 && p.hops <= 4 && inner.every((id) => !id.startsWith('person:') || visibleTo(viewerId, s.person.get(id)!));
+    paths[r.id] = ok ? p!.text : null;
+    if (!ok || extra > 8) continue;
+    for (const id of p!.ids) {
+      if (nodes.has(id)) continue;
+      extra++;
+      if (id === viewerId) { const me = s.person.get(id)!; nodes.set(id, { id, name: 'You', label: 'You', type: me.type, score: 0.3, rank: 99, ring: 3, short: 'You' }); continue; }
+      if (id.startsWith('project:')) { const pr = s.project.get(id)!; nodes.set(id, { id, name: pr.name, label: `${pr.name} (${pr.year})`, type: 'project', kind: 'project', score: 0.25, rank: 99, ring: 3, short: `${pr.name} (${pr.year})` }); continue; }
+      if (id.startsWith('person:')) { const q = s.person.get(id)!; nodes.set(id, { id, name: q.name, label: `${q.name} (on a path)`, type: q.type, score: 0.25, rank: 99, ring: 3, short: 'Knows people in this search' }); }
+    }
+    for (let i = 1; i < p!.ids.length; i++) addEdge(p!.ids[i - 1], p!.ids[i], p!.steps[i].via ? `${p!.steps[i - 1].label} → ${p!.steps[i].label} (${p!.steps[i].via})` : `${p!.steps[i - 1].label} → ${p!.steps[i].label}`);
+  }
+  return { nodes: [...nodes.values()], edges: [...edges.values()].filter((e) => nodes.has(e.source) && nodes.has(e.target)), paths };
 }

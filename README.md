@@ -8,7 +8,7 @@ Three places, plus **My Network**:
 
 | Place | Question | What is there |
 |---|---|---|
-| **Find People** `/people` | Who can I meet? | Search by interest or career, pick a purpose (Meet fellow Yellow Jackets, Career advice or mentorship, Industry networking, Work on something together), see *Why this person?* from stored facts, **Ask to connect** with an editable note. Profiles at `/people/[id]` show only consented fields and "How you're connected" (or "No confirmed connection path found"). |
+| **Find People** `/people` | Who can I meet? | Search by interest or career, pick a purpose (Meet fellow Yellow Jackets, Career advice or mentorship, Industry networking, Work on something together), see *Why this person?* from stored facts, switch to **See connections** for the web of confirmed ties and warm introduction paths, and **Ask to connect** with an editable note. Profiles at `/people/[id]` show only consented fields and "How you're connected" (or "No confirmed connection path found"). |
 | **Communities** `/communities` | Where do I belong? | Six curated demo communities (Swarm Circles) with plain reasons ("You selected Seattle.", "Suggested because you listed Robotics."), or "Browse communities" when there is nothing to go on. One detail page per community: who it's for, people you can meet, events. |
 | **Opportunities** `/opportunities` | What can I get involved in? | Jobs, Internships, Mentorship, Other resources. Official resources (Career Center / CareerBuzz, CREATE-X, Alumni Association) are external links; GT Swarm does not run applications. |
 | **My Network** `/network` | Who am I and whom do I know? | Membership and graduation status, contact preferences, request counts (Inbox), connections, link to edit the profile. |
@@ -82,7 +82,7 @@ Without a key (or when Gemini is busy), everything falls back to the graph plus 
 
 ## Full show-through
 
-See **[DEMO.md](DEMO.md)** for the 2-minute demo script, how matching works, and our assumptions. **Start guided demo** (on the homepage, or in the Demo persona menu at top right) runs a 10-step tour of three short stories. It switches personas and highlights what to click. The startup tour is on `/startups`.
+See **[DEMO.md](DEMO.md)** for the 2-minute demo script, how matching works, and our assumptions. **Start guided demo** (on the homepage, or in the Demo persona menu at top right) runs an 18-step tour (about 3 minutes) through four moments: a student finding a mentor (with the connection web), a founder getting unstuck and matched with a cofounder (Why this match?, the web, matching both ways), an alum finding community in a new city, and graduation. It switches personas and highlights what to click. The startup tour is on `/startups`.
 
 ## How it works
 

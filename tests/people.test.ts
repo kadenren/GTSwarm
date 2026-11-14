@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { getDb, resetFromSeed } from '@/lib/db';
 import { snapshot } from '@/lib/data';
 import { ActionError } from '@/lib/actions';
-import { visibleTo, canRequest, whyConnect, findPeople, profileFor, sendConnectRequest, saveContactPrefs, contactPrefsOf } from '@/lib/people';
+import { visibleTo, canRequest, whyConnect, findPeople, profileFor, sendConnectRequest, saveContactPrefs, contactPrefsOf, peopleWeb } from '@/lib/people';
 import { suggestCircles, circleMembers } from '@/lib/circles';
 import { listGroups } from '@/lib/community';
 import { byName } from './helpers';
@@ -105,5 +105,18 @@ describe('Communities', () => {
     const n = listGroups(NOAH()).length;
     expect(n).toBeGreaterThanOrEqual(4);
     expect(n).toBeLessThanOrEqual(6);
+  });
+});
+
+describe('Connection web', () => {
+  beforeEach(() => resetFromSeed());
+
+  it('only shows people the viewer may see, and every line joins two shown nodes', async () => {
+    const results = await findPeople(KENJI(), { q: 'robotics career advice', purpose: 'mentorship' });
+    const web = peopleWeb(KENJI(), results);
+    const ids = new Set(web.nodes.map((n) => n.id));
+    for (const n of web.nodes) if (n.id.startsWith('person:') && n.id !== KENJI()) expect(visibleTo(KENJI(), person(n.id))).toBe(true);
+    for (const e of web.edges) { expect(ids.has(e.source)).toBe(true); expect(ids.has(e.target)).toBe(true); }
+    expect(ids.has(RAVI())).toBe(false);
   });
 });

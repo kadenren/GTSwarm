@@ -1,23 +1,33 @@
-# GT Swarm demo script (60 to 90 seconds)
+# GT Swarm demo script (about 3 minutes)
 
-**Live site:** https://gtswarm.vercel.app. Click **Start guided demo** on the homepage (or in the Demo persona menu, top right). Each step either explains what's on screen or asks the judge to click the real site; every step also has **Skip, do it for me**. Every person, community, event and posting is **fictional**.
+**Live site:** https://gtswarm.vercel.app. Click **Start guided demo** on the homepage (or in the Demo persona menu, top right). Each step explains what's on screen or asks the judge to click the real site; every step has **Skip, do it for me**. Every person, community, event and posting is **fictional**.
 
-**The point to land:** Georgia Tech gives us a community, but finding your place in it is hard, especially after graduation or in a new city. GT Swarm helps Yellow Jackets find people who share their interests and **welcome a hello**, join communities, and keep the same network from student to alum.
+**The point to land:** Georgia Tech already has the people who could help each other, but those connections live in group chats, LinkedIn and luck. GT Swarm matches people on what they've actually built and solved, shows how they're connected through confirmed ties, and only introduces people who said yes. It stays with you from student to alum.
 
-## Main guided demo: three stories
+**What's unique:** matching on demonstrated work (projects built, problems solved), not job titles; explained matches ("Why this match?"); the connection web with warm introduction paths built only from confirmed ties; matching in both directions (founders find people, students find startups); consent before ranking.
 
-| # | Story | The judge does | What they see |
+## Main guided demo: four moments in a Yellow Jacket's life
+
+| # | Moment | The judge does | What they see |
 |---|---|---|---|
-| 1 | Home | Next | "Your Georgia Tech community, for life." and a live preview of what Noah sees |
-| 2 | Noah, alum '24, moved to Seattle | **Explore community** on GT in Seattle | Suggested because he chose to share Seattle |
-| 3 | GT in Seattle | **Ask to connect → Send request** on Jamie | Only members who welcome requests; *Why this person?* from shared facts; editable note |
-| 4 | Jamie decides | **Accept** | Request arrives with its purpose; connected, shown in My Network |
-| 5 | Kenji, robotics student | Search "robotics career advice", purpose **Career advice or mentorship** | Only alumni who chose to mentor students; others removed before ranking |
-| 6 | Why this person? | **Ask to connect → Send request** | Quinn: robotics engineer, mentors students, shares Kenji's interests. A mentorship request, not a generic message |
-| 7 | Internships | Next | Internships Kenji is eligible for first; official listings stay on CareerBuzz |
-| 8 | Optional restriction | Next | GT Alumni Professionals is for verified alumni; a plain explanation, enforced on the server |
-| 9 | Sofia graduates | **Simulate verified graduation** | Same account becomes Verified alum; labeled simulated |
-| 10 | Close | Finish | "Georgia Tech gives us a community. GT Swarm makes it easier to find our place in it—and stay part of it for life." |
+| 1 | Why GT Swarm | Next | The problem: the people exist, finding them is luck |
+| 2 | Kenji, robotics student | Search "robotics career advice", purpose **Career advice or mentorship** | Only alumni who chose to mentor students, each with a plain reason |
+| 3 | The web of connections | **See connections** | Relevance web; lines are only confirmed ties; Kenji's warm path to Quinn |
+| 4 | Ask for mentorship | **Ask to connect → Send request** in the side panel | A mentorship request with an editable note |
+| 5 | Opportunities | Next | Alumni-posted internships; official listings stay on CareerBuzz |
+| 6 | Elena, alum founder, is stuck | Example problem in Get Unstuck | Tara already solved the hospital security review |
+| 7 | Matchmaking | Example, **Find people** | Dana ranks first for an alumni hardware cofounder |
+| 8 | Why Dana? | **Why this match?** | Every factor from her record: work match (keyword + meaning), shipped wearable, GT ties, open to cofounding |
+| 9 | The web behind the match | **View network**, click Dana | Elena → Diego Park → Dana: a warm introduction through teammates |
+| 10 | Invite | **Invite to connect → Send invite** | Sent with the reason; Dana decides |
+| 11 | Matching both ways | **Find Your Startup** as Maya | Restwell is recommended from her profile, no typing |
+| 12 | Noah moves to Seattle | **Explore community** on GT in Seattle | Suggested because he shared his city |
+| 13 | A hello | **Ask to connect → Send** on Jamie | Only members who welcome requests |
+| 14 | Consent | **Accept** as Jamie | Connected; the new tie joins the web |
+| 15 | Sofia graduates | **Simulate verified graduation** | Same account becomes Verified alum (labeled simulated) |
+| 16 | Alumni spaces open | Next | The alumni-only community now lets her join; enforced on the server |
+| 17 | Why it works for GT | Next | One-semester opt-in pilot with existing programs (proposed) |
+| 18 | Close | Finish | "Georgia Tech gives us a community. GT Swarm makes it easier to find our place in it—and stay part of it for life." |
 
 ## Startup demo (Startups page → Watch the startup demo)
 

@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import PageHero from '@/components/PageHero';
 import AskToConnect from '@/components/AskToConnect';
+import PeopleWeb from '@/components/PeopleWeb';
 import { getViewerId } from '@/lib/viewer';
 import { snapshot } from '@/lib/data';
-import { findPeople, PURPOSES, canRequest, type Purpose } from '@/lib/people';
+import { findPeople, peopleWeb, PURPOSES, canRequest, type Purpose } from '@/lib/people';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,6 +23,10 @@ export default async function FindPeoplePage({ searchParams }: { searchParams: P
   const cities = [...new Set(s.people.map((p) => p.city).filter(Boolean) as string[])].sort();
   const me = s.person.get(viewerId)!;
   const qs = (extra: Record<string, string>) => new URLSearchParams({ ...Object.fromEntries(Object.entries(sp).filter(([, v]) => v) as [string, string][]), ...extra }).toString();
+  const view = sp.view === 'web' ? 'web' : 'list';
+  const note = (r: { name: string; reason: string }) => `Hi ${r.name.split(' ')[0]}, I'm ${me.name.split(' ')[0]}${me.type === 'student' ? `, a Georgia Tech student (${me.major})` : `, GT class of ${me.grad_year}`}. ${r.reason} I'd love to connect.`;
+  const web = view === 'web' && results.length ? peopleWeb(viewerId, results) : null;
+  const purposeLabel = PURPOSES.find((p) => p.id === purpose)!.label;
   const sel = 'rounded-lg border border-navy/15 bg-white px-2.5 py-2 text-sm text-navy';
 
   return (
@@ -29,7 +34,8 @@ export default async function FindPeoplePage({ searchParams }: { searchParams: P
       <PageHero eyebrow="Find People" title="Find people"
         subtitle="Meet Yellow Jackets who share your interests or have experience you're curious about. You only see people who are open to hearing from you." />
       <div className="mx-auto max-w-6xl space-y-6 px-4 py-8">
-        <form className="card space-y-3 p-4" aria-label="Find people" data-tour="people-search">
+        <form key={JSON.stringify(sp)} className="card space-y-3 p-4" aria-label="Find people" data-tour="people-search">
+          {view === 'web' && <input type="hidden" name="view" value="web" />}
           <div className="flex flex-col gap-2 sm:flex-row">
             <input name="q" defaultValue={sp.q ?? ''} className="input flex-1 text-base" placeholder="Search people, interests, or careers" aria-label="Search people, interests, or careers" />
             <button className="btn-primary px-6">Search</button>
@@ -58,8 +64,20 @@ export default async function FindPeoplePage({ searchParams }: { searchParams: P
           <p className="text-[11px] text-ink/50">Alumni are people who attended Georgia Tech and graduated. Results are fictional demo members.</p>
         </form>
 
-        <p className="text-sm text-ink/60">{results.length ? `${results.length} ${results.length === 1 ? 'person' : 'people'}${sp.q ? ` for “${sp.q}”` : ''}` : ''}</p>
-        {results.length === 0 ? (
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm text-ink/60">{results.length ? `${results.length} ${results.length === 1 ? 'person' : 'people'}${sp.q ? ` for “${sp.q}”` : ''}` : ''}</p>
+          {results.length > 0 && (
+            <div className="flex rounded-lg bg-white p-1 shadow-sm ring-1 ring-navy/10" role="group" aria-label="View">
+              <Link href={`/people?${qs({ view: 'list' })}`} scroll={false} aria-current={view === 'list' ? 'page' : undefined} className={`rounded-md px-3 py-1 text-sm font-semibold ${view === 'list' ? 'bg-navy text-white' : 'text-navy/70'}`} data-testid="view-list">List</Link>
+              <Link href={`/people?${qs({ view: 'web' })}`} scroll={false} aria-current={view === 'web' ? 'page' : undefined} className={`rounded-md px-3 py-1 text-sm font-semibold ${view === 'web' ? 'bg-navy text-white' : 'text-navy/70'}`} data-testid="see-connections">See connections</Link>
+            </div>
+          )}
+        </div>
+        {web ? (
+          <PeopleWeb nodes={web.nodes} edges={web.edges} query={sp.q || 'People for you'} purposeLabel={purposeLabel} defaultPurpose={purpose}
+            people={results.slice(0, 12).map((r) => ({ id: r.id, name: r.name, affiliation: `${r.affiliation}${r.city ? ` · ${r.city}` : ''}`, reason: r.reason, path: web.paths[r.id] ?? null,
+              available: r.available, blockedReason: r.blockedReason, note: note(r), purposes: PURPOSES.map((x) => ({ id: x.id, label: x.label, ...canRequest(viewerId, r.id, x.id) })) }))} />
+        ) : results.length === 0 ? (
           <p className="card p-8 text-center text-sm text-ink/60">No members match those filters. Try removing a filter.</p>
         ) : (
           <ul className="space-y-3" data-testid="people-results" data-purpose={purpose}>
@@ -77,7 +95,7 @@ export default async function FindPeoplePage({ searchParams }: { searchParams: P
                   <div className="flex shrink-0 flex-col items-start gap-2 sm:w-64 sm:items-end">
                     <Link href={`/people/${encodeURIComponent(r.id)}`} className="text-sm font-semibold text-navy underline decoration-gold underline-offset-4" data-testid="view-profile">View profile</Link>
                     {r.available ? <AskToConnect personId={r.id} firstName={r.name.split(' ')[0]} purposes={purposes} defaultPurpose={purpose} compact
-                      suggestedNote={`Hi ${r.name.split(' ')[0]}, I'm ${me.name.split(' ')[0]}${me.type === 'student' ? `, a Georgia Tech student (${me.major})` : `, GT class of ${me.grad_year}`}. ${r.reason} I'd love to connect.`} />
+                      suggestedNote={note(r)} />
                       : <p className="text-xs text-ink/60">{r.blockedReason}</p>}
                   </div>
                 </li>
@@ -85,7 +103,7 @@ export default async function FindPeoplePage({ searchParams }: { searchParams: P
             })}
           </ul>
         )}
-        {results.length > shown.length && <div className="text-center"><Link href={`/people?${qs({ show: String(limit + PAGE) })}`} className="btn-ghost" scroll={false}>Show more</Link></div>}
+        {!web && results.length > shown.length && <div className="text-center"><Link href={`/people?${qs({ show: String(limit + PAGE) })}`} className="btn-ghost" scroll={false}>Show more</Link></div>}
 
         <p className="text-sm text-ink/65">Looking for someone who solved a specific technical problem? <Link href="/stuck" className="font-semibold text-navy underline decoration-gold underline-offset-4">Find technical expertise</Link>. Building a startup? <Link href="/match?mode=people" className="font-semibold text-navy underline decoration-gold underline-offset-4">Find a cofounder or engineer</Link>.</p>
       </div>
