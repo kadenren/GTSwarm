@@ -6,7 +6,7 @@ export interface PathStep { id: string; kind: 'person' | 'project' | 'problem' |
 export interface WarmPath { ids: string[]; steps: PathStep[]; hops: number; text: string }
 
 function stepLabel(s: Snapshot, id: string, viewerId: string): PathStep {
-  if (id === viewerId) return { id, kind: 'person', label: 'You' };
+  if (id === viewerId && id.startsWith('person:')) return { id, kind: 'person', label: 'You' };
   if (id.startsWith('person:')) return { id, kind: 'person', label: s.person.get(id)!.name };
   if (id.startsWith('project:')) {
     const p = s.project.get(id)!;

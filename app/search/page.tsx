@@ -1,11 +1,15 @@
 import SearchClient from '@/components/SearchClient';
 import { viewerContext } from '@/lib/context';
+import { suggestIntros } from '@/lib/graph/circles';
+import { snapshot, personLabel } from '@/lib/data';
 
 export const dynamic = 'force-dynamic';
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
   const { me, projects } = await viewerContext();
+  const s = snapshot();
+  const intros = suggestIntros(me.id).map((i) => ({ ...i, label: personLabel(s.person.get(i.personId)!) }));
   const suggestions =
     me.type === 'student'
       ? [{ q: 'low-power embedded hardware, has shipped a product', role: 'Cofounder', audience: 'both' }]
@@ -21,7 +25,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           <p className="mt-1 text-sm text-ink/70">Search a skill, pick the role you need, and see who in the swarm has actually built it, and how you are connected.</p>
         </div>
       </div>
-      <SearchClient kind="expertise" viewerName={me.name} viewerProjects={projects} suggestions={suggestions}
+      <SearchClient kind="expertise" intros={intros} viewerName={me.name} viewerProjects={projects} suggestions={suggestions}
         initial={{ q: sp.q ?? '', role: sp.role ?? 'Cofounder', audience: sp.aud ?? 'both', log: '' }} />
     </>
   );

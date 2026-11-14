@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import RelevanceWeb, { WebLegend, type WebNode } from './RelevanceWeb';
 import PersonPanel, { type ViewerProject } from './PersonPanel';
 import NetworkWeb from './NetworkWeb';
+import YouShouldMeet, { type IntroView } from './YouShouldMeet';
 import type { SearchResponse } from '@/lib/searchApi';
 
 const ROLES = ['Cofounder', 'Advisor', 'Helper', 'Early engineer', 'First customer'] as const;
@@ -16,13 +17,14 @@ const AUDIENCES = [
 export interface Suggestion { q: string; role?: string; audience?: string; label?: string }
 
 export default function SearchClient({
-  kind, viewerName, viewerProjects, initial, suggestions,
+  kind, viewerName, viewerProjects, initial, suggestions, intros = [],
 }: {
   kind: 'expertise' | 'stuck';
   viewerName: string;
   viewerProjects: ViewerProject[];
   initial: { q: string; role: string; audience: string; log: string };
   suggestions: Suggestion[];
+  intros?: IntroView[];
 }) {
   const router = useRouter();
   const [q, setQ] = useState(initial.q);
@@ -214,6 +216,7 @@ export default function SearchClient({
           )}
         </div>
       )}
+      {data && !loading && intros.length > 0 && <div className="mt-6"><YouShouldMeet intros={intros} /></div>}
       {loading && !data && <div className="mt-6 h-[520px] animate-pulse rounded-xl bg-white/60" aria-label="Loading results" />}
     </div>
   );
