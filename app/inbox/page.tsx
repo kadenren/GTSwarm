@@ -39,7 +39,7 @@ export default async function InboxPage() {
     const statusClass = r.status === 'accepted' ? 'bg-teal-light text-teal' : r.status === 'declined' ? 'bg-navy/5 text-ink/50' : 'bg-gold/20 text-gold-dark';
     const who = other.type === 'alum' ? `Alum, class of ${other.grad_year}` : 'Student';
     return (
-      <li key={r.id} className="card p-5" data-testid={`request-${mode}`}>
+      <li key={r.id} className="card p-5" data-testid={`request-${mode}`} data-status={r.status}>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             <span className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white ${other.type === 'alum' ? 'bg-teal' : 'bg-plum'}`}>{initials(other.name)}</span>

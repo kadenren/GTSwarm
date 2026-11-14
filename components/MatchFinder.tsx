@@ -17,9 +17,11 @@ interface OwnedBuild { id: string; name: string }
 const AUDIENCES = [{ v: 'both', l: 'Both' }, { v: 'students', l: 'Students' }, { v: 'alumni', l: 'Alumni' }] as const;
 const COMPONENTS: Record<string, string> = { E: 'Work matches your request', X: 'Documented experience', T: 'Shared GT ties', R: 'Open to the role', A: 'Availability' };
 const WEIGHT: Record<string, number> = { E: 0.55, X: 0.2, T: 0.1, R: 0.1, A: 0.05 };
+/** One-click examples: each fills the text and sets the role and audience it is about (nothing is searched until you click). */
 const PEOPLE_EXAMPLES = [
-  "I'm building a wearable medical device startup and need an alumni cofounder with embedded hardware or medical-device expertise.",
-  "I'm building an autonomous robotics startup and need a technical cofounder experienced in ROS 2, embedded systems, and navigation.",
+  { label: 'Alumni cofounder for a medical wearable', text: "I'm building a wearable medical device startup and need an alumni cofounder with embedded hardware or medical-device expertise.", role: 'Cofounder', aud: 'alumni' },
+  { label: 'Student firmware engineer', text: 'wearable firmware engineer', role: 'Early engineer', aud: 'students' },
+  { label: 'Robotics technical cofounder', text: "I'm building an autonomous robotics startup and need a technical cofounder experienced in ROS 2, embedded systems, and navigation.", role: 'Cofounder', aud: 'both' },
 ];
 const STARTUP_EXAMPLE = "I'm a computer engineering student interested in embedded systems, wearable devices, and early-stage hardware startups.";
 
@@ -78,10 +80,10 @@ export default function MatchFinder({ initialMode, initialQuery, initialRole, in
               className={`rounded-lg px-5 py-2 text-sm font-semibold transition ${mode === v ? 'bg-navy text-white shadow' : 'text-navy/70 hover:text-navy'}`}>{l}</button>
           ))}
         </div>
-        <form className="mt-4" onSubmit={(e) => { e.preventDefault(); run(); }}>
+        <form className="mt-4" onSubmit={(e) => { e.preventDefault(); run(); }} data-filled={text.trim() ? "true" : "false"}>
           <label htmlFor="match-text" className="label">{mode === 'people' ? 'Who are you looking for?' : 'Your skills, experience and interests'}</label>
           <textarea id="match-text" className="input h-24 text-base" value={text} onChange={(e) => setText(e.target.value)}
-            placeholder={mode === 'people' ? PEOPLE_EXAMPLES[0] : `Leave empty to use your saved profile, or describe yourself: "${STARTUP_EXAMPLE}"`} />
+            placeholder={mode === 'people' ? PEOPLE_EXAMPLES[0].text : `Leave empty to use your saved profile, or describe yourself: "${STARTUP_EXAMPLE}"`} />
           <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-3">
             <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Role">
               <span className="mr-1 text-xs font-semibold uppercase tracking-wide text-ink/50">{mode === 'people' ? 'Role' : 'Role I want'}</span>
@@ -101,14 +103,15 @@ export default function MatchFinder({ initialMode, initialQuery, initialRole, in
             )}
             <button type="submit" className="btn-gold ml-auto px-6" disabled={loading} data-testid="match-submit">{loading ? 'Matching…' : mode === 'people' ? 'Find people' : 'Find startups'}</button>
           </div>
-          {!text && (
-            <div className="mt-3 flex flex-wrap gap-2 text-xs">
-              <span className="text-ink/50">Try:</span>
-              {(mode === 'people' ? PEOPLE_EXAMPLES : [STARTUP_EXAMPLE]).map((ex) => (
-                <button key={ex} type="button" onClick={() => setText(ex)} className="max-w-full truncate rounded-full bg-paper px-3 py-1 text-left text-navy hover:bg-gold/20">{ex}</button>
-              ))}
-            </div>
-          )}
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs" data-tour="match-examples">
+            <span className="text-ink/50">{mode === 'people' ? 'Fill an example:' : 'Or fill an example:'}</span>
+            {mode === 'people'
+              ? PEOPLE_EXAMPLES.map((ex, i) => (
+                <button key={ex.label} type="button" data-testid={`people-example-${i}`} onClick={() => { setText(ex.text); setRole(ex.role); setAudience(ex.aud); setError(''); }}
+                  className={`rounded-full border px-3 py-1 font-medium transition ${text === ex.text ? 'border-gold bg-gold/20 text-navy' : 'border-navy/10 bg-paper text-navy hover:bg-gold/20'}`}>{ex.label}</button>
+              ))
+              : <button type="button" data-testid="startup-example" onClick={() => setText(STARTUP_EXAMPLE)} className={`rounded-full border px-3 py-1 font-medium transition ${text === STARTUP_EXAMPLE ? 'border-gold bg-gold/20 text-navy' : 'border-navy/10 bg-paper text-navy hover:bg-gold/20'}`}>Embedded systems student</button>}
+          </div>
           {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
         </form>
       </div>
@@ -143,7 +146,7 @@ function PeopleResults({ data, viewer, viewerProjects, ownedBuilds }: { data: Se
         </div>
       </div>
       {view === 'cards' ? (
-        <ol className="mt-4 grid gap-4 lg:grid-cols-2" data-testid="people-results">
+        <ol className="mt-4 grid gap-4 lg:grid-cols-2" data-testid="people-results" data-aud={data.audience}>
           {data.results.map((r) => <li key={r.personId}><PersonMatchCard r={r} role={data.role} query={data.query} viewer={viewer} ownedBuilds={ownedBuilds} /></li>)}
         </ol>
       ) : (

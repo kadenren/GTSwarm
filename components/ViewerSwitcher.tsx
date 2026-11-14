@@ -37,7 +37,7 @@ export default function ViewerSwitcher({ viewers, current }: { viewers: readonly
 
   return (
     <div ref={box} className="relative">
-      <button type="button" onClick={() => setOpen((o) => !o)} aria-haspopup="menu" aria-expanded={open} aria-label={`Viewing as ${me.label}. Switch demo persona`}
+      <button type="button" data-tour="persona" onClick={() => setOpen((o) => !o)} aria-haspopup="menu" aria-expanded={open} aria-label={`Viewing as ${me.label}. Switch demo persona`}
         className={`flex items-center gap-2.5 rounded-full border border-white/15 bg-white/5 py-1 pl-1 pr-3 text-left transition hover:border-gold/60 ${open ? 'border-gold/60' : ''} ${pending ? 'opacity-60' : ''}`}>
         <span className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white ring-2 ring-white/20 ${tone(me.sub)}`} aria-hidden="true">{initials(me.label)}</span>
         <span className="hidden flex-col leading-tight sm:flex">
