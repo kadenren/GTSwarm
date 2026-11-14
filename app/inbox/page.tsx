@@ -4,6 +4,7 @@ import { getViewerId } from '@/lib/viewer';
 import { snapshot } from '@/lib/data';
 import { isOwner } from '@/lib/actions';
 import { AcceptDecline, AddToProject } from '@/components/RequestActions';
+import PageHero from '@/components/PageHero';
 
 export const dynamic = 'force-dynamic';
 
@@ -69,9 +70,9 @@ export default async function InboxPage() {
   };
 
   return (
+    <>
+      <PageHero eyebrow="Inbox" title="Requests and introductions" subtitle={`For ${me.name}. Accepting creates a consented connection, nothing more. Joining a project is a separate step.`} />
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-3xl font-bold text-navy">Inbox</h1>
-      <p className="mt-1 text-sm text-ink/70">Requests for {me.name}. Accepting creates a consented connection, nothing more.</p>
       <section className="mt-6">
         <h2 className="label">Received ({received.length})</h2>
         {received.length ? <ul className="space-y-3">{received.map((r) => card(r, 'received'))}</ul> : <p className="card p-6 text-sm text-ink/60">No requests yet.</p>}
@@ -87,5 +88,6 @@ export default async function InboxPage() {
         )}
       </section>
     </div>
+    </>
   );
 }

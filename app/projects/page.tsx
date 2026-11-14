@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { snapshot } from '@/lib/data';
 import { getViewerId } from '@/lib/viewer';
+import PageHero from '@/components/PageHero';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,8 +15,9 @@ export default async function ProjectsPage() {
     byYear.get(p.year)!.push(p);
   }
   return (
+    <>
+      <PageHero eyebrow="The swarm" title="Every project, connected" subtitle={`${s.projects.length} projects from 2011 to 2026, linked by the people who built them and the teams that carried them forward.`} />
     <div className="mx-auto max-w-7xl px-4 py-8">
-      <h1 className="text-3xl font-bold text-navy">Projects</h1>
       <section className="mt-6">
         <h2 className="label">Your projects</h2>
         {mine.length === 0 ? <p className="text-sm text-ink/60">You are not on any projects yet.</p> : (
@@ -52,5 +54,6 @@ export default async function ProjectsPage() {
         </div>
       </section>
     </div>
+    </>
   );
 }

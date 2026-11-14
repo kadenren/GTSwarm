@@ -24,16 +24,17 @@ Open http://localhost:3000.
 - **Offline or blocked model download?** Seeding still succeeds and search runs on the built-in BM25 keyword scorer. The footer shows which mode is active: `semantic (local MiniLM embeddings + BM25)` or `keyword (BM25 fallback)`. Re-run `npm run seed` with internet to switch to semantic mode.
 - `npm test` runs the acceptance tests (against a throwaway copy of the seed database).
 - `npm run build` is a production build with type checking.
-- Optional: put `ANTHROPIC_API_KEY=...` in `.env.local` to turn on two AI helpers. Without a key, both fall back to deterministic code, and nothing in the core demo calls an API.
-  - **Add project:** Claude extracts the fields from a pasted abstract (otherwise a keyword extractor does).
+- Optional: put `ANTHROPIC_API_KEY=...` in `.env.local` to turn on the AI helpers. Without a key, each falls back to deterministic code, and nothing in the core demo calls an API.
+  - **Scout (I'm stuck):** Claude plans and runs searches over the GT Swarm network. A "live web" checkbox appears that also searches the public web for Georgia Tech alumni (off by default, so the demo never searches on the spot). Without a key, a deterministic scout reads the request, infers the role and audience, and searches the network.
+  - **Add project:** Claude fills in the fields from a description, uploaded files (PDF, Word, text, Markdown) and links (GitHub links import the README). Without a key, a keyword extractor does.
   - **Polished wording:** in a person's panel, Claude rephrases the fact-built connection description. The rewrite is fact-checked against the original (no new names, numbers or terms, no gendered pronouns) and cached, and the cache survives `/demo/reset`. To pre-warm it for the demo, open each hero's panel once before presenting.
 
 ## Demo script (about 5 minutes)
 
-Before you start, open **http://localhost:3000/demo/reset** to restore the seeded state.
+Before you start, open **http://localhost:3000/demo/reset** to restore the seeded state. The gold **Demo guide** button (bottom right) walks through every step below with one click each, switching the viewer for you, and has its own **Reset data** button.
 
 1. **Viewing as: Leo Martinez (PulseBand student).** Go to **Find expertise**, choose **Cofounder**, search `low-power embedded hardware, has shipped a product` (or click the suggestion). Dana Whitfield sits on the inner ring with the gold line. Hover to see her one-line connection, click to read the full description, the score breakdown and the warm path. Click **Request Cofounder conversation**, then **Send request**.
-2. **I'm stuck:** search `Bluetooth drops when the sensor sleeps`. Marcus Reyes is on the inner ring; his panel leads with his solved problem and the fix.
+2. **I'm stuck → Search solved problems:** search `Bluetooth drops when the sensor sleeps`. Marcus Reyes is on the inner ring; his panel leads with his solved problem and the fix. Then switch to **Ask the scout** and type a need in plain words (for example `We need an advisor who has been through FDA clearance for a wearable`): it shows each search step and returns people with evidence.
 3. **My projects → PulseBand → Log progress:** add the solved problem `Bluetooth drops when the sensor sleeps`, a short solution, and **Marcus Reyes** as helper. It appears on the build record, and searching it in I'm stuck now finds it.
 4. **Switch to Elena Brooks (alum founder).** Find expertise, **Advisor**, `FDA approval for a wearable medical device`. Priya Natarajan is rank 1 (alum to alum), and **You should meet** below suggests Priya, from the same circle, through Hannah Lee.
 5. **As Elena:** **Early engineer**, **Students**, `wearable firmware`. Maya Okafor, Jordan Kim and Sofia Alvarez fill the inner ring (alum to student).
@@ -41,6 +42,10 @@ Before you start, open **http://localhost:3000/demo/reset** to restore the seede
 7. **Network:** the gold path from PulseBand to Dana (continued from Wearable Sensing 2017). Drag the year slider to watch the swarm grow.
 
 Extras: **Expand** in a person's panel re-centers the web on their network; **Circles** shows auto-detected communities; startup project pages have a **Team builder**; **Add project** turns an abstract into a project that animates into the swarm.
+
+## About the data
+
+People in the demo are fictional on purpose: the app attributes availability, roles and connections to people, so those must be stated by the people themselves. In a real rollout, data comes in with consent: builders claim their profile and add their own projects through **Add project** (write-ups, reports, posters, READMEs). The live web search in the scout only reads public pages and only reports leads backed by a cited source.
 
 ## How it works
 

@@ -11,6 +11,8 @@ const STEPS: Step[] = [
     show: 'Dana lands on the inner ring with the gold line. Hover her, open her panel, read the warm path, send the request.' },
   { title: 'Get unstuck on a bug', as: LEO, url: '/stuck?q=Bluetooth+drops+when+the+sensor+sleeps',
     show: 'Marcus is on the inner ring. His panel leads with the exact problem he solved and the fix.' },
+  { title: 'Ask the scout in plain words', as: LEO, url: '/stuck?scout=We+need+an+advisor+who+has+been+through+FDA+clearance+for+a+wearable',
+    show: 'The scout reads the request (an advisor, regulatory), searches the indexed network step by step, and returns Priya with the matching solved problem.' },
   { title: 'Grow the swarm as you build', as: LEO, url: '/projects/project%3Apr004',
     show: 'Log progress: add the solved problem with Marcus as helper. It joins the build record and becomes searchable.' },
   { title: 'Alum to alum: FDA advisor', as: ELENA, url: '/search?q=FDA+approval+for+a+wearable+medical+device&role=Advisor&aud=both',
@@ -66,7 +68,7 @@ export default function DemoGuide({ current }: { current: string }) {
           <div className="flex items-center justify-between bg-navy px-4 py-3 text-white">
             <div>
               <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold">Demo guide</div>
-              <div className="font-display text-base font-bold">8 steps, about 5 minutes</div>
+              <div className="font-display text-base font-bold">9 steps, about 6 minutes</div>
             </div>
             <button onClick={reset} disabled={busy === 'reset'} className="rounded-md border border-white/25 px-2.5 py-1 text-xs font-semibold hover:border-gold hover:text-gold">
               {busy === 'reset' ? 'Resetting…' : 'Reset data'}

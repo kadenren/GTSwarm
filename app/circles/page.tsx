@@ -3,6 +3,7 @@ import { detectCircles, circleOf, suggestIntros } from '@/lib/graph/circles';
 import { snapshot, personLabel } from '@/lib/data';
 import { getViewerId } from '@/lib/viewer';
 import YouShouldMeet from '@/components/YouShouldMeet';
+import PageHero from '@/components/PageHero';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,12 +14,10 @@ export default async function CirclesPage() {
   const mine = circleOf(viewerId);
   const intros = suggestIntros(viewerId).map((i) => ({ ...i, label: personLabel(s.person.get(i.personId)!) }));
   return (
+    <>
+      <PageHero eyebrow="Circles" title="Communities that formed on their own" subtitle="Detected with Louvain community detection on the graph of people, projects and skills. Nobody signs up for a circle; it emerges from what people built together." />
     <div className="mx-auto max-w-7xl px-4 py-8">
-      <h1 className="text-3xl font-bold text-navy">Circles</h1>
-      <p className="mt-1 max-w-3xl text-sm text-ink/70">
-        Communities detected automatically with Louvain community detection on the graph of people, projects and skills. Nobody signs up for a circle; it emerges from what people built together.
-      </p>
-      <div className="mt-6"><YouShouldMeet intros={intros} title={`You should meet${mine ? ` (from ${mine.name})` : ''}`} /></div>
+      <div><YouShouldMeet intros={intros} title={`You should meet${mine ? ` (from ${mine.name})` : ''}`} /></div>
       <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {circles.map((c) => {
           const alumni = c.people.filter((p) => s.person.get(p)!.type === 'alum').length;
@@ -41,5 +40,6 @@ export default async function CirclesPage() {
         })}
       </ul>
     </div>
+    </>
   );
 }
