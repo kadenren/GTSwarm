@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import type { ScoutEvent, ScoutPerson, ScoutProblem, ScoutReport } from '@/lib/scout';
+import EvidenceToProblem from './EvidenceToProblem';
 
 const EXAMPLES = [
   'Bluetooth keeps dropping when our wearable sensor goes to sleep',
@@ -20,7 +21,7 @@ function StepIcon({ kind }: { kind: Step['kind'] }) {
   return <span className={`${base} bg-plum-light text-plum`}><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 7h10M7 2v10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg></span>;
 }
 
-export default function ScoutPanel({ webAvailable, initialNeed = '' }: { webAvailable: boolean; initialNeed?: string }) {
+export default function ScoutPanel({ webAvailable, initialNeed = '', evidenceAi = false }: { webAvailable: boolean; initialNeed?: string; evidenceAi?: boolean }) {
   const [need, setNeed] = useState(initialNeed);
   const [web, setWeb] = useState(false);
   const [running, setRunning] = useState(false);
@@ -90,6 +91,7 @@ export default function ScoutPanel({ webAvailable, initialNeed = '' }: { webAvai
         <textarea id="scout-need" value={need} onChange={(e) => setNeed(e.target.value)} rows={3}
           placeholder="Our wearable loses its Bluetooth connection whenever the sensor sleeps. Who has fixed this before?"
           className="input resize-y text-base" />
+        <div className="mt-2"><EvidenceToProblem aiEnabled={evidenceAi} onProblem={(t) => setNeed(t)} /></div>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap gap-2 text-xs">
             {EXAMPLES.map((x) => (

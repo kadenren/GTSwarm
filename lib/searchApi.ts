@@ -1,6 +1,7 @@
 import { rankForExpertise, rankForProblem } from './graph/rank';
 import { edgesAmong } from './graph/edges';
 import { snapshot, ROLES, type Audience, type Role } from './data';
+import { linksOf } from './profile';
 
 export interface SearchRequest { kind: 'expertise' | 'stuck'; query: string; role?: Role; audience?: Audience; log?: string }
 
@@ -18,6 +19,7 @@ export async function runSearch(viewerId: string, req: SearchRequest) {
       .sort((a, b) => b.p.year - a.p.year)
       .map(({ p, role, title }) => ({ id: p.id, name: p.name, year: p.year, team: p.team_name, teamType: p.team_type, role, title, outcome: p.outcome })),
     solved: (s.problemsBy.get(r.personId) ?? []).slice(0, 4).map((pb) => ({ id: pb.id, description: pb.description })),
+    links: linksOf(r.personId),
   }));
   return {
     kind: req.kind,

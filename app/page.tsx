@@ -33,6 +33,7 @@ export default function Home() {
               GT Swarm maps every capstone, VIP team, CREATE-X startup, lab and club into one graph of people, projects and solved problems, so you can find the right Yellow Jacket at every step of building.
             </p>
             <div className="mt-8 max-w-xl"><HomeSearch /></div>
+            <p className="mt-4 text-sm text-white/70">GT alum or student? <Link href="/join" className="font-semibold text-gold underline decoration-gold/50 underline-offset-4 hover:text-gold-light">Add yourself to the swarm in two minutes →</Link></p>
             <dl className="mt-8 flex flex-wrap gap-x-8 gap-y-3">
               {[[st.projects, 'projects mapped'], [st.claimed, 'builders'], [st.problems, 'solved problems'], [st.lineages, 'project handoffs']].map(([n, l]) => (
                 <div key={l as string}>

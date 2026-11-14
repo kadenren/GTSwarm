@@ -1,0 +1,19 @@
+*** Booting Zephyr OS build v3.6.0 ***
+[00:00:00.004] <inf> hydraband: HydraBand fw 0.9.3 starting on nRF52840
+[00:00:00.118] <inf> bt_hci_core: HW Platform: Nordic Semiconductor (0x0002)
+[00:00:00.121] <inf> bt_hci_core: Identity: D4:7A:21:0C:9E:13 (random)
+[00:00:00.402] <inf> hydraband: Advertising started
+[00:00:05.731] <inf> bt_conn: Connected: 6B:2F:91:44:AA:10 (random), interval 30 ms
+[00:00:35.733] <inf> sensors: sweat=41.2 uS, hr=96 bpm, notify ok
+[00:01:05.734] <inf> sensors: sweat=42.0 uS, hr=101 bpm, notify ok
+[00:01:06.002] <inf> pm: Entering PM_STATE_SUSPEND_TO_IDLE (system off between samples)
+[00:01:06.002] <dbg> clock_control: LFCLK stop requested
+[00:01:12.310] <wrn> bt_conn: Disconnected: 6B:2F:91:44:AA:10 (reason 0x08, supervision timeout)
+[00:01:12.311] <err> hydraband: BLE link lost while sensor was asleep
+[00:01:35.736] <inf> pm: Exiting PM_STATE_SUSPEND_TO_IDLE
+[00:01:35.740] <err> sensors: notify failed (-128, not connected), buffering 1 sample
+[00:01:36.120] <inf> hydraband: Advertising restarted
+[00:01:41.877] <inf> bt_conn: Connected: 6B:2F:91:44:AA:10 (random), interval 30 ms
+[00:02:11.902] <inf> pm: Entering PM_STATE_SUSPEND_TO_IDLE (system off between samples)
+[00:02:18.215] <wrn> bt_conn: Disconnected: 6B:2F:91:44:AA:10 (reason 0x08, supervision timeout)
+[00:02:18.216] <err> hydraband: BLE link lost while sensor was asleep

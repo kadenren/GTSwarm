@@ -2,6 +2,7 @@ import { handle } from '@/lib/api';
 import { extractProject } from '@/lib/extract';
 import { textFromFile, textFromLink, type SourceInfo } from '@/lib/ingest';
 import { ActionError } from '@/lib/actions';
+import { geminiEnabled, mediaFor, isImageName, type MediaPart } from '@/lib/gemini';
 
 export const maxDuration = 60;
 
@@ -28,9 +29,19 @@ export async function POST(req: Request) {
       parts.push(description.trim());
       sources.push({ name: 'Your description', kind: 'description', chars: description.trim().length, ok: true });
     }
+    const media: MediaPart[] = [];
+    const gemini = geminiEnabled();
     for (const f of files) {
-      const { text, info } = await textFromFile(f.name, Buffer.from(await f.arrayBuffer()));
-      sources.push(info);
+      const buf = Buffer.from(await f.arrayBuffer());
+      // Gemini reads photos and PDFs directly (posters, scanned reports, slides)
+      const m = gemini ? mediaFor(f.name, buf) : null;
+      if (m) media.push(m);
+      if (isImageName(f.name)) {
+        sources.push({ name: f.name, kind: 'text', chars: 0, ok: !!m, note: m ? 'photo, read by Gemini' : 'Reading photos needs GEMINI_API_KEY' });
+        continue;
+      }
+      const { text, info } = await textFromFile(f.name, buf);
+      sources.push(m ? { ...info, ok: true, note: [info.note, 'also read visually by Gemini'].filter(Boolean).join(', ') } : info);
       if (text) parts.push(`From ${f.name}:\n${text}`);
     }
     const savedLinks: { url: string; title: string }[] = [];
@@ -41,8 +52,11 @@ export async function POST(req: Request) {
       if (text) parts.push(`From ${title}:\n${text}`);
     }
     const combined = parts.join('\n\n');
-    if (combined.trim().length < 40) throw new ActionError(sources.some((s) => !s.ok) ? 'Could not read enough text from what you added. Add a short description too.' : 'Add a few sentences, a file or a link.');
-    const out = await extractProject(combined);
+    if (combined.trim().length < 40 && !media.length && files.some((f) => isImageName(f.name))) {
+      throw new ActionError('Reading a poster photo needs a GEMINI_API_KEY. Add the report PDF, README or a short description instead.');
+    }
+    if (combined.trim().length < 40 && !media.length) throw new ActionError(sources.some((s) => !s.ok) ? 'Could not read enough text from what you added. Add a short description too.' : 'Add a few sentences, a file or a link.');
+    const out = await extractProject(combined, media);
     return { ...out, sources, links: savedLinks };
   });
 }

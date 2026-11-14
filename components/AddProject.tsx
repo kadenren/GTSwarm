@@ -21,7 +21,7 @@ export default function AddProject({ aiEnabled }: { aiEnabled: boolean }) {
   const [sources, setSources] = useState<SourceInfo[]>([]);
   const [links, setLinks] = useState<{ url: string; title: string }[]>([]);
   const [draft, setDraft] = useState<Draft | null>(null);
-  const [source, setSource] = useState<'ai' | 'keyword' | null>(null);
+  const [source, setSource] = useState<'gemini' | 'claude' | 'keyword' | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [saved, setSaved] = useState<Saved | null>(null);
@@ -65,7 +65,7 @@ export default function AddProject({ aiEnabled }: { aiEnabled: boolean }) {
     <div className="grid gap-6 lg:grid-cols-2">
       <section className="card p-5">
         <h2 className="text-lg font-bold text-navy">1. Tell us about it</h2>
-        <p className="text-xs text-ink/60">Any mix of a description, files and links. {aiEnabled ? 'Claude reads them and fills in the fields; you confirm.' : 'GT Swarm reads them and fills in the fields; you confirm.'}</p>
+        <p className="text-xs text-ink/60">Any mix of a description, files and links. {aiEnabled ? 'Gemini reads them, including photos and scanned PDFs, and fills in the fields. You confirm before anything is saved.' : 'GT Swarm reads them and fills in the fields. You confirm before anything is saved.'}</p>
         <label className="mt-4 block">
           <span className="label">Description</span>
           <textarea className="input h-36" value={abstract} onChange={(e) => setAbstract(e.target.value)} placeholder="What you built, for whom, with what, and what problems you solved along the way" />
@@ -81,9 +81,9 @@ export default function AddProject({ aiEnabled }: { aiEnabled: boolean }) {
             role="button" tabIndex={0} aria-label="Add files"
             className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-6 text-center transition ${dragging ? 'border-gold bg-gold/10' : 'border-navy/20 hover:border-navy/40'}`}>
             <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><path d="M14 18V6M9 11l5-5 5 5" stroke="#003057" strokeWidth="2" fill="none" strokeLinecap="round" /><path d="M5 18v4h18v-4" stroke="#B3A369" strokeWidth="2" fill="none" strokeLinecap="round" /></svg>
-            <span className="mt-1 text-sm font-medium text-navy">Drop a report, poster or slides here, or click to browse</span>
-            <span className="text-xs text-ink/50">PDF, Word (.docx), text or Markdown, up to 8 MB each</span>
-            <input ref={fileInput} type="file" multiple accept=".pdf,.docx,.txt,.md,.markdown" className="hidden" onChange={(e) => { addFiles(e.target.files); e.target.value = ''; }} />
+            <span className="mt-1 text-sm font-medium text-navy">Drop a report, slides or a photo of your poster here, or click to browse</span>
+            <span className="text-xs text-ink/50">PDF, Word, text, Markdown or a photo (JPG, PNG, HEIC), up to 8 MB each</span>
+            <input ref={fileInput} type="file" multiple accept=".pdf,.docx,.txt,.md,.markdown,.png,.jpg,.jpeg,.webp,.heic" className="hidden" onChange={(e) => { addFiles(e.target.files); e.target.value = ''; }} />
           </div>
           {files.length > 0 && (
             <ul className="mt-2 flex flex-wrap gap-2">
@@ -124,7 +124,7 @@ export default function AddProject({ aiEnabled }: { aiEnabled: boolean }) {
       <section className="card p-5">
         <div className="flex items-baseline justify-between">
           <h2 className="text-lg font-bold text-navy">2. Confirm the details</h2>
-          {source && <span className="text-[11px] text-ink/50">{source === 'ai' ? 'Filled in by Claude from your sources' : 'Filled in by GT Swarm from your sources'}</span>}
+          {source && <span className="text-[11px] text-ink/50">{source === 'gemini' ? 'Filled in by Gemini from your sources' : source === 'claude' ? 'Filled in by Claude from your sources' : 'Filled in by GT Swarm keyword rules'}</span>}
         </div>
         {!draft ? <p className="mt-3 text-sm text-ink/60">Extracted fields appear here for you to check and edit.</p> : (
           <div className="mt-3 space-y-3">

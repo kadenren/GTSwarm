@@ -5,7 +5,7 @@ import Wordmark from '@/components/Wordmark';
 import ViewerSwitcher from '@/components/ViewerSwitcher';
 import NavLinks from '@/components/NavLinks';
 import DemoGuide from '@/components/DemoGuide';
-import { VIEWERS, getViewerId } from '@/lib/viewer';
+import { getViewerId, viewerOptions } from '@/lib/viewer';
 import { getDb } from '@/lib/db';
 import { currentSearchMode } from '@/lib/search';
 
@@ -28,6 +28,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     { href: '/impact', label: 'Impact' },
     { href: '/add', label: 'Add' },
     { href: '/inbox', label: 'Inbox', badge: pending },
+    { href: '/profile', label: 'Profile' },
   ];
   return (
     <html lang="en">
@@ -40,7 +41,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </Link>
             <NavLinks links={links} />
             <div className="ml-auto">
-              <ViewerSwitcher viewers={VIEWERS} current={viewerId} />
+              <ViewerSwitcher viewers={viewerOptions(viewerId)} current={viewerId} />
             </div>
           </div>
         </header>

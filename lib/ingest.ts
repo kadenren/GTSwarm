@@ -66,3 +66,24 @@ export async function textFromLink(url: string): Promise<{ text: string; title: 
     return { text: '', title: url, info: { name: url, kind: 'link', chars: 0, ok: false, note: `Could not fetch (${e instanceof Error ? e.message : 'error'}); the link is still saved` } };
   }
 }
+
+export interface RepoInfo { name: string; description: string; year: number; language: string | null; url: string; stars: number }
+
+/** Public repositories for a GitHub profile URL or username (GitHub's public REST API, no token). */
+export async function githubRepos(profile: string): Promise<{ user: string | null; repos: RepoInfo[]; info: SourceInfo }> {
+  const user = profile.trim().replace(/^https?:\/\/(www\.)?github\.com\//i, '').replace(/^@/, '').split(/[/?#]/)[0];
+  if (!/^[a-z\d](?:[a-z\d-]{0,38})$/i.test(user)) return { user: null, repos: [], info: { name: profile, kind: 'link', chars: 0, ok: false, note: 'Not a GitHub username or profile URL' } };
+  try {
+    const res = await fetch(`https://api.github.com/users/${user}/repos?sort=pushed&per_page=12&type=owner`, {
+      signal: AbortSignal.timeout(6000), headers: { accept: 'application/vnd.github+json', 'user-agent': 'GT-Swarm/0.1 (profile import)' },
+    });
+    if (!res.ok) throw new Error(res.status === 404 ? 'user not found' : `HTTP ${res.status}`);
+    const data = (await res.json()) as { name: string; description: string | null; created_at: string; language: string | null; html_url: string; fork: boolean; stargazers_count: number }[];
+    const repos = data.filter((r) => !r.fork).slice(0, 8).map((r) => ({
+      name: r.name, description: r.description ?? '', year: new Date(r.created_at).getFullYear(), language: r.language, url: r.html_url, stars: r.stargazers_count,
+    }));
+    return { user, repos, info: { name: `GitHub: ${user}`, kind: 'link', chars: repos.length, ok: true, note: `${repos.length} public ${repos.length === 1 ? 'repository' : 'repositories'}` } };
+  } catch (e) {
+    return { user, repos: [], info: { name: `GitHub: ${user}`, kind: 'link', chars: 0, ok: false, note: `Could not reach GitHub (${e instanceof Error ? e.message : 'error'}); the link is still saved` } };
+  }
+}

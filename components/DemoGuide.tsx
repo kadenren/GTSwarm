@@ -21,6 +21,10 @@ const STEPS: Step[] = [
     show: 'The three students with wearable firmware build records fill the inner ring.' },
   { title: 'Consent, then connect', as: DANA, url: '/inbox',
     show: 'Accept Leo’s request. Accepting only creates a connection. Then switch to Leo and click Add to project as Cofounder.' },
+  { title: 'Map a new project from files', as: LEO, url: '/add',
+    show: 'Drop demo-files/1-HydraBand-capstone-report.pdf (and the poster photo if Gemini is on). Review the filled-in fields, then Add to the swarm.' },
+  { title: 'An alum joins in two minutes', as: LEO, url: '/join',
+    show: 'Type Rachel Bianchi, drop demo-files/4-resume-Rachel-Bianchi-alum.pdf, pick Advisor and Helper, create. Then search BLE sleep firmware (Advisor, Alumni): Rachel is rank 1.' },
   { title: 'See the whole swarm', as: LEO, url: '/graph',
     show: 'The gold path runs PulseBand → Wearable Sensing (2017) → Dana. Drag the year slider to watch the swarm grow.' },
   { title: 'Show the impact', as: LEO, url: '/impact',
@@ -68,7 +72,7 @@ export default function DemoGuide({ current }: { current: string }) {
           <div className="flex items-center justify-between bg-navy px-4 py-3 text-white">
             <div>
               <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold">Demo guide</div>
-              <div className="font-display text-base font-bold">9 steps, about 6 minutes</div>
+              <div className="font-display text-base font-bold">11 steps, about 8 minutes</div>
             </div>
             <button onClick={reset} disabled={busy === 'reset'} className="rounded-md border border-white/25 px-2.5 py-1 text-xs font-semibold hover:border-gold hover:text-gold">
               {busy === 'reset' ? 'Resetting…' : 'Reset data'}

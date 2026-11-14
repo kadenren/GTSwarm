@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { snapshot } from './data';
+import { geminiJson, geminiEnabled, type MediaPart } from './gemini';
 
 /**
  * Turn a pasted project abstract into structured fields for confirmation.
@@ -16,6 +17,12 @@ export interface Extracted {
   problems: { description: string; solution: string }[];
 }
 export const TEAM_TYPES: Extracted['team_type'][] = ['VIP', 'Capstone', 'CREATE-X', 'Lab', 'Club', 'Invention Studio', 'Startup'];
+
+const GEMINI_SYSTEM =
+  'You extract Georgia Tech student project records from project write-ups, reports, slides and photos of posters. ' +
+  'Use only facts stated in the sources; never invent names, years or results. If a poster photo is attached, read its text. ' +
+  'List only problems the sources say were solved, each with its stated solution. If the year is not stated, use the current year. ' +
+  'team_name is the course, VIP team, lab, club or company as written, or empty.';
 
 const SCHEMA = {
   type: 'object',
@@ -35,8 +42,20 @@ const SCHEMA = {
   },
 } as const;
 
-export async function extractProject(abstract: string): Promise<{ data: Extracted; source: 'ai' | 'keyword' }> {
-  const text = abstract.trim().slice(0, 8000);
+export type ExtractSource = 'gemini' | 'claude' | 'keyword';
+
+export async function extractProject(abstract: string, media: MediaPart[] = []): Promise<{ data: Extracted; source: ExtractSource }> {
+  const text = abstract.trim().slice(0, 30000);
+  if (geminiEnabled()) {
+    const parsed = await geminiJson<Extracted>({
+      system: GEMINI_SYSTEM,
+      text: text ? `Project sources:
+${text}` : 'Read the attached files.',
+      media,
+      schema: SCHEMA,
+    });
+    if (parsed) return { data: normalize(parsed, text || parsed.summary || ''), source: 'gemini' };
+  }
   if (process.env.ANTHROPIC_API_KEY) {
     try {
       const client = new Anthropic({ timeout: 20_000, maxRetries: 1 });
@@ -55,7 +74,7 @@ export async function extractProject(abstract: string): Promise<{ data: Extracte
         const block = response.content.find((b) => b.type === 'text');
         if (block && block.type === 'text') {
           const parsed = JSON.parse(block.text) as Extracted;
-          return { data: normalize(parsed, text), source: 'ai' };
+          return { data: normalize(parsed, text), source: 'claude' };
         }
       }
     } catch (e) {
@@ -82,8 +101,9 @@ function normalize(x: Extracted, text: string): Extracted {
 const sentences = (t: string) => t.replace(/\s+/g, ' ').split(/(?<=[.!?])\s+/).map((x) => x.trim()).filter(Boolean);
 
 /** Deterministic extractor: regexes for year and team type, the swarm's own skill list for technologies. */
-export function keywordExtract(text: string): Extracted {
+export function keywordExtract(raw: string): Extracted {
   const s = snapshot();
+  const text = raw.replace(/^From [^\n]{1,120}:\n/gm, ''); // drop the per-file labels added when combining sources
   const sents = sentences(text);
   const lower = text.toLowerCase();
   const yearMatch = text.match(/\b(20[0-3]\d)\b/);
@@ -101,17 +121,33 @@ export function keywordExtract(text: string): Extracted {
   const technologies = s.skills
     .map((k) => k.name)
     .filter((n) => n.length > 2 && new RegExp(`(^|[^a-z0-9])${n.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^a-z0-9]|$)`).test(lower))
+    // drop a skill that appears as a whole word inside a longer matched skill ("React" inside "React Native")
+    .filter((n, _i, all) => !all.some((m) => m !== n && new RegExp(`(^|\\s)${n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\s|$)`, 'i').test(m)))
     .slice(0, 10);
   const problems: Extracted['problems'] = [];
-  for (let i = 0; i < sents.length; i++) {
-    const t = sents[i];
-    if (!/(problem|issue|challenge|struggl|fail|drop|noise|drift|overheat|crash|unstable|broke|couldn't|could not)/i.test(t)) continue;
-    const sol = t.match(/(?:,|;)?\s*(?:so we|we fixed (?:it|this) by|fixed by|solved (?:it |this )?by|which we solved by|we solved (?:it|this) by)\s+(.+)$/i);
-    const next = sents[i + 1];
-    const description = (sol ? t.slice(0, sol.index) : t).replace(/^(the )?(main |biggest |key )?(problem|issue|challenge) (was|is) (that )?/i, '').replace(/[.,;]$/, '');
-    const solution = sol?.[1] ?? (next && /(fix|solv|switch|added|replac|redesign|moved|used|implemented)/i.test(next) ? next : '');
-    if (description.length > 8 && solution) problems.push({ description: description.charAt(0).toUpperCase() + description.slice(1), solution });
-    if (problems.length >= 3) break;
+  const SOL = /(?:,|;)?\s*(?:so we (?:fixed|solved) (?:it|this) by|we (?:fixed|solved) (?:it|this) by|which we (?:fixed|solved) by|(?:fixed|solved) (?:it |this )?by|so we)\s+(.+)$/i;
+  const TRIGGER = /(problem|issue|challenge|struggl|fail|drop|noise|drift|overheat|crash|unstable|broke|couldn't|could not)/i;
+  const tidy = (t: string) => t
+    .replace(/^.*?\b(the (main |biggest |key )?(problem|issue|challenge) (was|is) (that )?)/i, '') // drop headings merged into the sentence
+    .replace(/^.*?\b(another (issue|problem) was that )/i, '')
+    .replace(/^(we also |also,? )/i, '')
+    .replace(/^(we )?(also )?struggled with /i, '')
+    .replace(/[.,;]$/, '').trim();
+  // first pass: sentences that state the fix explicitly; second pass: a problem followed by a fix sentence
+  for (const pass of [1, 2]) {
+    for (let i = 0; i < sents.length && problems.length < 3; i++) {
+      const t = sents[i];
+      if (!TRIGGER.test(t)) continue;
+      const sol = t.match(SOL);
+      if ((pass === 1) !== !!sol) continue;
+      const next = sents[i + 1];
+      const description = tidy(sol ? t.slice(0, sol.index) : t);
+      const solution = sol?.[1] ?? (next && /^(we |so we |to fix|the fix)/i.test(next) && /(fix|solv|switch|added|replac|redesign|moved|implemented)/i.test(next) ? next : '');
+      if (description.length > 8 && solution && !problems.some((p) => p.description.toLowerCase() === description.toLowerCase())) {
+        const fix = solution.replace(/\.$/, '');
+        problems.push({ description: description.charAt(0).toUpperCase() + description.slice(1), solution: fix.charAt(0).toUpperCase() + fix.slice(1) });
+      }
+    }
   }
   return {
     name: named ?? sents[0]?.split(/[,.]/)[0]?.split(' ').slice(0, 5).join(' ') ?? 'New project',

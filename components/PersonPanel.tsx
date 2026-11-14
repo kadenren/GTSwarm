@@ -80,6 +80,11 @@ export default function PersonPanel({
             {isAlum ? `Alum, ${result.major} '${String(result.gradYear).slice(2)}` : `Student, ${result.major}, class of ${result.gradYear}`}
             {result.currentRole && isAlum ? ` · ${result.currentRole}` : ''}
           </p>
+          {result.links.length > 0 && (
+            <p className="mt-1 flex flex-wrap gap-2 text-[11px]">
+              {result.links.map((l) => <a key={l.kind} href={l.url} target="_blank" rel="noreferrer" className="font-medium text-navy underline decoration-gold underline-offset-2">{({ linkedin: 'LinkedIn', github: 'GitHub', scholar: 'Scholar', website: 'Website' } as Record<string, string>)[l.kind] ?? l.kind}</a>)}
+            </p>
+          )}
           <p className="mt-1 text-xs font-semibold text-gold-dark">
             Rank {result.rank} · {result.ring === 1 ? 'inner ring' : result.ring === 2 ? 'middle ring' : 'outer ring'} · score {result.score.toFixed(2)}
           </p>
