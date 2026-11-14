@@ -68,7 +68,7 @@ export function describeFromEvidence({ s, person, viewerId, query, role, lead, e
     const ln = lineageNote(pr.id);
     if (ln) sentences.push(ln);
   } else {
-    short = person.current_role ?? `${person.major} ${person.type}`;
+    short = person.type === 'alum' ? person.current_role ?? `${person.major} alum` : `${person.major} student, class of ${person.grad_year}`;
     sentences.push(`${name}'s profile: ${lowerFirst(stripDot(person.bio.split('. ')[0]))}.`);
   }
 

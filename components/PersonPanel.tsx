@@ -26,7 +26,7 @@ export default function PersonPanel({
     const proj = viewerProjects.find((p) => p.id === projectId);
     return kind === 'stuck'
       ? `Hi ${first}, I'm ${viewerName.split(' ')[0]}${proj ? ` from ${proj.name}` : ''}. I'm stuck on "${query}". I saw you solved "${result.matchedProblem?.description ?? 'something similar'}". Could you spare 15 minutes?`
-      : `Hi ${first}, I'm ${viewerName.split(' ')[0]}${proj ? ` from ${proj.name}` : ''}. We're looking for ${role === 'Advisor' || role === 'Early engineer' ? 'an' : 'a'} ${role?.toLowerCase()} with experience in ${query}. Would you be open to a short conversation?`;
+      : `Hi ${first}, I'm ${viewerName.split(' ')[0]}${proj ? ` from ${proj.name}` : ''}. We're looking for ${role === 'Advisor' || role === 'Early engineer' ? 'an' : 'a'} ${role?.toLowerCase()} ("${query}") and your work stood out. Would you be open to a short conversation?`;
   };
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<{ ok: boolean; text: string } | null>(null);
