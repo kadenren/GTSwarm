@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "gt-swarm",
+      "runtimeExecutable": "C:/Users/kaden/AppData/Local/Programs/node-v22.23.5-win-x64/node.exe",
+      "runtimeArgs": ["node_modules/next/dist/bin/next", "dev", "-p", "3000"],
+      "port": 3000
+    }
+  ]
+}
