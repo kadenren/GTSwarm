@@ -23,6 +23,11 @@ export function impactStats() {
   const overTime = [...quarters].sort((a, b) => a[0].localeCompare(b[0])).map(([period, count]) => ({ period, count, cumulative: (running += count) }));
   const db = getDb();
   const accepted = (db.prepare("SELECT COUNT(*) n FROM requests WHERE status = 'accepted'").get() as { n: number }).n;
+  const helpAsks = (db.prepare("SELECT COUNT(*) n FROM requests WHERE kind = 'stuck'").get() as { n: number }).n;
+  const alumni = s.people.filter((p) => p.type === 'alum' && p.claimed);
+  const alumniOpen = alumni.filter((p) => p.open_to.some((r) => r === 'Advisor' || r === 'Helper')).length;
+  const solvers = new Set(s.problems.map((p) => p.solved_by));
+  const alumniSolvers = alumni.filter((p) => solvers.has(p.id)).length;
   const recentMilestones = db.prepare('SELECT m.title, m.date, m.confirmed_by, p.id pid, p.name FROM milestones m JOIN projects p ON p.id = m.project_id ORDER BY m.date DESC LIMIT 6').all() as { title: string; date: string; confirmed_by: string | null; pid: string; name: string }[];
   const outcomes = s.projects.filter((p) => p.outcome).sort((a, b) => b.year - a.year).slice(0, 6).map((p) => ({ id: p.id, name: p.name, year: p.year, outcome: p.outcome!, team: p.team_name }));
   return {
@@ -33,6 +38,10 @@ export function impactStats() {
     lineages: s.projects.filter((p) => p.continued_from).length,
     connections: made.length,
     acceptedRequests: accepted,
+    helpAsks,
+    alumni: alumni.length,
+    alumniOpen,
+    alumniSolvers,
     byDirection,
     overTime,
     recentMilestones,

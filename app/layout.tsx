@@ -20,10 +20,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const viewerId = await getViewerId();
   const pending = (getDb().prepare("SELECT COUNT(*) n FROM requests WHERE to_person = ? AND status = 'sent'").get(viewerId) as { n: number }).n;
   const mode = await currentSearchMode();
-  // Four main sections. Get Unstuck, My Swarm, the whole network and Impact still work; they are linked from the footer.
+  // Five main sections. My Swarm, the whole network and Impact are linked from the footer.
   const links = [
     { href: '/', label: 'Discover' },
     { href: '/match', label: 'Find Matches' },
+    { href: '/stuck', label: 'Get Unstuck' },
     { href: '/profile', label: 'My Profile' },
     { href: '/inbox', label: 'Inbox', badge: pending },
   ];
@@ -49,16 +50,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <span className="flex items-center gap-2">
               <span className="font-display font-bold text-navy">GT Swarm</span>
               <span className="text-ink/30">·</span>
-              <span>Hackathon demo: every person, startup and outcome is fictional.</span>
+              <span>Opt-in, consent-first matching for Georgia Tech. Demo data is fictional.</span>
             </span>
             <nav aria-label="More" className="flex flex-wrap items-center gap-x-4 gap-y-1">
-              {[["/add", "Post a startup"], ["/join", "Join GT Swarm"], ["/stuck", "Get Unstuck"], ["/swarm", "My Swarm"], ["/graph", "Whole network"], ["/impact", "Impact"]].map(([h, l]) => (
+              {[["/add", "Post a startup"], ["/join", "Join GT Swarm"], ["/swarm", "My Swarm"], ["/graph", "Whole network"], ["/impact", "Impact for GT"]].map(([h, l]) => (
                 <Link key={h} href={h} className="hover:text-navy hover:underline">{l}</Link>
               ))}
             </nav>
             <span data-testid="search-mode" className="flex items-center gap-1.5">
               <span className={`h-2 w-2 rounded-full ${mode === 'keyword' ? 'bg-gold' : 'bg-teal'}`} aria-hidden="true" />
-              {mode === 'gemini' ? 'Matching: Gemini embeddings + Gemini matchmaker, cached' : `Search mode: ${mode === 'semantic' ? 'semantic (local MiniLM embeddings + BM25)' : 'keyword (BM25 fallback)'} · runs fully offline`}
+              {mode === 'gemini' ? 'Matching: Gemini embeddings + graph evidence' : `Matching: ${mode === 'semantic' ? 'local embeddings + graph evidence' : 'keyword + graph evidence'}`}
             </span>
           </div>
         </footer>

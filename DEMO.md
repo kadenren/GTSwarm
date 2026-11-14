@@ -2,21 +2,24 @@
 
 **Live site:** https://gtswarm.vercel.app. Click **Try Demo** for a hands-on tour: the judge clicks the real site (navigation, example buttons, Find People, Find Startups, invites, the persona menu, Accept) and the tour moves on when they do. Every step also has **Skip, do it for me**. Every person, startup and request is **fictional**.
 
-**The point to land:** Georgia Tech already has the talent startups need, but founders, alumni and students can't see each other, so connections happen by luck. GT Swarm learns what each person has built and wants, matches them in both directions with reasons, and turns matches into real, consented connections.
+**The point to land:** Georgia Tech already has the people and the answers startups need, but founders, alumni and students can't see each other, so connections happen by luck. GT Swarm learns what each person has built and solved, matches them in both directions with reasons, and turns matches into real, consented connections. Connection is not only hiring: when a founder hits a wall (a bug, a hospital security review, a fundraising question), GT Swarm finds the student or alum who already solved it, and the ask is just 15 minutes.
 
 | # | Chapter | The judge does | What they see |
 |---|---|---|---|
-| 1 | Why | Reads, **Next** | Startups and open roles nobody can see |
-| 2 | Find People · alum → alum | Fills the example (or types), **Find people** | Dana Whitfield, an alum, on top |
-| 3 | Find People · alum → alum | **Why this match?** | The reason, from her real work |
-| 4 | Find People · alum → alum | **View network** | The match map |
-| 5 | Find People · alum → alum | **Matches → Invite to connect → Send invite** | "Sent" |
-| 6 | Builder profile | **Use a sample resume** (as Maya, a student) | A profile drafted from a resume |
-| 7 | Find Startups · student → alum | **Find Startups** tab | Restwell, matched from her profile |
-| 8 | Find Startups · student → alum | **Request to join → Send request** | "Sent to Elena" |
-| 9 | Connect · alum ↔ alum | **Accept** (as Dana) | Two alumni connected |
-| 10 | Connect · student ↔ alum | **Accept** (as Elena) | Connected; joining the team stays her choice |
-| 11 | Network | **Finish** | Dana and Maya on Elena's map |
+| 1 | Why | Reads, **Next** | Startups, open roles and solved problems nobody can see |
+| 2 | 1 · Build a team · alum → alum | Fills the example (or types), **Find people** | Dana Whitfield, an alum, on top |
+| 3 | 1 · Build a team | **Why this match?** | The reason, from her real work |
+| 4 | 1 · Build a team | **View network** | The match map |
+| 5 | 1 · Build a team | **Matches → Invite to connect → Send invite** | "Sent" |
+| 6 | 2 · Get unstuck · beyond hiring | Clicks **Hospital security review stalled our pilot** (or types a problem) | Tara Holloway, an alum founder who passed the same review |
+| 7 | 2 · Get unstuck | **See how Tara solved it** | The fix on record: encryption, audit logs, a BAA, minimal data |
+| 8 | 2 · Get unstuck | **Ask Tara for 15 minutes → Send request** | Sent with the problem attached |
+| 9 | 3 · Join a startup · builder profile | **Use a sample resume** (as Maya, a student) | A profile drafted from a resume |
+| 10 | 3 · Join a startup · student → alum | **Find Startups** tab | Restwell, matched from her profile |
+| 11 | 3 · Join a startup | **Request to join → Send request** | "Sent to Elena" |
+| 12 | 4 · Connect · alum ↔ alum | **Accept** (as Dana) | Two alumni connected |
+| 13 | 4 · Connect · student ↔ alum | **Accept** (as Elena) | Connected; joining the team stays her choice |
+| 14 | What GT gets | **Finish** | Alumni engagement and help requests, counted live (Elena's ask is already in them) |
 
 The tour opens pages and switches personas itself; the judge only does the actions above. Every action has **Skip, do it for me**.
 
@@ -25,7 +28,8 @@ The tour opens pages and switches personas itself; the judge only does the actio
 ## Optional extras
 - **View network** on Find People results opens the radial relevance web.
 - **My Profile**: interests (exploring, cofounders, joining, advising, collaborating, investing), roles open to, hours, and the startups you own.
-- Footer links: **Post a startup** and **Join GT Swarm** (fill a profile or startup from a resume, report or poster), **Get Unstuck** (find who already solved your technical problem), **My Swarm**, **Whole network** and **Impact**.
+- **Get Unstuck** (top bar) has example problems across engineering, security, fundraising, equity and FDA. Each finds the person who solved it, with the fix.
+- Footer links: **Post a startup** and **Join GT Swarm** (fill a profile or startup from a resume, report or poster), **My Swarm** (your own network map), **Whole network** and **Impact for GT**.
 
 ## How matching works (for questions)
 - **Founder → people:** a ranking score from what people actually built and solved compared with the request (55%), documented experience (20%), shared GT ties (10%), openness to the role (10%) and availability (5%). A chosen role and the students/alumni filter are eligibility checks, not score boosts. No person is boosted by name.
@@ -39,7 +43,8 @@ The tour opens pages and switches personas itself; the judge only does the actio
 - **Founders keep their startup pages current** (stage, open roles, needs). Stale pages make matches worse; owners can edit status in one click.
 - **People are honest about roles and availability.** Willingness to cofound or advise is self-reported, and it gates who appears for that role.
 - **One office could run it.** It is one web app and one database, with an optional Gemini key for meaning-based search and document reading. Matching works without it.
-- **Students use it at specific moments:** looking for a team or startup, needing an advisor or engineer, or stuck on a technical problem, not as a daily feed.
+- **Students use it at specific moments:** looking for a team or startup, needing an advisor or engineer, or stuck on a problem, not as a daily feed.
+- **Alumni give small amounts of time.** Most alumni will not join a startup, but many will answer a specific 15-minute question about something they already solved. The product is built around that small ask.
 - **Demo-only tools are off in production.** The data reset works in development, or only when `GTSWARM_DEMO=1` is set.
 
 ## If something goes wrong

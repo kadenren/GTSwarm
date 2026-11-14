@@ -478,6 +478,13 @@ fixedProblem(skyward, 'Drone altitude oscillates in gusty wind', 'Retuned the al
 fixedProblem(gridwise, 'Battery inverter trips when the microgrid islands from the grid', 'Added a soft transfer with droop control and a synchronization check before reclosing.', jamal, '2025-09-21');
 fixedProblem(autonav, 'LiDAR misses low curbs at night', 'Tilted the lower LiDAR down five degrees and fused it with a wide-angle camera for curb detection.', ravi, '2026-03-11');
 
+// Founder problems (security, fundraising, customers, equity): problem solving is not only technical. Fixed values, no RNG.
+fixedProblem(tessera, 'Hospital IT security review stalled our pilot for months', 'Mapped every question in the hospital security questionnaire to a control: encrypted patient data at rest and in transit, single sign-on with audit logs, a signed BAA, and collected only the vitals the model needed. The review passed in four weeks.', tara, '2026-04-09');
+fixedProblem(vitaltag, 'Investors wanted clinical evidence before our pre-seed round', 'Ran a small feasibility study with an Atlanta emergency department, reported time-to-triage against the current process, and led the pitch with that one number. Closed the pre-seed round two months later.', priya, '2019-10-15');
+fixedProblem(pulseband, 'Customer interviews kept ending without a buyer', 'Stopped pitching athletes and interviewed 30 trainers and coaches instead. Trainers owned the budget, so the first pilot was sold to an athletic department, not to players.', leo, '2025-09-15');
+fixedProblem(voltline, 'Splitting equity with a cofounder who joined a year in', 'Used four-year vesting with a one-year cliff, credited the founder for the year already worked, and signed a written cofounder agreement before any new code was written.', nadia, '2025-04-02');
+fixedProblem(restwell, 'Turning a free hospital pilot into a paid contract', 'Agreed on the success metric with the hospital before the pilot started (readmissions avoided), then priced per monitored patient so the contract paid for itself in the hospital budget.', elena, '2025-08-20');
+
 // =====================================================================
 // 4. CONNECTIONS, REQUESTS, MILESTONES
 // =====================================================================

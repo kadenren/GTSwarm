@@ -27,7 +27,7 @@ export default async function ImpactPage() {
           <h1 className="mt-2 max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl">
             Georgia Tech&apos;s builders, <span className="text-gold">one introduction apart</span>.
           </h1>
-          <p className="mt-3 max-w-2xl text-white/70">Every number on this page is computed live from the GT Swarm graph.</p>
+          <p className="mt-3 max-w-2xl text-white/70">What Georgia Tech gets: a live view of who is helping whom. Every number is computed from opt-in profiles and accepted connections.</p>
           <dl className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {hero.map((h) => (
               <div key={h.l} className="border-l-2 border-gold/70 pl-4" data-testid="impact-tile">
@@ -55,6 +55,25 @@ export default async function ImpactPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* alumni engagement */}
+      <section className="mx-auto max-w-7xl px-4 pt-14" aria-label="Alumni engagement">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-dark">Alumni engagement</p>
+        <h2 className="mt-2 text-3xl font-bold text-navy">Alumni help in minutes, not semesters</h2>
+        <p className="mt-2 max-w-2xl text-ink/70">Most alumni will never join a startup, but many will take a 15-minute question about something they have already solved. GT Swarm makes that ask easy and specific.</p>
+        <dl className="mt-6 grid gap-4 sm:grid-cols-3" data-tour="impact">
+          {[
+            [st.alumniOpen, `of ${st.alumni} alumni on the network are open to advising or helping`],
+            [st.alumniSolvers, 'alumni have a solved problem on record that founders can search'],
+            [st.helpAsks, 'help requests sent through Get Unstuck, each with the problem attached'],
+          ].map(([n, l]) => (
+            <div key={l as string} className="card p-5" data-testid="engagement-tile">
+              <dd className="font-display text-4xl font-bold text-navy tabular-nums">{n}</dd>
+              <dt className="mt-1 text-sm text-ink/70">{l}</dt>
+            </div>
+          ))}
+        </dl>
       </section>
 
       {/* directions */}

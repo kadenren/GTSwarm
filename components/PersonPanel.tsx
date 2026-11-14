@@ -65,7 +65,7 @@ export default function PersonPanel({
     }
   }
 
-  const ctaLabel = kind === 'stuck' ? 'Ask for help' : `Request ${role} conversation`;
+  const ctaLabel = kind === 'stuck' ? `Ask ${first} for 15 minutes` : `Request ${role} conversation`;
   const isAlum = result.type === 'alum';
 
   return (
@@ -183,7 +183,7 @@ export default function PersonPanel({
       </div>
 
       <div className="border-t border-navy/10 bg-paper/60 p-4">
-        {status && <p className={`mb-2 text-sm ${status.ok ? 'text-teal' : 'text-red-700'}`} role="status">{status.text}</p>}
+        {status && <p className={`mb-2 text-sm ${status.ok ? 'text-teal' : 'text-red-700'}`} role="status" data-testid="request-status">{status.text}</p>}
         {composing ? (
           <div className="space-y-2">
             {viewerProjects.length > 0 && (
@@ -199,7 +199,7 @@ export default function PersonPanel({
               <textarea className="input h-28 resize-none" value={message} onChange={(e) => setMessage(e.target.value)} />
             </label>
             <div className="flex gap-2">
-              <button className="btn-primary flex-1" onClick={send} disabled={sending}>{sending ? 'Sending…' : 'Send request'}</button>
+              <button className="btn-primary flex-1" onClick={send} disabled={sending} data-testid="request-send">{sending ? 'Sending…' : 'Send request'}</button>
               <button className="btn-ghost" onClick={() => setComposing(false)}>Cancel</button>
             </div>
           </div>

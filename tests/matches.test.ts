@@ -140,3 +140,30 @@ describe('Profiles and demo tools', () => {
     expect(demoToolsEnabled()).toBe(true);
   });
 });
+
+describe('Get Unstuck: problem solving beyond hiring', () => {
+  beforeEach(() => { delete process.env.GEMINI_API_KEY; resetFromSeed(); });
+
+  it('founder problems (security, fundraising, equity) find the alum who solved them, with the fix attached', async () => {
+    const cases: [string, string][] = [
+      ['Hospital IT security review stalled our pilot', 'Tara Holloway'],
+      ['Investors want clinical evidence before our pre-seed round', 'Priya Natarajan'],
+      ['Splitting equity with a cofounder who joined late', 'Nadia Okoro'],
+      ['Bluetooth disconnects when the microcontroller enters sleep mode', 'Marcus Reyes'],
+    ];
+    for (const [query, who] of cases) {
+      const out = await runSearch(byName('Elena Brooks'), { kind: 'stuck', query, role: 'Helper', audience: 'both' });
+      expect(out.results[0].name).toBe(who);
+      expect(out.results[0].matchedProblem?.solution.length).toBeGreaterThan(20);
+    }
+  });
+
+  it('asking for help sends a request with the problem attached, which the helper can accept', () => {
+    const elena = byName('Elena Brooks'), tara = byName('Tara Holloway');
+    const before = count("SELECT COUNT(*) n FROM requests WHERE kind = 'stuck'");
+    const r = sendRequest({ from: elena, to: tara, kind: 'stuck', role: 'Helper', message: 'I saw you solved "Hospital IT security review stalled our pilot". Could you spare 15 minutes?', projectId: projectByName('Restwell Patch') });
+    expect(count("SELECT COUNT(*) n FROM requests WHERE kind = 'stuck'")).toBe(before + 1);
+    acceptRequest(r.id, tara);
+    expect(count("SELECT COUNT(*) n FROM requests WHERE id = ? AND status = 'accepted'", r.id)).toBe(1);
+  });
+});

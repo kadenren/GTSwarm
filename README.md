@@ -50,16 +50,17 @@ Without a key (or when Gemini is busy), everything falls back to the graph plus 
 
 | Page | What it does |
 |---|---|
-| Discover `/` | Startup feed with filters for industry, skills needed, stage, founder type and actively recruiting |
+| Discover `/` | Three ways in (build a team, join a startup, get unstuck), privacy principles, and the startup feed with filters for industry, skills needed, stage, founder type and actively recruiting |
 | Find Matches `/match` | **Find People** (role and students/alumni filters, match cards, Why this match?, View connections, View network) and **Find Startups** (from text or your saved profile, Request to join) |
+| Get Unstuck `/stuck` | Describe a problem (technical, security, regulatory, fundraising, equity); see who solved it and how; ask them for 15 minutes |
 | My Profile `/profile` | Your record, interests, roles you are open to, hours, what you want to work on, your startups, startups that could use you |
 | Inbox `/inbox` | Invites and join requests, accept or decline, your connections, and the founder's separate "add to team" step |
 | Startup page `/projects/[id]` | Stage, open roles, needs, recommended people with Invite, join requests, build record |
-| Footer | Post a startup, Join GT Swarm, Get Unstuck (solved-problem matching), My Swarm, Whole network, Impact |
+| Footer | Post a startup, Join GT Swarm, My Swarm, Whole network, Impact for GT (alumni engagement, help requests, connections by direction) |
 
 ## Full show-through
 
-See **[DEMO.md](DEMO.md)** for the 2-minute demo script, how matching works, and our assumptions. The gold **Demo** button (top right) starts an 11-step guided tour of the same story: it resets the data, switches accounts, and highlights what to click with an arrow at each step.
+See **[DEMO.md](DEMO.md)** for the 2-minute demo script, how matching works, and our assumptions. The gold **Demo** button (top right) starts a 14-step guided tour of the same story: it resets the data, switches accounts, and highlights what to click with an arrow at each step.
 
 ## How it works
 

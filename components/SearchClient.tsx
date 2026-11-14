@@ -141,7 +141,25 @@ export default function SearchClient({
 
       {error && <p className="mt-6 rounded-lg bg-red-50 p-4 text-sm text-red-800" role="alert">{error}</p>}
 
-      {!data && !loading && (
+      {!data && !loading && kind === 'stuck' && (
+        <section className="mt-6 grid gap-4 md:grid-cols-3" aria-label="How Get Unstuck works" data-testid="stuck-how">
+          {[
+            ['1', 'Describe the problem', 'Plain words are fine. Paste an error log if you have one. Technical, regulatory, security, fundraising or hiring.'],
+            ['2', 'See who solved it, and how', 'Students and alumni are ranked on problems they actually solved on GT projects, with the fix on record.'],
+            ['3', 'Ask for 15 minutes', 'Your question goes to their inbox with the problem attached. They can say yes or no; nothing else is shared.'],
+          ].map(([n, t, d]) => (
+            <div key={n} className="card flex gap-4 p-5">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold font-display font-bold text-navy-900">{n}</span>
+              <div>
+                <h3 className="font-display font-bold text-navy">{t}</h3>
+                <p className="mt-1 text-sm text-ink/65">{d}</p>
+              </div>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {!data && !loading && kind !== 'stuck' && (
         <section className="mt-6 grid gap-4 md:grid-cols-3" aria-label="How to read results">
           {[
             { t: 'Closer to the center = stronger match', d: 'People are ranked on what they actually built and solved, plus role fit, shared ties and availability.', icon: (
@@ -169,12 +187,12 @@ export default function SearchClient({
               {data.results[0].name.split(' ').map((w) => w[0]).join('')}
             </span>
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-gold-dark">Best match</div>
-              <div className="font-display text-lg font-bold text-navy">{data.results[0].name} <span className="text-sm font-medium text-ink/55">{data.results[0].label}</span></div>
-              <div className="text-sm text-ink/70">{data.results[0].description.short.split(' · ')[0]}{data.results[0].path ? ` · ${data.results[0].path.hops} ${data.results[0].path.hops === 1 ? 'hop' : 'hops'} from you` : ''}</div>
+              <div className="text-[11px] font-semibold uppercase tracking-wide text-gold-dark">{kind === 'stuck' ? 'Solved this before' : 'Best match'}</div>
+              <div className="font-display text-lg font-bold text-navy">{data.results[0].name} <span className="text-sm font-medium text-ink/55">{data.results[0].label.replace(/^[^,]+,\s*/, '')}</span></div>
+              <div className="text-sm text-ink/70">{kind === 'stuck' && data.results[0].matchedProblem ? `“${data.results[0].matchedProblem.description}” on ${data.results[0].matchedProblem.projectName} (${data.results[0].matchedProblem.year})` : data.results[0].description.short.split(' · ')[0]}{data.results[0].path ? ` · ${data.results[0].path.hops} ${data.results[0].path.hops === 1 ? 'hop' : 'hops'} from you` : ''}</div>
             </div>
           </div>
-          <button className="btn-gold" onClick={() => setSelected(data.results[0].personId)}>See why {data.results[0].name.split(' ')[0]} matched</button>
+          <button className="btn-gold" data-testid="best-match-why" onClick={() => setSelected(data.results[0].personId)}>{kind === 'stuck' ? `See how ${data.results[0].name.split(' ')[0]} solved it` : `See why ${data.results[0].name.split(' ')[0]} matched`}</button>
         </div>
       )}
 
