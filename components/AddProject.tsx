@@ -1,9 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
-import * as d3 from 'd3';
-import 'd3-transition';
-import { TEAM_COLORS } from './NetworkExplorer';
+import { useRef, useState } from 'react';
 
 const TYPES = ['VIP', 'Capstone', 'CREATE-X', 'Lab', 'Club', 'Invention Studio', 'Startup'];
 const SAMPLE = `ThermoCuff: In the 2026 ECE Senior Design capstone, our team built a wearable cuff that tracks skin temperature and heart rate for patients recovering at home. The firmware runs on an nRF52 with BLE and a PPG sensor. The main problem was that readings drifted when the cuff warmed up against the skin, so we fixed it by adding a reference thermistor and a two-point calibration at startup. We also struggled with battery life lasting under a day; we solved it by duty-cycling the PPG sensor and batching radio packets every 30 seconds.`;
@@ -59,7 +56,7 @@ export default function AddProject({ aiEnabled }: { aiEnabled: boolean }) {
   }
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => (d ? { ...d, [k]: v } : d));
 
-  if (saved) return <JoinAnimation saved={saved} />;
+  if (saved) return <SavedCard saved={saved} />;
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -161,44 +158,23 @@ export default function AddProject({ aiEnabled }: { aiEnabled: boolean }) {
   );
 }
 
-/** The new project flies into the swarm and links to its nearest neighbors. */
-function JoinAnimation({ saved }: { saved: Saved }) {
-  const ref = useRef<SVGSVGElement>(null);
-  useEffect(() => {
-    const W = 760, H = 420, cx = W / 2, cy = H / 2;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const svg = d3.select(ref.current!);
-    svg.selectAll('*').remove();
-    const nb = saved.neighbors.map((n, i) => {
-      const a = (i / saved.neighbors.length) * Math.PI * 2 - Math.PI / 2;
-      const r = 120 + (1 - n.sim) * 60;
-      return { ...n, x: cx + Math.cos(a) * r * 1.45, y: cy + Math.sin(a) * r };
-    });
-    const links = svg.append('g');
-    const nodes = svg.append('g').selectAll('g').data(nb).join('g').attr('transform', (d) => `translate(${d.x},${d.y})`).style('opacity', 0);
-    nodes.append('circle').attr('r', 7).attr('fill', (d) => TEAM_COLORS[d.teamType] ?? '#888');
-    nodes.append('text').attr('y', 20).attr('text-anchor', 'middle').attr('font-size', 11).attr('fill', '#F7F6F2').text((d) => `${d.name} (${d.year})`);
-    nodes.transition().duration(reduced ? 0 : 400).delay((_, i) => (reduced ? 0 : i * 40)).style('opacity', 1);
-    const me = svg.append('g').attr('transform', `translate(${W - 40},${30})`);
-    me.append('circle').attr('r', 14).attr('fill', '#B3A369').attr('stroke', '#fff').attr('stroke-width', 3);
-    me.append('text').attr('y', 32).attr('text-anchor', 'middle').attr('font-size', 13).attr('font-weight', 700).attr('fill', '#D6CC9E').text(saved.name);
-    me.transition().delay(reduced ? 0 : 600).duration(reduced ? 0 : 900).ease(d3.easeCubicOut).attr('transform', `translate(${cx},${cy})`)
-      .on('end', () => {
-        links.selectAll('line').data(nb).join('line').attr('x1', cx).attr('y1', cy).attr('x2', cx).attr('y2', cy)
-          .attr('stroke', '#B3A369').attr('stroke-opacity', (d) => 0.25 + d.sim * 0.6).attr('stroke-width', (d) => 1 + d.sim * 3)
-          .transition().duration(reduced ? 0 : 500).delay((_, i) => (reduced ? 0 : i * 50)).attr('x2', (d) => d.x).attr('y2', (d) => d.y);
-      });
-  }, [saved]);
+/** Confirmation after saving: the project is live, with its closest projects listed. */
+function SavedCard({ saved }: { saved: Saved }) {
   return (
-    <section className="card overflow-hidden" data-testid="join-animation">
-      <svg ref={ref} viewBox="0 0 760 420" className="w-full bg-navy-900" role="img" aria-label={`${saved.name} joins the swarm next to its closest projects`} />
-      <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-        <div>
-          <h2 className="text-lg font-bold text-navy">{saved.name} joined the swarm</h2>
-          <p className="text-sm text-ink/70">It is now searchable, linked to its closest projects, and its solved problems show up in Get Unstuck.</p>
-        </div>
-        <Link className="btn-primary" href={`/projects/${encodeURIComponent(saved.id)}`}>Open project page</Link>
-      </div>
+    <section className="card p-6" data-testid="join-animation">
+      <h2 className="text-xl font-bold text-navy">{saved.name} is on GT Swarm</h2>
+      <p className="mt-1 text-sm text-ink/70">It is now searchable, students and alumni can request to join, and its solved problems show up in Get Unstuck.</p>
+      {saved.neighbors.length > 0 && (
+        <>
+          <h3 className="label mt-4">Closest projects</h3>
+          <ul className="flex flex-wrap gap-2">
+            {saved.neighbors.slice(0, 6).map((n) => (
+              <li key={n.id}><Link href={`/projects/${encodeURIComponent(n.id)}`} className="tag hover:bg-gold/20">{n.name} ({n.year})</Link></li>
+            ))}
+          </ul>
+        </>
+      )}
+      <Link className="btn-primary mt-5" href={`/projects/${encodeURIComponent(saved.id)}`}>Open startup page</Link>
     </section>
   );
 }

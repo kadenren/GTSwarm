@@ -33,7 +33,6 @@ interface Step {
 }
 
 const FIND_COFOUNDER = "/match?mode=people&q=I%27m+building+a+wearable+medical+device+startup+and+need+an+alumni+cofounder+with+embedded+hardware+or+medical-device+expertise.&role=Cofounder&aud=alumni";
-const FOR_MAYA = '/match?mode=startups';
 const STUCK_SECURITY = '/stuck?q=Hospital+IT+security+review+stalled+our+pilot';
 const RESTWELL_PAGE = '/projects/project%3Apr009';
 const FIRST_PERSON = '[data-testid="people-results"] > li:first-child';
@@ -42,83 +41,63 @@ const RESTWELL_REQUEST = `[data-testid="request-received"]:has(a[href="${RESTWEL
 const RESTWELL_ACCEPTED = `[data-testid="request-received"][data-status="accepted"]:has(a[href="${RESTWELL_PAGE}"])`;
 
 /**
- * Fourteen steps, only the important parts, in four chapters: build a team, get unstuck, join a startup, connect.
- * The tour opens pages and switches personas; the visitor does the actions that show the product.
+ * Ten steps. Step 1 states the goal and the three ways GT Swarm meets it; the tour then tries each way,
+ * shows the consent step, and ends on what GT gets. The tour opens pages and switches personas itself.
  */
 const STEPS: Step[] = [
-  { as: ELENA, url: '/', target: '[data-tour="stats"]', who: 'Why GT Swarm',
-    title: 'GT has the people and the answers. Founders can’t find them.',
-    body: 'Startups need teammates, and they hit problems other Yellow Jackets already solved. GT Swarm connects them on what they have actually built.' },
+  { as: ELENA, url: '/', target: '[data-tour="ways"]', who: 'The goal',
+    title: 'Connect every Yellow Jacket with the person who can help',
+    body: 'Students and alumni opt in with what they have built. GT Swarm matches them three ways: build a team, get unstuck, join a startup. Let’s try each one.' },
 
-  { as: ELENA, url: '/match', target: `${FIRST_PERSON} || [data-tour="match-form"]`, who: '1 · Build a team · Alum → Alum',
+  { as: ELENA, url: '/match', target: `${FIRST_PERSON} || [data-tour="match-form"]`, who: '1 · Build your team',
     title: 'Elena, an alum founder, needs a cofounder',
-    body: 'Describe who you need in plain words, or fill the example.',
+    body: 'Describe who you need in plain words.',
     action: 'Click “Alumni cofounder for a medical wearable” (or type your own), then “Find people”.',
     done: '[data-testid="people-results"]', skipUrl: FIND_COFOUNDER,
-    doneBody: 'Dana Whitfield, an alum, is the top match. Only alumni open to cofounding are ranked.' },
-  { as: ELENA, url: '/match', target: `${FIRST_PERSON}:has([data-testid="why-breakdown"]) || ${FIRST_PERSON} button[aria-expanded]`, prepare: '[data-testid="view-cards"]', who: '1 · Build a team · Alum → Alum',
-    title: 'Why Dana?', body: '',
-    action: 'Click “Why this match?” on her card.',
-    done: `${FIRST_PERSON} [data-testid="why-breakdown"]`, skipClick: `${FIRST_PERSON} button[aria-expanded]`,
-    doneBody: 'Real work, not keywords: she solved a battery problem on a wearable board and wants to cofound.' },
-  { as: ELENA, url: '/match', target: '[data-testid="relevance-web"] || [data-testid="view-network"]', corner: true, who: '1 · Build a team · Alum → Alum',
-    title: 'The match map', body: '',
+    doneBody: 'Dana Whitfield, an alum, is the top match, and her card says why: she solved a battery problem on a wearable board and wants to cofound.' },
+  { as: ELENA, url: '/match', target: '[data-testid="relevance-web"] || [data-testid="view-network"]', corner: true, who: '1 · Build your team',
+    title: 'See the match map', body: '',
     action: 'Click “View network”.',
     done: '[data-testid="relevance-web"]', skipClick: '[data-testid="view-network"]',
     doneBody: 'Best fits sit closest to the center. Lines link people who have built together.' },
-  { as: ELENA, url: '/match', target: `${FIRST_PERSON} [role="status"] || ${FIRST_PERSON} [data-testid="invite-form"] || ${FIRST_PERSON} [data-testid="invite-button"] || [data-testid="view-cards"]`, who: '1 · Build a team · Alum → Alum',
+  { as: ELENA, url: '/match', target: `${FIRST_PERSON} [role="status"] || ${FIRST_PERSON} [data-testid="invite-form"] || ${FIRST_PERSON} [data-testid="invite-button"] || [data-testid="view-cards"]`, who: '1 · Build your team',
     title: 'Invite Dana', body: '',
     action: 'Click “Matches”, then “Invite to connect”, then “Send invite”.',
     done: `${FIRST_PERSON} [role="status"]`, skipClick: `[data-testid="view-cards"] && ${FIRST_PERSON} [data-testid="invite-button"] && ${FIRST_PERSON} [data-testid="invite-send"]`,
-    doneBody: 'Sent. Dana will see it with the reason attached.' },
+    doneBody: 'Sent. Dana sees it in her inbox with the reason attached. Alum to alum.' },
 
-  { as: ELENA, url: '/stuck', target: '[data-testid="best-match"] || form[aria-label="Describe your problem"]', who: '2 · Get unstuck · Beyond hiring',
-    title: 'Elena hits a wall: a hospital security review',
+  { as: ELENA, url: '/stuck', target: '[data-testid="best-match"] || form[aria-label="Describe your problem"]', who: '2 · Get unstuck',
+    title: 'Elena hits a wall',
     body: 'Her hospital pilot is stuck in an IT security review. She doesn’t need a hire, she needs someone who has been through it.',
     action: 'Click “Hospital security review stalled our pilot” (or describe your own problem).',
     done: '[data-testid="best-match"]', skipUrl: STUCK_SECURITY,
-    doneBody: 'Tara Holloway, an alum founder, got through the same review. Matched on the problem, not a job title.' },
-  { as: ELENA, url: '/stuck', target: '[data-testid="person-panel"] || [data-testid="best-match"]', who: '2 · Get unstuck · Beyond hiring',
-    title: 'See how she solved it', body: '',
-    action: 'Click “See how Tara solved it”.',
-    done: '[data-testid="matched-problem"]', skipClick: '[data-testid="best-match-why"]',
-    doneBody: 'The fix is on record: encryption, audit logs, only the data the model needed. Elena knows Tara has done this before she asks.' },
-  { as: ELENA, url: '/stuck', target: '[data-testid="person-panel"]', prepare: '[data-testid="best-match-why"]', who: '2 · Get unstuck · Beyond hiring',
-    title: 'Ask for 15 minutes', body: 'Small asks are how busy alumni help.',
-    action: 'Click “Ask Tara for 15 minutes”, then “Send request”.',
-    done: '[data-testid="request-status"]', skipClick: '[data-testid="request-button"] && [data-testid="request-send"]',
-    doneBody: 'Sent with the problem attached. Tara can say yes or no; nothing else is shared.' },
+    doneBody: 'Tara Holloway, an alum founder, solved the same problem. Matched on the problem, not a job title.' },
+  { as: ELENA, url: '/stuck', target: '[data-testid="person-panel"] || [data-testid="best-match"]', who: '2 · Get unstuck',
+    title: 'See how she solved it, then ask', body: '',
+    action: 'Click “See how Tara solved it”, then “Ask Tara for 15 minutes” and “Send request”.',
+    done: '[data-testid="request-status"]', skipClick: '[data-testid="best-match-why"] && [data-testid="request-button"] && [data-testid="request-send"]',
+    doneBody: 'The fix was on record, so the ask is small and specific: 15 minutes, problem attached.' },
 
-  { as: MAYA, url: '/join', target: '[data-testid="profile-draft"] || [data-testid="sample-resume"]', who: '3 · Join a startup · Builder profile',
-    title: 'Now Maya, a student. Profiles start from a resume.', body: 'Matching runs on what people have built.',
+  { as: MAYA, url: '/join', target: '[data-testid="profile-draft"] || [data-testid="sample-resume"]', who: '3 · Join a startup',
+    title: 'Now Maya, a student. Her profile starts from a resume.', body: '',
     action: 'Click “Use a sample resume”.',
     done: '[data-testid="profile-draft"]', skipClick: '[data-testid="sample-resume"]',
-    doneBody: 'Skills and projects filled in from the resume, ready to review. Nothing is saved until she confirms.' },
-  { as: MAYA, url: '/match', target: `${RESTWELL_MATCH} || [data-testid="mode-startups"]`, who: '3 · Join a startup · Student → Alum',
+    doneBody: 'Skills and projects filled in from the resume. Nothing is saved until she confirms.' },
+  { as: MAYA, url: '/match', target: `${RESTWELL_MATCH} || [data-testid="mode-startups"]`, who: '3 · Join a startup',
     title: 'Startups that need Maya', body: 'Find Startups uses her profile. No typing needed.',
-    action: 'Click the “Find Startups” tab.',
-    done: RESTWELL_MATCH, skipUrl: FOR_MAYA,
-    doneBody: 'Restwell, Elena’s startup, needs the BLE firmware skills Maya already has.' },
-  { as: MAYA, url: '/match', target: RESTWELL_MATCH, who: '3 · Join a startup · Student → Alum',
-    title: 'Request to join', body: '',
-    action: 'Click “Request to join”, then “Send request”.',
-    done: `${RESTWELL_MATCH} [role="status"]`, skipClick: `${RESTWELL_MATCH} [data-testid="collab-button"] && ${RESTWELL_MATCH} .btn-primary`,
-    doneBody: 'Sent to Elena.' },
+    action: 'Click the “Find Startups” tab, then “Request to join” on Restwell and “Send request”.',
+    done: `${RESTWELL_MATCH} [role="status"]`, skipClick: `[data-testid="mode-startups"] && ${RESTWELL_MATCH} [data-testid="collab-button"] && ${RESTWELL_MATCH} .btn-primary`,
+    doneBody: 'Restwell, Elena’s startup, needs the BLE firmware Maya has built. Request sent. Student to alum.' },
 
-  { as: DANA, url: '/inbox', target: RESTWELL_REQUEST, who: '4 · Connect · Alum ↔ Alum',
-    title: 'Dana gets Elena’s invite', body: 'Nothing happens without a yes.',
-    action: 'Click Accept.',
-    done: RESTWELL_ACCEPTED, skipClick: `${RESTWELL_REQUEST} button`,
-    doneBody: 'Two alumni, connected.' },
-  { as: ELENA, url: '/inbox', target: RESTWELL_REQUEST, who: '4 · Connect · Student ↔ Alum',
-    title: 'Elena gets Maya’s request', body: '',
+  { as: ELENA, url: '/inbox', target: RESTWELL_REQUEST, who: 'Connect',
+    title: 'Nothing happens without a yes', body: 'Maya’s request is in Elena’s inbox, with the reason attached.',
     action: 'Click Accept.',
     done: RESTWELL_ACCEPTED, skipClick: `${RESTWELL_REQUEST} button`,
     doneBody: 'Connected. Adding Maya to the team stays Elena’s choice.' },
 
-  { as: ELENA, url: '/impact', target: '[data-tour="impact"]', corner: true, who: 'What Georgia Tech gets',
+  { as: ELENA, url: '/impact', target: '[data-tour="impact"]', who: 'What Georgia Tech gets',
     title: 'Every connection and answer, counted',
-    body: 'Elena’s question to Tara is already in these numbers. GT sees which alumni help, which problems get solved and which startups grow, from opt-in data where every contact starts with a yes.' },
+    body: 'Elena’s question to Tara is already in these numbers. GT sees which alumni help, which problems get solved and which startups grow, from opt-in data.' },
 ];
 
 const KEY = 'gtswarm-tour';
@@ -255,9 +234,12 @@ export default function DemoTour({ current }: { current: string }) {
       return;
     }
     if (s.skipUrl) { router.push(s.skipUrl); return; }
+    // click each in turn, waiting up to 8s for it to appear (results and panels render after a fetch)
     for (const sel of (s.skipClick ?? '').split(' && ').filter(Boolean)) {
-      document.querySelector<HTMLElement>(sel)?.click();
-      await new Promise((r) => setTimeout(r, 700));
+      let el: HTMLElement | null = null;
+      for (let i = 0; i < 40 && !(el = document.querySelector<HTMLElement>(sel)); i++) await new Promise((r) => setTimeout(r, 200));
+      el?.click();
+      await new Promise((r) => setTimeout(r, 500));
     }
   }
 

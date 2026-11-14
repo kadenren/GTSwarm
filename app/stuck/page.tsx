@@ -24,9 +24,9 @@ export default async function StuckPage({ searchParams }: { searchParams: Promis
       <PageHero eyebrow="Get unstuck" title={<>Hit a wall? <span className="text-gold">Someone at GT already got past it.</span></>}
         subtitle={`Not every connection is a hire. Describe the problem in plain words, a bug, a security review, a fundraising question, and GT Swarm finds the students and alumni who solved it, from ${s.problems.length} solved problems on record.`} />
       <div className="pt-6">
-        <SearchClient kind="stuck" aiPolish={false} viewerName={me.name} viewerProjects={projects}
+        <SearchClient kind="stuck" viewerName={me.name} viewerProjects={projects}
           suggestions={STUCK_EXAMPLES}
-          initial={{ q: sp.q ?? '', role: 'Helper', audience: sp.aud ?? 'both', log: '' }} />
+          initial={{ q: sp.q ?? '', role: 'Helper', audience: sp.aud ?? 'both' }} />
       </div>
     </>
   );

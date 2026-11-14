@@ -50,17 +50,17 @@ Without a key (or when Gemini is busy), everything falls back to the graph plus 
 
 | Page | What it does |
 |---|---|
-| Discover `/` | Three ways in (build a team, join a startup, get unstuck), privacy principles, and the startup feed with filters for industry, skills needed, stage, founder type and actively recruiting |
-| Find Matches `/match` | **Find People** (role and students/alumni filters, match cards, Why this match?, View connections, View network) and **Find Startups** (from text or your saved profile, Request to join) |
+| Discover `/` | The three ways in (build a team, get unstuck, join a startup) and the startup feed (search, industry, founder type, actively recruiting) |
+| Find Matches `/match` | **Find People** (role and students/alumni filters, match cards, Why this match?, View network) and **Find Startups** (from text or your saved profile, Request to join) |
 | Get Unstuck `/stuck` | Describe a problem (technical, security, regulatory, fundraising, equity); see who solved it and how; ask them for 15 minutes |
 | My Profile `/profile` | Your record, interests, roles you are open to, hours, what you want to work on, your startups, startups that could use you |
 | Inbox `/inbox` | Invites and join requests, accept or decline, your connections, and the founder's separate "add to team" step |
-| Startup page `/projects/[id]` | Stage, open roles, needs, recommended people with Invite, join requests, build record |
-| Footer | Post a startup, Join GT Swarm, My Swarm, Whole network, Impact for GT (alumni engagement, help requests, connections by direction) |
+| Startup page `/projects/[id]` | Stage, open roles, needs, recommended people with Invite, join requests, solved problems, team, Add a solved problem |
+| Footer | Post a startup, Join GT Swarm, Impact for GT (a few live numbers: opt-ins, alumni engagement, help requests, connections by direction, outcomes) |
 
 ## Full show-through
 
-See **[DEMO.md](DEMO.md)** for the 2-minute demo script, how matching works, and our assumptions. The gold **Demo** button (top right) starts a 14-step guided tour of the same story: it resets the data, switches accounts, and highlights what to click with an arrow at each step.
+See **[DEMO.md](DEMO.md)** for the 2-minute demo script, how matching works, and our assumptions. The gold **Demo** button (top right) starts a 10-step guided tour of the same story: it resets the data, switches accounts, and highlights what to click with an arrow at each step.
 
 ## How it works
 
@@ -74,7 +74,6 @@ See **[DEMO.md](DEMO.md)** for the 2-minute demo script, how matching works, and
 | Search | `lib/search.ts`, `lib/geminiVec.ts` | BM25 with a synonym table, blended with Gemini embeddings when available |
 | Ranking | `lib/graph/rank.ts` | `score = 0.55 E + 0.20 X + 0.10 T + 0.10 R + 0.05 A` (text match, documented experience, shared ties, role fit, availability). No per-person boosts. |
 | Warm paths | `lib/graph/path.ts` | Weighted shortest path (Dijkstra) with readable steps |
-| My Swarm | `lib/graph/myswarm.ts` | Graph closeness blended with match relevance |
 | Relevance web | `components/RelevanceWeb.tsx` | D3 + SVG radial web: rings by score, gold best match |
 
 ## Reset

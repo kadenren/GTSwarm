@@ -8,7 +8,6 @@ import DemoTour from '@/components/DemoTour';
 import DemoButton from '@/components/DemoButton';
 import { getViewerId, viewerOptions } from '@/lib/viewer';
 import { getDb } from '@/lib/db';
-import { currentSearchMode } from '@/lib/search';
 
 export const metadata: Metadata = {
   title: 'GT Swarm: Where Yellow Jackets build together',
@@ -19,8 +18,7 @@ export const dynamic = 'force-dynamic';
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const viewerId = await getViewerId();
   const pending = (getDb().prepare("SELECT COUNT(*) n FROM requests WHERE to_person = ? AND status = 'sent'").get(viewerId) as { n: number }).n;
-  const mode = await currentSearchMode();
-  // Five main sections. My Swarm, the whole network and Impact are linked from the footer.
+  // Five main sections. Posting a startup, joining and Impact for GT are linked from the footer.
   const links = [
     { href: '/', label: 'Discover' },
     { href: '/match', label: 'Find Matches' },
@@ -53,14 +51,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <span>Opt-in, consent-first matching for Georgia Tech. Demo data is fictional.</span>
             </span>
             <nav aria-label="More" className="flex flex-wrap items-center gap-x-4 gap-y-1">
-              {[["/add", "Post a startup"], ["/join", "Join GT Swarm"], ["/swarm", "My Swarm"], ["/graph", "Whole network"], ["/impact", "Impact for GT"]].map(([h, l]) => (
+              {[["/add", "Post a startup"], ["/join", "Join GT Swarm"], ["/impact", "Impact for GT"]].map(([h, l]) => (
                 <Link key={h} href={h} className="hover:text-navy hover:underline">{l}</Link>
               ))}
             </nav>
-            <span data-testid="search-mode" className="flex items-center gap-1.5">
-              <span className={`h-2 w-2 rounded-full ${mode === 'keyword' ? 'bg-gold' : 'bg-teal'}`} aria-hidden="true" />
-              {mode === 'gemini' ? 'Matching: Gemini embeddings + graph evidence' : `Matching: ${mode === 'semantic' ? 'local embeddings + graph evidence' : 'keyword + graph evidence'}`}
-            </span>
           </div>
         </footer>
         <DemoTour current={viewerId} />

@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import RelevanceWeb, { WebLegend, type WebNode } from './RelevanceWeb';
 import PersonPanel, { type ViewerProject } from './PersonPanel';
 import BuildCardView from './BuildCard';
-import NetworkWeb from './NetworkWeb';
 import { MATCH_ROLES, roleLabel } from '@/lib/roles';
 import type { SearchResponse, SearchResult } from '@/lib/searchApi';
 import type { BuildMatch } from '@/lib/matching';
@@ -164,8 +163,6 @@ function PeopleResults({ data, viewer, viewerProjects, ownedBuilds }: { data: Se
 
 function PersonMatchCard({ r, role, query, viewer, ownedBuilds }: { r: SearchResult; role: string | null; query: string; viewer: Viewer; ownedBuilds: OwnedBuild[] }) {
   const [why, setWhy] = useState(false);
-  const [connections, setConnections] = useState(false);
-  const first = r.name.split(' ')[0];
   const tone = r.strength === 'Strong match' ? 'bg-teal text-white' : r.strength === 'Good match' ? 'bg-teal-light text-teal' : 'bg-navy/5 text-navy/70';
   return (
     <article className={`card flex h-full flex-col p-5 ${r.rank === 1 ? 'border-gold ring-2 ring-gold/30' : ''}`} data-testid="person-card">
@@ -174,7 +171,6 @@ function PersonMatchCard({ r, role, query, viewer, ownedBuilds }: { r: SearchRes
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2">
             <h3 className="font-display text-lg font-bold text-navy">{r.name}</h3>
-            <span className="rounded bg-paper px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-ink/45" title="All people in this demo are fictional">Demo profile</span>
           </div>
           <p className="text-sm text-ink/65">{r.type === 'alum' ? `Alum, ${r.major} '${String(r.gradYear).slice(2)}` : `${r.major} student, class of ${r.gradYear}`}{r.currentRole ? ` · ${r.currentRole}` : ''}</p>
         </div>
@@ -220,9 +216,7 @@ function PersonMatchCard({ r, role, query, viewer, ownedBuilds }: { r: SearchRes
       <div className="mt-auto flex flex-wrap items-center gap-2 pt-4">
         <InviteButton person={{ id: r.personId, name: r.name }} role={role} query={query} viewer={viewer} ownedBuilds={ownedBuilds} />
         <button className="btn-ghost px-3 py-1.5 text-sm" onClick={() => setWhy(!why)} aria-expanded={why}>{why ? 'Hide details' : 'Why this match?'}</button>
-        <button className="btn-ghost px-3 py-1.5 text-sm" onClick={() => setConnections(true)} data-testid="view-connections">View connections</button>
       </div>
-      {connections && <ConnectionsDialog r={r} onClose={() => setConnections(false)} firstName={first} />}
     </article>
   );
 }
@@ -271,50 +265,6 @@ export function InviteButton({ person, role, query, viewer, ownedBuilds }: { per
         <button className="btn-ghost px-3 py-1.5 text-xs" onClick={() => setOpen(false)}>Cancel</button>
       </div>
       {status && !status.ok && <p className="text-xs text-red-700">{status.text}</p>}
-    </div>
-  );
-}
-
-/** How a match connects to you: documented ties (shared projects, accepted connections, the warm path) vs inferred similarity. */
-function ConnectionsDialog({ r, onClose, firstName }: { r: SearchResult; onClose: () => void; firstName: string }) {
-  const [center, setCenter] = useState(r.personId);
-  useEffect(() => { const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose(); window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey); }, [onClose]);
-  return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-navy-900/60 p-4" role="dialog" aria-modal="true" aria-label={`${r.name}'s connections`} onClick={onClose}>
-      <div className="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl" onClick={(e) => e.stopPropagation()} data-testid="connections-dialog">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h2 className="text-xl font-bold text-navy">How {firstName} connects to you</h2>
-            <p className="text-sm text-ink/60">The web shows {center === r.personId ? `${firstName}'s` : 'this person’s'} real network: people they built with or are connected to. Click anyone to re-center.</p>
-          </div>
-          <button onClick={onClose} className="rounded-md p-1.5 text-ink/50 hover:bg-paper hover:text-navy" aria-label="Close">
-            <svg width="16" height="16" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-          </button>
-        </div>
-        <div className="mt-4 grid gap-5 lg:grid-cols-[1fr_300px]">
-          <div className="min-w-0"><NetworkWeb personId={center} onSelectPerson={setCenter} /></div>
-          <div className="space-y-4 text-sm">
-            <div className="rounded-xl border border-navy/10 p-4">
-              <h3 className="flex items-center gap-2 font-semibold text-navy"><svg width="22" height="6" aria-hidden="true"><line x1="0" y1="3" x2="22" y2="3" stroke="#003057" strokeWidth="2.5" /></svg>Documented</h3>
-              <p className="text-[11px] text-ink/50">Stored facts: shared projects and accepted connections</p>
-              <ul className="mt-2 space-y-1 text-ink/80">
-                {r.path ? <li>Warm path: {r.path.text} ({r.path.hops} {r.path.hops === 1 ? 'step' : 'steps'})</li> : <li>No chain of real connections to you yet</li>}
-                {r.ties.map((t) => <li key={t}>{t}</li>)}
-                {r.built.slice(0, 3).map((b) => <li key={b.id}>{b.role === 'advisor' ? 'Advised' : b.role === 'founder' ? 'Founded' : 'Built'} <Link href={`/projects/${encodeURIComponent(b.id)}`} className="text-navy underline decoration-gold">{b.name}</Link> ({b.year})</li>)}
-              </ul>
-            </div>
-            <div className="rounded-xl border border-dashed border-navy/25 p-4">
-              <h3 className="flex items-center gap-2 font-semibold text-navy"><svg width="22" height="6" aria-hidden="true"><line x1="0" y1="3" x2="22" y2="3" stroke="#B3A369" strokeWidth="2.5" strokeDasharray="4 3" /></svg>Inferred</h3>
-              <p className="text-[11px] text-ink/50">Similarity between their record and your request</p>
-              <ul className="mt-2 space-y-1 text-ink/80">
-                {r.matchedSkills.length > 0 && <li>Skills you asked for: {r.matchedSkills.join(', ')}</li>}
-                {r.reasons.filter((x) => /close match|Solved|Helped solve/.test(x)).slice(0, 2).map((x) => <li key={x}>{x.replace(/, a close match for ".*"$/, '')}</li>)}
-                <li>{r.reasons.find((x) => /documented projects/.test(x)) ?? 'Related work on record'}</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

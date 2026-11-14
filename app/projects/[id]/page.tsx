@@ -4,7 +4,6 @@ import { projectView } from '@/lib/project';
 import { getViewerId } from '@/lib/viewer';
 import { snapshot, personLabel } from '@/lib/data';
 import LogProgress from '@/components/LogProgress';
-import ConfirmMilestone from '@/components/ConfirmMilestone';
 import BuildStatusEditor from '@/components/BuildStatusEditor';
 import { CollaborateButton } from '@/components/BuildCard';
 import { StageBar, STAGE_STYLE } from '@/components/stage';
@@ -27,7 +26,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   const viewerId = await getViewerId();
   const v = projectView(id, viewerId);
   if (!v) notFound();
-  const { project: p, team, lineage, record, problems, viewerRole } = v;
+  const { project: p, team, problems, viewerRole } = v;
   const s = snapshot();
   const people = s.people.filter((x) => x.claimed && x.id !== viewerId).map((x) => ({ id: x.id, name: x.name, label: personLabel(x) })).sort((a, b) => a.name.localeCompare(b.name));
   const builders = team.filter((t) => t.role !== 'advisor');
@@ -42,11 +41,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
     ? (getDb().prepare("SELECT id, from_person, role, status, created_at FROM requests WHERE project_id = ? AND to_person = ? ORDER BY created_at DESC").all(p.id, viewerId) as { id: string; from_person: string; role: string | null; status: string; created_at: string }[])
         .filter((r) => !(s.membersOf.get(p.id) ?? []).some((m) => m.person_id === r.from_person))
     : [];
-  const isAdvisor = viewerRole === 'advisor';
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
-      <Link href="/projects" className="text-sm text-navy/70 hover:text-navy">← All projects</Link>
+      <Link href="/" className="text-sm text-navy/70 hover:text-navy">← Discover</Link>
       <header className="mt-3 flex flex-wrap items-start justify-between gap-4">
         <div className="max-w-3xl">
           <div className="flex flex-wrap items-center gap-2">
@@ -125,66 +123,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_380px]">
         <div className="min-w-0 space-y-6">
-          {lineage.length > 1 && (
-            <section className="card p-5" aria-label="Lineage timeline">
-              <h2 className="text-lg font-bold text-navy">Lineage</h2>
-              <p className="text-xs text-ink/60">This project continues across years. Each team inherits the last one&apos;s work and builders.</p>
-              <ol className="mt-4 flex gap-0 overflow-x-auto pb-2">
-                {lineage.map((l, i) => (
-                  <li key={l.id} className="relative min-w-[180px] flex-1 pr-4">
-                    <div className="flex items-center">
-                      <span className={`z-10 h-4 w-4 shrink-0 rounded-full border-2 ${l.id === p.id ? 'border-gold bg-gold' : 'border-navy bg-white'}`} />
-                      {i < lineage.length - 1 && <span className="h-0.5 flex-1 bg-navy/20" />}
-                    </div>
-                    <Link href={`/projects/${encodeURIComponent(l.id)}`} className={`mt-2 block rounded-lg p-2 hover:bg-paper ${l.id === p.id ? 'bg-gold/10' : ''}`}>
-                      <div className="font-display text-xl font-bold text-navy">{l.year}</div>
-                      <div className="text-sm font-medium text-navy">{l.name}</div>
-                      <div className="text-xs text-ink/60">{l.team}</div>
-                      {l.parent && l.parent !== lineage[i - 1]?.id && <div className="text-[11px] text-ink/50">branches from {s.project.get(l.parent)!.name} ({s.project.get(l.parent)!.year})</div>}
-                      <div className="mt-1 text-[11px] text-ink/60">{l.builders.slice(0, 3).join(', ')}{l.builders.length > 3 ? ` +${l.builders.length - 3}` : ''}</div>
-                    </Link>
-                  </li>
-                ))}
-              </ol>
-            </section>
-          )}
-
-          <section className="card p-5" aria-label="Build record">
-            <h2 className="text-lg font-bold text-navy">Build record</h2>
-            <p className="text-xs text-ink/60">Milestones and solved problems. A gold check means an advisor confirmed it.</p>
-            {record.length === 0 ? (
-              <p className="mt-4 text-sm text-ink/60">Nothing logged yet.</p>
-            ) : (
-              <ol className="mt-4 space-y-3" data-testid="build-record">
-                {record.map((r) => (
-                  <li key={r.id} className="flex gap-3">
-                    <span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${r.kind === 'milestone' && r.confirmedBy ? 'bg-gold text-navy-900' : r.kind === 'problem' ? 'bg-teal-light text-teal' : 'bg-navy/10 text-navy/50'}`} aria-hidden="true">
-                      {r.kind === 'milestone' && r.confirmedBy ? (
-                        <svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 7.5l2.5 2.5L11 4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" /></svg>
-                      ) : r.kind === 'problem' ? (
-                        <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="3.5" fill="currentColor" /></svg>
-                      ) : (
-                        <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="3" fill="none" stroke="currentColor" strokeWidth="1.5" /></svg>
-                      )}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-baseline justify-between gap-2">
-                        <span className="font-medium text-navy">{r.title}{r.simulated && <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wide text-amber-800" title="Logged during this demo session; not a verified real-world outcome">Simulated · added in this demo</span>}</span>
-                        <span className="text-xs tabular-nums text-ink/50">{r.date}</span>
-                      </div>
-                      {r.detail && <p className="text-sm text-ink/75">{r.detail}</p>}
-                      <p className="text-xs text-ink/55">
-                        {r.kind === 'milestone' ? (r.confirmedBy ? `Confirmed by ${r.confirmedBy}` : 'Not yet confirmed') : `Solved by ${r.by ?? 'the team'}${r.helper ? ` with help from ${r.helper}` : ''}`}
-                      </p>
-                      {r.kind === 'milestone' && !r.confirmedBy && isAdvisor && <div className="mt-1"><ConfirmMilestone id={r.id} /></div>}
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            )}
-          </section>
-
-
           <section className="card p-5" aria-label="Solved problems">
             <h2 className="text-lg font-bold text-navy">Solved problems</h2>
             {problems.length === 0 ? <p className="mt-2 text-sm text-ink/60">None documented yet.</p> : (
@@ -235,7 +173,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
           {canLog ? (
             <LogProgress projectId={p.id} projectName={p.name} people={people} />
           ) : (
-            <p className="card p-5 text-sm text-ink/60">Only members of this project can log progress. Switch &ldquo;Viewing as&rdquo; to a team member to try it.</p>
+            <p className="card p-5 text-sm text-ink/60">Team members add the problems they solve here, so the next builder can find them in Get Unstuck.</p>
           )}
         </aside>
       </div>

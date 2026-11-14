@@ -6,30 +6,27 @@
 
 | # | Chapter | The judge does | What they see |
 |---|---|---|---|
-| 1 | Why | Reads, **Next** | Startups, open roles and solved problems nobody can see |
-| 2 | 1 · Build a team · alum → alum | Fills the example (or types), **Find people** | Dana Whitfield, an alum, on top |
-| 3 | 1 · Build a team | **Why this match?** | The reason, from her real work |
-| 4 | 1 · Build a team | **View network** | The match map |
-| 5 | 1 · Build a team | **Matches → Invite to connect → Send invite** | "Sent" |
-| 6 | 2 · Get unstuck · beyond hiring | Clicks **Hospital security review stalled our pilot** (or types a problem) | Tara Holloway, an alum founder who passed the same review |
-| 7 | 2 · Get unstuck | **See how Tara solved it** | The fix on record: encryption, audit logs, a BAA, minimal data |
-| 8 | 2 · Get unstuck | **Ask Tara for 15 minutes → Send request** | Sent with the problem attached |
-| 9 | 3 · Join a startup · builder profile | **Use a sample resume** (as Maya, a student) | A profile drafted from a resume |
-| 10 | 3 · Join a startup · student → alum | **Find Startups** tab | Restwell, matched from her profile |
-| 11 | 3 · Join a startup | **Request to join → Send request** | "Sent to Elena" |
-| 12 | 4 · Connect · alum ↔ alum | **Accept** (as Dana) | Two alumni connected |
-| 13 | 4 · Connect · student ↔ alum | **Accept** (as Elena) | Connected; joining the team stays her choice |
-| 14 | What GT gets | **Finish** | Alumni engagement and help requests, counted live (Elena's ask is already in them) |
+| 1 | The goal | Reads, **Next** | The three ways GT Swarm connects people: build a team, get unstuck, join a startup |
+| 2 | 1 · Build your team | Fills the example (or types), **Find people** | Dana Whitfield, an alum, on top, with the reason on her card |
+| 3 | 1 · Build your team | **View network** | The match map |
+| 4 | 1 · Build your team | **Matches → Invite to connect → Send invite** | "Sent" (alum to alum) |
+| 5 | 2 · Get unstuck | Clicks **Hospital security review stalled our pilot** (or types a problem) | Tara Holloway, an alum founder who solved it |
+| 6 | 2 · Get unstuck | **See how Tara solved it → Ask Tara for 15 minutes → Send request** | The fix on record, and a specific ask |
+| 7 | 3 · Join a startup | **Use a sample resume** (as Maya, a student) | A profile drafted from a resume |
+| 8 | 3 · Join a startup | **Find Startups** tab, then **Request to join** on Restwell | Restwell needs what Maya has built (student to alum) |
+| 9 | Connect | **Accept** (as Elena) | Connected; joining the team stays her choice |
+| 10 | What GT gets | **Finish** | Alumni engagement and help requests, counted live |
 
 The tour opens pages and switches personas itself; the judge only does the actions above. Every action has **Skip, do it for me**.
 
 **Before presenting:** click **Try Demo** once to warm the site up, then click it again. Each click starts a fresh private session, so a judge clicking along never sees your changes and you never see theirs.
 
 ## Optional extras
-- **View network** on Find People results opens the radial relevance web.
+- **Why this match?** on a person card shows how the score adds up.
 - **My Profile**: interests (exploring, cofounders, joining, advising, collaborating, investing), roles open to, hours, and the startups you own.
 - **Get Unstuck** (top bar) has example problems across engineering, security, fundraising, equity and FDA. Each finds the person who solved it, with the fix.
-- Footer links: **Post a startup** and **Join GT Swarm** (fill a profile or startup from a resume, report or poster), **My Swarm** (your own network map), **Whole network** and **Impact for GT**.
+- **Startup pages**: what the team needs, recommended people with Invite, solved problems, and **Add a solved problem**, which is how problems get into Get Unstuck.
+- Footer links: **Post a startup** and **Join GT Swarm** (fill a startup or profile from a resume, report or poster) and **Impact for GT**.
 
 ## How matching works (for questions)
 - **Founder → people:** a ranking score from what people actually built and solved compared with the request (55%), documented experience (20%), shared GT ties (10%), openness to the role (10%) and availability (5%). A chosen role and the students/alumni filter are eligibility checks, not score boosts. No person is boosted by name.

@@ -3,8 +3,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import RelevanceWeb, { WebLegend, type WebNode } from './RelevanceWeb';
 import PersonPanel, { type ViewerProject } from './PersonPanel';
-import NetworkWeb from './NetworkWeb';
-import YouShouldMeet, { type IntroView } from './YouShouldMeet';
 import type { SearchResponse } from '@/lib/searchApi';
 
 const ROLES = ['Cofounder', 'Advisor', 'Helper', 'Early engineer', 'First customer'] as const;
@@ -17,40 +15,34 @@ const AUDIENCES = [
 export interface Suggestion { q: string; role?: string; audience?: string; label?: string }
 
 export default function SearchClient({
-  kind, viewerName, viewerProjects, initial, suggestions, intros = [], aiPolish = false,
+  kind, viewerName, viewerProjects, initial, suggestions,
 }: {
   kind: 'expertise' | 'stuck';
   viewerName: string;
   viewerProjects: ViewerProject[];
-  initial: { q: string; role: string; audience: string; log: string };
+  initial: { q: string; role: string; audience: string };
   suggestions: Suggestion[];
-  intros?: IntroView[];
-  aiPolish?: boolean;
 }) {
   const router = useRouter();
   const [q, setQ] = useState(initial.q);
   const [role, setRole] = useState(initial.role || 'Cofounder');
   const [audience, setAudience] = useState(initial.audience || 'both');
-  const [log, setLog] = useState(initial.log);
-  const [showLog, setShowLog] = useState(!!initial.log);
   const [data, setData] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<'web' | 'list'>('web');
   const [selected, setSelected] = useState<string | null>(null);
-  const [expanded, setExpanded] = useState<string | null>(null);
 
-  const run = useCallback(async (query: string, r: string, a: string, l: string) => {
+  const run = useCallback(async (query: string, r: string, a: string) => {
     if (!query.trim()) return;
     setLoading(true);
     setError(null);
     setSelected(null);
-    setExpanded(null);
     const params = new URLSearchParams({ q: query });
     if (kind === 'expertise') { params.set('role', r); params.set('aud', a); } else if (a !== 'both') params.set('aud', a);
     router.replace(`?${params.toString()}`, { scroll: false });
     try {
-      const res = await fetch('/api/search', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ kind, query, role: r, audience: a, log: l }) });
+      const res = await fetch('/api/search', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ kind, query, role: r, audience: a }) });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? 'Search failed');
       setData(json);
@@ -63,7 +55,7 @@ export default function SearchClient({
   }, [kind, router]);
 
   useEffect(() => {
-    if (initial.q) run(initial.q, initial.role || 'Cofounder', initial.audience || 'both', initial.log);
+    if (initial.q) run(initial.q, initial.role || 'Cofounder', initial.audience || 'both');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -75,7 +67,7 @@ export default function SearchClient({
     <div className="relative z-10 mx-auto -mt-6 max-w-7xl px-4 pb-8">
       <form
         className="card p-5"
-        onSubmit={(e) => { e.preventDefault(); run(q, role, audience, log); }}
+        onSubmit={(e) => { e.preventDefault(); run(q, role, audience); }}
         aria-label={kind === 'stuck' ? 'Describe your problem' : 'Search for expertise'}
       >
         <label htmlFor="q" className="label">{kind === 'stuck' ? 'What are you stuck on?' : 'What expertise do you need?'}</label>
@@ -109,18 +101,6 @@ export default function SearchClient({
             </fieldset>
           </div>
         )}
-        {kind === 'stuck' && (
-          <div className="mt-3">
-            {showLog ? (
-              <>
-                <label htmlFor="log" className="label">Pasted log or code (optional)</label>
-                <textarea id="log" className="input h-28 font-mono text-xs" value={log} onChange={(e) => setLog(e.target.value)} placeholder="[00:12:03] <wrn> ble: disconnected (reason 0x08 supervision timeout)" />
-              </>
-            ) : (
-              <button type="button" className="text-sm font-medium text-navy underline decoration-gold underline-offset-4" onClick={() => setShowLog(true)}>+ Paste a log or code snippet</button>
-            )}
-          </div>
-        )}
         {suggestions.length > 0 && (
           <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
             <span className="text-ink/50">Try:</span>
@@ -130,7 +110,7 @@ export default function SearchClient({
                   setQ(s.q);
                   if (s.role) setRole(s.role);
                   setAudience(s.audience ?? 'both');
-                  run(s.q, s.role ?? role, s.audience ?? 'both', log);
+                  run(s.q, s.role ?? role, s.audience ?? 'both');
                 }}>
                 {s.label ?? s.q}
               </button>
@@ -144,7 +124,7 @@ export default function SearchClient({
       {!data && !loading && kind === 'stuck' && (
         <section className="mt-6 grid gap-4 md:grid-cols-3" aria-label="How Get Unstuck works" data-testid="stuck-how">
           {[
-            ['1', 'Describe the problem', 'Plain words are fine. Paste an error log if you have one. Technical, regulatory, security, fundraising or hiring.'],
+            ['1', 'Describe the problem', 'Plain words are fine: a bug, a security review, a fundraising question.'],
             ['2', 'See who solved it, and how', 'Students and alumni are ranked on problems they actually solved on GT projects, with the fix on record.'],
             ['3', 'Ask for 15 minutes', 'Your question goes to their inbox with the problem attached. They can say yes or no; nothing else is shared.'],
           ].map(([n, t, d]) => (
@@ -180,7 +160,7 @@ export default function SearchClient({
         </section>
       )}
 
-      {data && !loading && data.results[0] && !expanded && (
+      {data && !loading && data.results[0] && (
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gold/50 bg-gradient-to-r from-gold/15 to-transparent px-5 py-3" data-testid="best-match">
           <div className="flex items-center gap-3">
             <span className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white ring-4 ring-gold ${data.results[0].type === 'alum' ? 'bg-teal' : 'bg-plum'}`}>
@@ -211,15 +191,14 @@ export default function SearchClient({
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h2 className="text-lg font-bold text-navy">
-                  {expanded ? `${data.results.find((r) => r.personId === expanded)?.name ?? 'Their'} network` : `${data.results.length} builders ranked for "${data.query}"`}
+                  {`${data.results.length} builders ranked for "${data.query}"`}
                 </h2>
                 <p className="text-xs text-ink/60">
-                  {expanded ? 'Second-degree view: people this builder has worked with or knows.' : data.matcher === 'gemini' ? 'The graph shortlisted candidates; Gemini read each record against your request and scored the fit. Shared ties, role fit and availability still count. Click a person for details.' : 'Ranked by graph evidence: what people built and solved, shared ties, role fit and availability. Click a person for details.'}
+                  {data.matcher === 'gemini' ? 'The graph shortlisted candidates; Gemini read each record against your request and scored the fit. Shared ties, role fit and availability still count. Click a person for details.' : 'Ranked by graph evidence: what people built and solved, shared ties, role fit and availability. Click a person for details.'}
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                {expanded && <button className="btn-ghost py-1.5" onClick={() => setExpanded(null)}>← Back to results</button>}
-                {!expanded && (
+                {(
                   <div className="flex rounded-lg border border-navy/15 p-0.5" role="tablist" aria-label="Result view">
                     {(['web', 'list'] as const).map((v) => (
                       <button key={v} role="tab" aria-selected={view === v} onClick={() => setView(v)}
@@ -232,9 +211,7 @@ export default function SearchClient({
               </div>
             </div>
 
-            {expanded ? (
-              <NetworkWeb personId={expanded} onSelectPerson={(id) => setExpanded(id)} />
-            ) : view === 'web' ? (
+            {view === 'web' ? (
               <>
                 <RelevanceWeb nodes={nodes} edges={data.edges} query={data.query} roleLabel={roleLabel} selectedId={selected} onSelect={setSelected} />
                 <WebLegend />
@@ -265,7 +242,6 @@ export default function SearchClient({
           {selectedResult && (
             <div className="lg:sticky lg:top-20 lg:self-start">
               <PersonPanel
-                aiPolish={aiPolish}
                 matcher={data.matcher}
                 result={selectedResult} kind={kind} role={data.role} query={data.query} viewerName={viewerName} viewerProjects={viewerProjects}
                 onClose={() => setSelected(null)}
@@ -274,7 +250,6 @@ export default function SearchClient({
           )}
         </div>
       )}
-      {data && !loading && intros.length > 0 && <div className="mt-6"><YouShouldMeet intros={intros} /></div>}
       {loading && !data && <div className="mt-6 h-[520px] animate-pulse rounded-xl bg-white/60" aria-label="Loading results" />}
     </div>
   );
