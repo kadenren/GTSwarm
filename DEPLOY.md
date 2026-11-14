@@ -28,7 +28,7 @@ The public demo runs on **Vercel** (the Next.js app) with **Supabase Postgres** 
 
 ## Redeploying updates
 
-- Code: commit and `git push`. Vercel builds and deploys automatically.
+- Code: commit and `git push` to `master`. The Vercel project (team GTSwarm, project gtswarm) is connected to github.com/kadenren/GTSwarm, so it builds and deploys to https://gtswarm.vercel.app automatically. Manual fallback: `npx vercel deploy --prod --scope gts-warm`.
 - Demo data: change it locally (`npm run seed`, `npm run ai:warm`), then rerun the seed command above. Add `-- --reset-sessions` to also clear every visitor's demo changes.
 
 ## Local development
