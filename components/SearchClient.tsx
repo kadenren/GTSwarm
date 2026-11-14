@@ -1,6 +1,6 @@
 'use client';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import RelevanceWeb, { WebLegend, type WebNode } from './RelevanceWeb';
 import PersonPanel, { type ViewerProject } from './PersonPanel';
 import type { SearchResponse } from '@/lib/searchApi';
@@ -24,6 +24,8 @@ export default function SearchClient({
   suggestions: Suggestion[];
 }) {
   const router = useRouter();
+  const params = useSearchParams();
+  const lastQuery = useRef<string | null>(null); // the query last searched, so our own URL update doesn't search twice
   const [q, setQ] = useState(initial.q);
   const [role, setRole] = useState(initial.role || 'Cofounder');
   const [audience, setAudience] = useState(initial.audience || 'both');
@@ -35,6 +37,7 @@ export default function SearchClient({
 
   const run = useCallback(async (query: string, r: string, a: string) => {
     if (!query.trim()) return;
+    lastQuery.current = query;
     setLoading(true);
     setError(null);
     setSelected(null);
@@ -54,10 +57,15 @@ export default function SearchClient({
     }
   }, [kind, router]);
 
+  // search on load, and again whenever a link changes ?q= (for example the guided demo opening an example)
   useEffect(() => {
-    if (initial.q) run(initial.q, initial.role || 'Cofounder', initial.audience || 'both');
+    const fromUrl = params.get('q') ?? initial.q;
+    if (fromUrl && fromUrl !== lastQuery.current) {
+      setQ(fromUrl);
+      run(fromUrl, initial.role || 'Cofounder', params.get('aud') ?? initial.audience ?? 'both');
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [params]);
 
   const nodes: WebNode[] = useMemo(() => (data?.results ?? []).map((r) => ({ id: r.personId, name: r.name, label: r.label, type: r.type, score: r.score, rank: r.rank, ring: r.ring, short: r.description.short })), [data]);
   const selectedResult = data?.results.find((r) => r.personId === selected) ?? null;
