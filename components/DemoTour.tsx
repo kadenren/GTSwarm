@@ -45,7 +45,7 @@ const STUCK_SECURITY_Q = '/stuck?q=Hospital+IT+security+review+stalled+our+pilot
 /**
  * The judge story (about two minutes). Show, don't tell: each step is a moment that can't happen at GT today.
  * Elena finds a cofounder she'd never heard of, sees the warm path to her, gets unstuck by an alum who already
- * solved her problem; Maya is matched to a startup she didn't know existed; they connect; SGA sees it counted.
+ * solved her problem (who, how, and a 15-minute ask); Maya is matched to a startup she didn't know existed; they connect; SGA sees it counted.
  */
 const STEPS: Step[] = [
   { as: ELENA, url: '/', target: RESTWELL_CARD, who: 'Meet Elena',
@@ -79,10 +79,20 @@ const STEPS: Step[] = [
     doneBody: 'Sent, with the reason attached. Dana can say yes or no.' },
 
   { as: ELENA, url: '/stuck', target: '[data-testid="best-match"] || form', who: 'Get Unstuck',
-    title: 'Then her hospital pilot stalls', body: 'A security review has frozen it for weeks.',
+    title: 'Then her hospital pilot stalls', body: 'A hospital security review has frozen it for weeks. Nobody on her team has done one. She doesn’t need a hire, just someone who has been through it.',
     action: 'Click “Hospital security review stalled our pilot”.',
     done: '[data-testid="best-match"]', skipUrl: STUCK_SECURITY_Q,
-    doneBody: 'Tara, another alum, got through this exact review, and how she did it is on record. Elena asks for 15 minutes instead of losing months.' },
+    doneBody: 'Tara Holloway, an alum founder. Not because “security” is in her title: she got a hospital pilot through this exact review.' },
+  { as: ELENA, url: '/stuck', target: '[data-testid="matched-problem"] || [data-testid="best-match"]', corner: true, who: 'Get Unstuck',
+    title: 'How did she do it?', body: '',
+    action: 'Click “See how Tara solved it”.',
+    done: '[data-testid="matched-problem"]', skipClick: '[data-testid="best-match-why"]',
+    doneBody: 'The fix is on record, with the project it happened on. Elena already knows what worked before she sends a single message.' },
+  { as: ELENA, url: '/stuck', target: '[data-testid="request-status"] || [data-testid="request-send"] || [data-testid="person-panel"] [data-testid="request-button"]', corner: true, who: 'Get Unstuck',
+    title: 'Ask for 15 minutes', body: '',
+    action: 'Click “Ask Tara for 15 minutes”, then “Send request”.',
+    done: '[data-testid="request-status"]', skipClick: '[data-testid="person-panel"] [data-testid="request-button"] && [data-testid="request-send"]',
+    doneBody: 'Most alumni will never join a startup. Almost all will give 15 minutes on something they already solved. That’s months saved for Elena, and an easy way for alumni to give back.' },
 
   { as: MAYA, url: '/match', target: `${RESTWELL_MATCH} || [data-testid="mode-startups"]`, who: 'Matching both ways',
     title: 'Meanwhile, Maya', body: 'A student who built Bluetooth firmware in class. She has never heard of Restwell.',

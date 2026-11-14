@@ -61,7 +61,7 @@ Without a key (or when Gemini is busy), everything falls back to the graph plus 
 
 ## Full show-through
 
-See **[DEMO.md](DEMO.md)** for the 2-minute demo script, how matching works, and our assumptions. The gold **Demo** button (top right) starts a 12-step guided tour (about two minutes): smart match, Why this match?, the connection web and warm path, Get Unstuck, two-way matching, consent, and Impact for GT: it resets the data, switches accounts, and highlights what to click with an arrow at each step.
+See **[DEMO.md](DEMO.md)** for the 2-minute demo script, how matching works, and our assumptions. The gold **Demo** button (top right) starts a 14-step guided tour (about two minutes): smart match, Why this match?, the connection web and warm path, Get Unstuck (who solved it, how, and a 15-minute ask), two-way matching, consent, and Impact for GT: it resets the data, switches accounts, and highlights what to click with an arrow at each step.
 
 ## How it works
 

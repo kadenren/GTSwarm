@@ -16,12 +16,14 @@ The demo shows instead of explains: every step is a moment that can't happen at 
 | 4 | The web | **View network** | Every dot a Yellow Jacket, closer = more relevant, every line two people who built together |
 | 5 | Is there a way in? | Click Dana on the map | Elena → Diego Park → Dana: a warm introduction no one could see before |
 | 6 | Reach out | **Invite to connect → Send invite** | One click, reason attached; Dana decides |
-| 7 | Get Unstuck | Example problem | Tara, another alum, already got through the same hospital security review |
-| 8 | Meanwhile, Maya | As Maya: **Find Your Startup** | A student matched to Restwell from what she's built, without typing |
-| 9 | Maya asks to join | **Request to join → Send request** | Sent to Elena |
-| 10 | Connected | As Elena: **Accept** | A student and an alum founder who'd never have met are connected; the web grows |
-| 11 | For SGA | **Next** | Impact for GT: every introduction counted, live from the demo |
-| 12 | Next semester | **Finish** | "These connections happen at GT today, by luck. GT Swarm makes them happen on purpose." One opt-in semester; it already runs |
+| 7 | Get Unstuck | Example problem | Her hospital pilot is frozen in a security review; Tara, an alum founder, got through the exact same one |
+| 8 | How did she do it? | **See how Tara solved it** | The fix is on record, with the project it happened on |
+| 9 | Ask for 15 minutes | **Ask Tara for 15 minutes → Send request** | Sent to Tara's inbox. Alumni who'd never join a startup will give 15 minutes on something they already solved |
+| 10 | Meanwhile, Maya | As Maya: **Find Your Startup** | A student matched to Restwell from what she's built, without typing |
+| 11 | Maya asks to join | **Request to join → Send request** | Sent to Elena |
+| 12 | Connected | As Elena: **Accept** | A student and an alum founder who'd never have met are connected; the web grows |
+| 13 | For SGA | **Next** | Impact for GT: every introduction counted, live from the demo |
+| 14 | Next semester | **Finish** | "These connections happen at GT today, by luck. GT Swarm makes them happen on purpose." One opt-in semester; it already runs |
 
 The tour opens pages and switches personas itself (about two minutes). Every action has **Skip, do it for me**.
 
