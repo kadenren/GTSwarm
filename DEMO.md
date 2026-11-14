@@ -1,29 +1,31 @@
 # GT Swarm demo script (about 2 minutes)
 
-**Live site:** https://gtswarm.vercel.app. Click **Try Demo** for a hands-on tour: the judge clicks the real site (navigation, example buttons, Find People, Find Startups, invites, the persona menu, Accept) and the tour moves on when they do. Every step also has **Skip, do it for me**. Every person, startup and request is **fictional**.
+**Live site:** https://gtswarm.vercel.app. Click **Demo** (top right) for a hands-on tour: the judge clicks the real site (navigation, example buttons, Find People, Find Startups, invites, the persona menu, Accept) and the tour moves on when they do. Every step also has **Skip, do it for me**. Every person, startup and request is **fictional**.
 
 **Who runs it:** the Student Government Association, as a one-semester opt-in pilot, with CREATE-X, Startup Exchange, the Alumni Association and project courses bringing people in (proposed; no existing partnership). Details at `/pilot`.
 
 **The point to land:** Georgia Tech already has the people and the answers startups need, but founders, alumni and students can't see each other, so connections happen by luck. GT Swarm learns what each person has built and solved, matches them in both directions with reasons, and turns matches into real, consented connections. Connection is not only hiring: when a founder hits a wall (a bug, a hospital security review, a fundraising question), GT Swarm finds the student or alum who already solved it, and the ask is just 15 minutes.
 
-| # | Chapter | The judge does | What they see |
+The demo shows instead of explains: every step is a moment that can't happen at Georgia Tech today. The case for adopting it comes only at the end.
+
+| # | Moment | The judge does | What they feel |
 |---|---|---|---|
-| 1 | The problem | Reads, **Next** | Founders can't find help; builders can't find startups |
-| 2 | Discover | Reads, **Next** | Restwell Patch in the startup feed (no sign-up); you are now Elena, its alum founder |
-| 3 | Founder → Expertise | Fills the example (or types), **Find people** | Dana Whitfield, an alum, ranks first |
-| 4 | Founder → Expertise | **Why this match?** | How her score adds up, from her record |
-| 5 | The web behind the match | **View network** | Distance = relevance; lines = documented ties only |
-| 6 | The web behind the match | Clicks Dana on the map | Documented warm path: Elena → Diego Park → Dana; keyword vs semantic relevance |
-| 7 | Founder → Expertise | **Invite to connect → Send invite** | "Sent", reason attached |
-| 6 | Builder → Opportunity | As Maya: **Find Your Startup** tab | Restwell recommended from her profile |
-| 7 | Builder → Opportunity | **Request to join → Send request** | "Sent to Elena" |
-| 8 | Consent | As Elena: **Accept** | Accepted; joining the team stays her choice |
-| 9 | Introduction made | Reads, **Next** | Maya in Elena's connections; Dana's invite waiting |
-| 10 | How GT gets this | **Finish** | The SGA pilot plan: a one-semester, opt-in pilot run by SGA with existing programs (proposed) |
+| 1 | Meet Elena | **Next** | An alum founder with a startup (Restwell Patch) and no cofounder |
+| 2 | Smart match | Example, **Find people** | Seconds later: Dana, an alum who shipped a wearable and is open to cofounding. Elena had never heard of her |
+| 3 | Why Dana? | **Why this match?** | Not a keyword hit: every line is something Dana actually built |
+| 4 | The web | **View network** | Every dot a Yellow Jacket, closer = more relevant, every line two people who built together |
+| 5 | Is there a way in? | Click Dana on the map | Elena → Diego Park → Dana: a warm introduction no one could see before |
+| 6 | Reach out | **Invite to connect → Send invite** | One click, reason attached; Dana decides |
+| 7 | Get Unstuck | Example problem | Tara, another alum, already got through the same hospital security review |
+| 8 | Meanwhile, Maya | As Maya: **Find Your Startup** | A student matched to Restwell from what she's built, without typing |
+| 9 | Maya asks to join | **Request to join → Send request** | Sent to Elena |
+| 10 | Connected | As Elena: **Accept** | A student and an alum founder who'd never have met are connected; the web grows |
+| 11 | For SGA | **Next** | Impact for GT: every introduction counted, live from the demo |
+| 12 | Next semester | **Finish** | "These connections happen at GT today, by luck. GT Swarm makes them happen on purpose." One opt-in semester; it already runs |
 
-The tour opens pages and switches personas itself; the judge only does the actions above (about 60 to 90 seconds). Every action has **Skip, do it for me**. Get Unstuck, profile building from a resume, the network map and Impact for GT are left for the judge to explore.
+The tour opens pages and switches personas itself (about two minutes). Every action has **Skip, do it for me**.
 
-**Before presenting:** click **Try Demo** once to warm the site up, then click it again. Each click starts a fresh private session, so a judge clicking along never sees your changes and you never see theirs.
+**Before presenting:** click **Demo** once to warm the site up, then click it again. Each click starts a fresh private session, so a judge clicking along never sees your changes and you never see theirs.
 
 ## Optional extras
 - **Why this match?** on a person card shows how the score adds up.
