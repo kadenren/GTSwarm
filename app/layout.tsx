@@ -25,14 +25,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     { href: '/circles', label: 'Circles' },
     { href: '/graph', label: 'Network' },
     { href: '/impact', label: 'Impact' },
-    { href: '/add', label: 'Add project' },
+    { href: '/add', label: 'Add' },
     { href: '/inbox', label: 'Inbox', badge: pending },
   ];
   return (
     <html lang="en">
       <body className="flex min-h-screen flex-col">
         <header className="sticky top-0 z-40 bg-navy text-white shadow-md">
-          <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
+          <div className="mx-auto flex max-w-[1400px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
             <Link href="/" className="flex flex-col leading-tight" aria-label="GT Swarm home">
               <Wordmark />
               <span className="text-[11px] tracking-wide text-gold-light/90">Where Yellow Jackets build together</span>

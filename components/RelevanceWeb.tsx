@@ -69,7 +69,8 @@ export default function RelevanceWeb({
   useEffect(() => {
     const svg = d3.select(svgRef.current!);
     svg.selectAll('*').remove();
-    const dur = reduced ? 0 : 600;
+    const still = reduced || document.hidden; // hidden tabs pause animation frames, so render final positions
+    const dur = still ? 0 : 600;
     const ease = d3.easeCubicOut;
     const byId = new Map(placed.map((p) => [p.id, p]));
     const best = placed.find((p) => p.rank === 1);
@@ -96,7 +97,7 @@ export default function RelevanceWeb({
       .attr('stroke-width', (d) => 0.8 + d.score * 4.5)
       .attr('stroke-opacity', (d) => 0.12 + d.score * 0.45)
       .attr('stroke-linecap', 'round')
-      .transition().duration(dur).delay((d) => (reduced ? 0 : d.rank * 25)).ease(ease)
+      .transition().duration(dur).delay((d) => (still ? 0 : d.rank * 25)).ease(ease)
       .attr('x2', (d) => d.x).attr('y2', (d) => d.y);
 
     // person-to-person dashed connections
@@ -107,7 +108,7 @@ export default function RelevanceWeb({
       .attr('x2', (d) => byId.get(d.target)!.x).attr('y2', (d) => byId.get(d.target)!.y)
       .attr('stroke', '#5B6B7C').attr('stroke-width', 1.4).attr('stroke-dasharray', '5 5').attr('stroke-opacity', 0)
       .call((sel) => sel.append('title').text((d) => `${byId.get(d.source)!.name} and ${byId.get(d.target)!.name}: ${d.label}`))
-      .transition().delay(dur).duration(reduced ? 0 : 350).attr('stroke-opacity', 0.55);
+      .transition().delay(dur).duration(still ? 0 : 350).attr('stroke-opacity', 0.55);
 
     // gold best-match line draws last
     if (best) {
@@ -116,7 +117,7 @@ export default function RelevanceWeb({
         .attr('x1', cx).attr('y1', cy).attr('x2', best.x).attr('y2', best.y)
         .attr('stroke', COLORS.gold).attr('stroke-width', 7).attr('stroke-linecap', 'round')
         .attr('stroke-dasharray', `${len} ${len}`).attr('stroke-dashoffset', len)
-        .transition().delay(dur).duration(reduced ? 0 : 450).ease(d3.easeCubicInOut).attr('stroke-dashoffset', 0);
+        .transition().delay(dur).duration(still ? 0 : 450).ease(d3.easeCubicInOut).attr('stroke-dashoffset', 0);
     }
 
     // center pill
@@ -139,7 +140,7 @@ export default function RelevanceWeb({
       .style('cursor', 'pointer')
       .attr('transform', `translate(${cx},${cy})`)
       .style('opacity', 0);
-    nodeG.transition().duration(dur).delay((d) => (reduced ? 0 : d.rank * 25)).ease(ease)
+    nodeG.transition().duration(dur).delay((d) => (still ? 0 : d.rank * 25)).ease(ease)
       .attr('transform', (d) => `translate(${d.x},${d.y})`).style('opacity', 1);
     nodeG.append('circle').attr('class', 'halo').attr('r', (d) => d.r + 6).attr('fill', 'none').attr('stroke', COLORS.gold).attr('stroke-width', 3).attr('opacity', 0);
     nodeG.append('circle').attr('class', 'dot').attr('r', (d) => d.r)
@@ -153,6 +154,14 @@ export default function RelevanceWeb({
       .attr('font-size', 12.5).attr('font-weight', (d) => (d.ring === 1 ? 700 : 500)).attr('fill', COLORS.navy)
       .attr('paint-order', 'stroke').attr('stroke', '#F7F6F2').attr('stroke-width', 4).attr('stroke-linejoin', 'round')
       .attr('pointer-events', 'none').text((d) => d.label);
+
+    // safety net: if animation frames are throttled (background tab, slow projector laptop), snap everything to its final state
+    const settle = window.setTimeout(() => {
+      svg.selectAll<SVGGElement, Placed>('g.node').interrupt().attr('transform', (d) => `translate(${d.x},${d.y})`).style('opacity', 1);
+      svg.selectAll<SVGLineElement, Placed>('g.spokes line').interrupt().attr('x2', (d) => d.x).attr('y2', (d) => d.y);
+      svg.selectAll<SVGLineElement, WebEdge>('g.peers line').interrupt().attr('stroke-opacity', 0.55);
+      svg.select('line.best').interrupt().attr('stroke-dashoffset', 0);
+    }, dur + 1200);
 
     const neighbors = (id: string) => new Set([id, ...edges.filter((e) => e.source === id || e.target === id).flatMap((e) => [e.source, e.target])]);
     const highlight = (id: string | null) => {
@@ -171,6 +180,7 @@ export default function RelevanceWeb({
       .on('blur', () => { highlight(null); setHover(null); })
       .on('click', (_e, d) => onSelectRef.current(d.id))
       .on('keydown', (e: KeyboardEvent, d) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelectRef.current(d.id); } });
+    return () => window.clearTimeout(settle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [placed, edges, query, roleLabel, reduced, centerKind, cx, cy, R, kx]);
 

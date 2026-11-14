@@ -12,7 +12,7 @@ export default function NavLinks({ links }: { links: { href: string; label: stri
           <Link
             key={l.href}
             href={l.href}
-            className={`relative rounded-md px-3 py-1.5 text-sm font-medium transition ${active ? 'bg-white/10 text-gold' : 'text-white/80 hover:text-white'}`}
+            className={`relative rounded-md px-2.5 py-1.5 text-sm font-medium transition ${active ? 'bg-white/10 text-gold' : 'text-white/80 hover:text-white'}`}
           >
             {l.label}
             {l.badge ? (

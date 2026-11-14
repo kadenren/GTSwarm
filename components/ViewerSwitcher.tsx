@@ -15,7 +15,7 @@ export default function ViewerSwitcher({ viewers, current }: { viewers: readonly
   }
   return (
     <label className="flex items-center gap-2 text-sm">
-      <span className="hidden text-white/70 sm:inline">Viewing as</span>
+      <span className="hidden text-white/70 xl:inline">Viewing as</span>
       <select
         aria-label="Viewing as"
         value={value}
