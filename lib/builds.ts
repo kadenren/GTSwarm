@@ -106,7 +106,7 @@ export function listBuilds(): BuildCard[] {
       skills: (s.projectSkillNames.get(p.id) ?? []).filter((k) => !DOMAINS.includes(k)).slice(0, 5),
       teamSize: team.length, isStartup: p.is_startup, teamIds: team.map((t) => t.id),
     };
-  }).sort((a, b) => Number(b.open) - Number(a.open) || b.year - a.year || a.name.localeCompare(b.name));
+  }).sort((a, b) => Number(b.open) - Number(a.open) || Number(b.isStartup) - Number(a.isStartup) || b.year - a.year || a.name.localeCompare(b.name));
 }
 
 export function buildFor(projectId: string): BuildCard | null {

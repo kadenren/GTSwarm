@@ -1,5 +1,6 @@
 import PageHero from '@/components/PageHero';
 import MatchFinder from '@/components/MatchFinder';
+import HowMatchingWorks from '@/components/HowMatchingWorks';
 import { viewerContext } from '@/lib/context';
 import { listBuilds } from '@/lib/builds';
 import { snapshot } from '@/lib/data';
@@ -16,10 +17,11 @@ export default async function MatchPage({ searchParams }: { searchParams: Promis
   const mode = sp.mode === 'startups' || sp.mode === 'join' ? 'startups' : 'people';
   return (
     <>
-      <PageHero eyebrow="Find matches" title="Find your next cofounder, collaborator, or startup."
-        subtitle="Describe what you are building and who you need, or what you can offer. GT Swarm matches what one person needs with what another can do, and shows why." />
+      <PageHero eyebrow="Find matches" title="Find your people, or find your startup."
+        subtitle="Founders: describe who you need. Students and alumni: see the startups that need what you've built. Every match shows why." />
       <MatchFinder initialMode={mode} initialQuery={sp.q ?? ''} initialRole={sp.role ?? 'any'} initialAudience={sp.aud ?? 'both'}
         viewer={{ name: me.name, type: me.type, openTo: me.open_to }} viewerProjects={projects} ownedBuilds={ownedBuilds} />
+      <HowMatchingWorks />
     </>
   );
 }

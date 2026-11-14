@@ -74,7 +74,7 @@ export default function MatchFinder({ initialMode, initialQuery, initialRole, in
     <div className="relative z-10 mx-auto -mt-8 max-w-6xl px-4 pb-12">
       <div className="card p-5 shadow-xl" data-tour="match-form">
         <div className="inline-flex rounded-xl bg-paper p-1" role="tablist" aria-label="What are you looking for?">
-          {([['people', 'Find People'], ['startups', 'Find Startups']] as const).map(([v, l]) => (
+          {([['people', 'Find Your People'], ['startups', 'Find Your Startup']] as const).map(([v, l]) => (
             <button key={v} role="tab" aria-selected={mode === v} onClick={() => switchMode(v)} data-testid={`mode-${v}`}
               className={`rounded-lg px-5 py-2 text-sm font-semibold transition ${mode === v ? 'bg-navy text-white shadow' : 'text-navy/70 hover:text-navy'}`}>{l}</button>
           ))}

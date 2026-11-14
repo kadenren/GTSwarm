@@ -48,7 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <span className="flex items-center gap-2">
               <span className="font-display font-bold text-navy">GT Swarm</span>
               <span className="text-ink/30">·</span>
-              <span>Opt-in, consent-first matching for Georgia Tech. Demo data is fictional.</span>
+              <span>Independent student project for the GT Campus Solutions Challenge. Not affiliated with or endorsed by Georgia Tech. All demo data is fictional.</span>
             </span>
             <nav aria-label="More" className="flex flex-wrap items-center gap-x-4 gap-y-1">
               {[["/add", "Post a startup"], ["/join", "Join GT Swarm"], ["/impact", "Impact for GT"]].map(([h, l]) => (

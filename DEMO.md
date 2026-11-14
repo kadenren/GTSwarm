@@ -6,18 +6,17 @@
 
 | # | Chapter | The judge does | What they see |
 |---|---|---|---|
-| 1 | The goal | Reads, **Next** | The three ways GT Swarm connects people: build a team, get unstuck, join a startup |
-| 2 | 1 · Build your team | Fills the example (or types), **Find people** | Dana Whitfield, an alum, on top, with the reason on her card |
-| 3 | 1 · Build your team | **View network** | The match map |
-| 4 | 1 · Build your team | **Matches → Invite to connect → Send invite** | "Sent" (alum to alum) |
-| 5 | 2 · Get unstuck | Clicks **Hospital security review stalled our pilot** (or types a problem) | Tara Holloway, an alum founder who solved it |
-| 6 | 2 · Get unstuck | **See how Tara solved it → Ask Tara for 15 minutes → Send request** | The fix on record, and a specific ask |
-| 7 | 3 · Join a startup | **Use a sample resume** (as Maya, a student) | A profile drafted from a resume |
-| 8 | 3 · Join a startup | **Find Startups** tab, then **Request to join** on Restwell | Restwell needs what Maya has built (student to alum) |
-| 9 | Connect | **Accept** (as Elena) | Connected; joining the team stays her choice |
-| 10 | What GT gets | **Finish** | Alumni engagement and help requests, counted live |
+| 1 | The problem | Reads, **Next** | Founders can't find help; builders can't find startups |
+| 2 | Discover | Reads, **Next** | Restwell Patch in the startup feed (no sign-up); you are now Elena, its alum founder |
+| 3 | Founder → Expertise | Fills the example (or types), **Find people** | Dana Whitfield, an alum, ranks first |
+| 4 | Founder → Expertise | **Why this match?** | How her score adds up, from her record |
+| 5 | Founder → Expertise | **Invite to connect → Send invite** | "Sent", reason attached |
+| 6 | Builder → Opportunity | As Maya: **Find Your Startup** tab | Restwell recommended from her profile |
+| 7 | Builder → Opportunity | **Request to join → Send request** | "Sent to Elena" |
+| 8 | Consent | As Elena: **Accept** | Accepted; joining the team stays her choice |
+| 9 | Introduction made | **Finish** | Maya in Elena's connections; Dana's invite waiting |
 
-The tour opens pages and switches personas itself; the judge only does the actions above. Every action has **Skip, do it for me**.
+The tour opens pages and switches personas itself; the judge only does the actions above (about 60 to 90 seconds). Every action has **Skip, do it for me**. Get Unstuck, profile building from a resume, the network map and Impact for GT are left for the judge to explore.
 
 **Before presenting:** click **Try Demo** once to warm the site up, then click it again. Each click starts a fresh private session, so a judge clicking along never sees your changes and you never see theirs.
 
