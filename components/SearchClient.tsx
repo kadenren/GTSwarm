@@ -17,7 +17,7 @@ const AUDIENCES = [
 export interface Suggestion { q: string; role?: string; audience?: string; label?: string }
 
 export default function SearchClient({
-  kind, viewerName, viewerProjects, initial, suggestions, intros = [],
+  kind, viewerName, viewerProjects, initial, suggestions, intros = [], aiPolish = false,
 }: {
   kind: 'expertise' | 'stuck';
   viewerName: string;
@@ -25,6 +25,7 @@ export default function SearchClient({
   initial: { q: string; role: string; audience: string; log: string };
   suggestions: Suggestion[];
   intros?: IntroView[];
+  aiPolish?: boolean;
 }) {
   const router = useRouter();
   const [q, setQ] = useState(initial.q);
@@ -209,6 +210,7 @@ export default function SearchClient({
           {selectedResult && (
             <div className="lg:sticky lg:top-20 lg:self-start">
               <PersonPanel
+                aiPolish={aiPolish}
                 result={selectedResult} kind={kind} role={data.role} query={data.query} viewerName={viewerName} viewerProjects={viewerProjects}
                 onClose={() => setSelected(null)} onExpand={(id) => { setExpanded(id); setView('web'); }}
               />

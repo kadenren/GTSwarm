@@ -25,7 +25,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           <p className="mt-1 text-sm text-ink/70">Search a skill, pick the role you need, and see who in the swarm has actually built it, and how you are connected.</p>
         </div>
       </div>
-      <SearchClient kind="expertise" intros={intros} viewerName={me.name} viewerProjects={projects} suggestions={suggestions}
+      <SearchClient kind="expertise" aiPolish={!!process.env.ANTHROPIC_API_KEY} intros={intros} viewerName={me.name} viewerProjects={projects} suggestions={suggestions}
         initial={{ q: sp.q ?? '', role: sp.role ?? 'Cofounder', audience: sp.aud ?? 'both', log: '' }} />
     </>
   );

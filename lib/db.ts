@@ -131,8 +131,9 @@ export function resetFromSeed(db: Database.Database = getDb()) {
   try {
     db.pragma('foreign_keys = OFF');
     db.transaction(() => {
-      for (const t of tables) db.exec(`DELETE FROM main.${t}`);
-      for (const t of [...tables].reverse()) db.exec(`INSERT INTO main.${t} SELECT * FROM seed.${t}`);
+      // polished wording is keyed by the exact template text, so it stays valid across resets; keep it
+      for (const t of tables) db.exec(t === 'cache' ? "DELETE FROM main.cache WHERE key NOT LIKE 'polish:%'" : `DELETE FROM main.${t}`);
+      for (const t of [...tables].reverse()) db.exec(`INSERT OR IGNORE INTO main.${t} SELECT * FROM seed.${t}`);
     })();
   } finally {
     db.pragma('foreign_keys = ON');

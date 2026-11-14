@@ -24,7 +24,9 @@ Open http://localhost:3000.
 - **Offline or blocked model download?** Seeding still succeeds and search runs on the built-in BM25 keyword scorer. The footer shows which mode is active: `semantic (local MiniLM embeddings + BM25)` or `keyword (BM25 fallback)`. Re-run `npm run seed` with internet to switch to semantic mode.
 - `npm test` runs the acceptance tests (against a throwaway copy of the seed database).
 - `npm run build` is a production build with type checking.
-- Optional: put `ANTHROPIC_API_KEY=...` in `.env.local` to let Claude extract fields on **Add project**. Without a key, a deterministic keyword extractor is used. Nothing in the core demo calls an API.
+- Optional: put `ANTHROPIC_API_KEY=...` in `.env.local` to turn on two AI helpers. Without a key, both fall back to deterministic code, and nothing in the core demo calls an API.
+  - **Add project:** Claude extracts the fields from a pasted abstract (otherwise a keyword extractor does).
+  - **Polished wording:** in a person's panel, Claude rephrases the fact-built connection description. The rewrite is fact-checked against the original (no new names, numbers or terms, no gendered pronouns) and cached, and the cache survives `/demo/reset`. To pre-warm it for the demo, open each hero's panel once before presenting.
 
 ## Demo script (about 5 minutes)
 

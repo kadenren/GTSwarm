@@ -14,7 +14,7 @@ export default async function StuckPage({ searchParams }: { searchParams: Promis
           <p className="mt-1 text-sm text-ink/70">Describe what is going wrong. GT Swarm searches problems that students and alumni have already solved, and shows who solved them.</p>
         </div>
       </div>
-      <SearchClient kind="stuck" viewerName={me.name} viewerProjects={projects}
+      <SearchClient kind="stuck" aiPolish={!!process.env.ANTHROPIC_API_KEY} viewerName={me.name} viewerProjects={projects}
         suggestions={[{ q: 'Bluetooth drops when the sensor sleeps' }]}
         initial={{ q: sp.q ?? '', role: 'Helper', audience: sp.aud ?? 'both', log: '' }} />
     </>

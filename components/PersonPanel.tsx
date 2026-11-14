@@ -14,10 +14,10 @@ const COMPONENT_INFO: Record<string, { label: string; weight: number; help: stri
 export interface ViewerProject { id: string; name: string; year: number }
 
 export default function PersonPanel({
-  result, kind, role, query, viewerName, viewerProjects, onClose, onExpand,
+  result, kind, role, query, viewerName, viewerProjects, onClose, onExpand, aiPolish = false,
 }: {
   result: SearchResult; kind: 'expertise' | 'stuck'; role: string | null; query: string; viewerName: string;
-  viewerProjects: ViewerProject[]; onClose: () => void; onExpand?: (id: string) => void;
+  viewerProjects: ViewerProject[]; onClose: () => void; onExpand?: (id: string) => void; aiPolish?: boolean;
 }) {
   const first = result.name.split(' ')[0];
   const [composing, setComposing] = useState(false);
@@ -33,6 +33,21 @@ export default function PersonPanel({
   const [sending, setSending] = useState(false);
 
   useEffect(() => { setComposing(false); setStatus(null); }, [result.personId]);
+
+  // optional: Claude rephrases the fact-built description (fact-checked and cached server-side); the template shows meanwhile
+  const [polished, setPolished] = useState<string | null>(null);
+  const [showOriginal, setShowOriginal] = useState(false);
+  useEffect(() => {
+    setPolished(null);
+    setShowOriginal(false);
+    if (!aiPolish) return;
+    let live = true;
+    fetch('/api/polish', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ personId: result.personId, query, role: kind === 'stuck' ? null : role }) })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (live && d?.source === 'polished') setPolished(d.text); })
+      .catch(() => undefined);
+    return () => { live = false; };
+  }, [aiPolish, result.personId, query, role, kind]);
   useEffect(() => { if (composing) setMessage(defaultMsg()); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [composing, projectId]);
 
   async function send() {
@@ -91,7 +106,12 @@ export default function PersonPanel({
 
         <section>
           <h3 className="label">How {first} connects to your search</h3>
-          <p className="text-sm leading-relaxed text-ink/90" data-testid="connection-description">{result.description.full}</p>
+          <p className="text-sm leading-relaxed text-ink/90" data-testid="connection-description">{polished && !showOriginal ? polished : result.description.full}</p>
+          {polished && (
+            <button className="mt-1 text-[11px] text-ink/50 underline decoration-gold/60 underline-offset-2 hover:text-navy" onClick={() => setShowOriginal((v) => !v)}>
+              {showOriginal ? 'Show wording polished by Claude' : 'Wording polished by Claude from these facts · show original'}
+            </button>
+          )}
         </section>
 
         {result.path && result.path.hops > 0 && (
