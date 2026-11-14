@@ -35,103 +35,115 @@ interface Step {
 const FIND_COFOUNDER = "/match?mode=people&q=I%27m+building+a+wearable+medical+device+startup+and+need+an+alumni+cofounder+with+embedded+hardware+or+medical-device+expertise.&role=Cofounder&aud=alumni";
 const FIND_ENGINEER = '/match?mode=people&q=wearable+firmware+engineer&role=Early+engineer&aud=students';
 const FOR_MAYA = '/match?mode=startups';
+const RESTWELL_PAGE = '/projects/project%3Apr009';
 const NAV = (href: string) => `header a[href="${href}"]`;
+const FOOTER = (href: string) => `footer a[href="${href}"]`;
 const PERSONA = '[data-testid="persona-menu"] || [data-tour="persona"]';
 const viewing = (name: string) => `[data-tour="persona"][aria-label^="Viewing as ${name}"]`;
 const FIRST_PERSON = '[data-testid="people-results"] > li:first-child';
+const RESTWELL_CARD = `[data-testid="discover-grid"] li:has(a[href="${RESTWELL_PAGE}"])`;
 const RESTWELL_MATCH = '[data-testid="startup-results"] li[data-build="project:pr009"]';
-const RESTWELL_REQUEST = '[data-testid="request-received"]:has(a[href="/projects/project%3Apr009"])';
-const RESTWELL_ACCEPTED = '[data-testid="request-received"][data-status="accepted"]:has(a[href="/projects/project%3Apr009"])';
+const RESTWELL_REQUEST = `[data-testid="request-received"]:has(a[href="${RESTWELL_PAGE}"])`;
+const RESTWELL_ACCEPTED = `[data-testid="request-received"][data-status="accepted"]:has(a[href="${RESTWELL_PAGE}"])`;
 
+/**
+ * A walk-through of actually using the site. The visitor clicks every page and does every action themselves;
+ * the tour points at the next thing, waits for it to happen, then says what it means.
+ */
 const STEPS: Step[] = [
   { as: ELENA, url: '/', target: '[data-tour="stats"]', who: 'Why GT Swarm',
     title: 'The talent is here. The connections aren’t.',
-    body: 'GT startups have dozens of open roles, and the alumni and students who could fill them never see them. You will fix that in two minutes, hands on.' },
+    body: 'GT startups have dozens of open roles, and the alumni and students who could fill them never see them. Let’s use the site to fix that.' },
+
+  // Discover
+  { as: ELENA, url: '/', target: RESTWELL_CARD, who: 'Discover',
+    title: 'Browse what Yellow Jackets are building',
+    body: 'Every card shows the stage, founder, and the roles the team needs. You are Elena, an alum, and this is her startup.',
+    action: 'Click “View startup” on Restwell Patch.', donePath: RESTWELL_PAGE, autoNext: true, skipUrl: RESTWELL_PAGE },
+  { as: ELENA, url: RESTWELL_PAGE, target: '[data-testid="collab-hub"]', who: 'Discover',
+    title: 'A startup’s page',
+    body: 'Its stage, the roles it is hiring for, what it needs right now, and people GT Swarm already recommends. Elena still needs a cofounder.' },
 
   // Find People: alum to alum
-  { as: ELENA, url: '/', target: NAV('/match'), who: 'Find People · Alum → Alum',
-    title: 'You are Elena, an alum founder',
-    body: 'She is building Restwell, a medical wearable, and needs a cofounder.',
-    action: 'Click “Find Matches” in the top bar.', donePath: '/match', autoNext: true, skipUrl: '/match' },
+  { as: ELENA, url: RESTWELL_PAGE, target: NAV('/match'), who: 'Find People · Alum → Alum',
+    title: 'Find her a cofounder',
+    body: '', action: 'Click “Find Matches” in the top bar.', donePath: '/match', autoNext: true, skipUrl: '/match' },
   { as: ELENA, url: '/match', target: `${FIRST_PERSON} || [data-tour="match-form"]`, who: 'Find People · Alum → Alum',
     title: 'Describe exactly who you need',
-    body: 'Type your own need, or fill the example. It also sets the role (Cofounder) and the audience (Alumni).',
-    action: 'Click “Alumni cofounder for a medical wearable”, then “Find people”.',
+    body: 'Type it in plain words, or fill the example. The example also picks the role (Cofounder) and the audience (Alumni).',
+    action: 'Type a need, or click “Alumni cofounder for a medical wearable”. Then click “Find people”.',
     done: '[data-testid="people-results"]', skipUrl: FIND_COFOUNDER,
     doneBody: 'Dana Whitfield is the top match. Only alumni open to cofounding are ranked, and the reason on her card comes from her own record.' },
   { as: ELENA, url: '/match', target: `${FIRST_PERSON}:has([data-testid="why-breakdown"]) || ${FIRST_PERSON} button[aria-expanded]`, prepare: '[data-testid="view-cards"]', who: 'Find People · Alum → Alum',
-    title: 'Why Dana?',
-    body: 'Every match explains itself.',
+    title: 'Why Dana?', body: 'Every match explains itself.',
     action: 'Click “Why this match?” on her card.',
     done: `${FIRST_PERSON} [data-testid="why-breakdown"]`, skipClick: `${FIRST_PERSON} button[aria-expanded]`,
     doneBody: 'Real work, not keywords: she solved a battery problem on a wearable board and wants to cofound. The score adds up from that.' },
   { as: ELENA, url: '/match', target: '[data-testid="relevance-web"] || [data-testid="view-network"]', corner: true, who: 'Find People · Alum → Alum',
-    title: 'See the match map',
-    body: 'The same results as a network.',
+    title: 'See the match map', body: 'The same results as a network.',
     action: 'Click “View network” above the results.',
     done: '[data-testid="relevance-web"]', skipClick: '[data-testid="view-network"]',
     doneBody: 'Best fits sit closest to the center. Lines link people who have built together.' },
   { as: ELENA, url: '/match', target: `${FIRST_PERSON} [role="status"] || ${FIRST_PERSON} [data-testid="invite-form"] || ${FIRST_PERSON} [data-testid="invite-button"] || [data-testid="view-cards"]`, who: 'Find People · Alum → Alum',
-    title: 'Invite Dana',
-    body: 'One click to reach the right alum.',
+    title: 'Invite Dana', body: 'One click to reach the right alum.',
     action: 'Click “Matches”, then “Invite to connect” on Dana’s card, then “Send invite”.',
     done: `${FIRST_PERSON} [role="status"]`, skipClick: `[data-testid="view-cards"] && ${FIRST_PERSON} [data-testid="invite-button"] && ${FIRST_PERSON} [data-testid="invite-send"]`,
     doneBody: 'Sent. Dana will see it in her inbox with the reason attached.' },
 
   // Find People: alum to student
   { as: ELENA, url: '/match', target: '[data-testid="people-results"][data-aud="students"] > li:first-child || [data-tour="match-form"]', who: 'Find People · Alum → Student',
-    title: 'Now find a student engineer',
-    body: 'Elena also needs an engineer. The same search works for students.',
-    action: 'Click “Student firmware engineer”, then “Find people”.',
+    title: 'Now find a student engineer', body: 'Elena also needs an engineer. Same search, for students.',
+    action: 'Click “Student firmware engineer” (or pick Engineer and Students yourself), then “Find people”.',
     done: '[data-testid="people-results"][data-aud="students"]', skipUrl: FIND_ENGINEER,
     doneBody: 'Students with real firmware work lead, like Maya Okafor. Same engine, alum to student.' },
 
   // Builder profile
   { as: ELENA, url: '/match', target: PERSONA, corner: true, who: 'Switch sides',
-    title: 'Now be Maya, a student',
-    body: 'Anyone can try any persona. They are fictional.',
+    title: 'Now be Maya, a student', body: 'The personas are fictional; anyone can try them.',
     action: 'Open “Viewing as” at the top right and pick Maya Okafor.',
     done: viewing('Maya'), autoNext: true, skipAs: MAYA },
   { as: MAYA, url: '/match', target: NAV('/profile'), who: 'Builder profile',
-    title: 'Open her builder profile',
-    body: 'Profiles are what matching runs on.',
+    title: 'Open her builder profile', body: '',
     action: 'Click “My Profile”.', donePath: '/profile', autoNext: true, skipUrl: '/profile' },
   { as: MAYA, url: '/profile', target: 'section[aria-label="Current profile"]', who: 'Builder profile',
     title: 'What matching runs on',
-    body: 'Maya’s projects, skills, and the roles she is open to. Founders find her by this, and it picks her startups.' },
-  { as: MAYA, url: '/join?invite=alumni', target: '[data-testid="profile-draft"] || [data-testid="sample-resume"]', who: 'Builder profile',
-    title: 'New members start from a resume',
-    body: 'Alumni join from an Alumni Association invite.',
+    body: 'Maya’s projects, skills, and the roles she is open to. Founders find her by this.' },
+  { as: MAYA, url: '/profile', target: '[data-testid="prefs-editor"]', who: 'Builder profile',
+    title: 'Say what you are looking for', body: 'Interests and roles shape her matches, and she can change them anytime.',
+    action: 'Make sure “Looking for a startup to join” is on, then click “Save preferences”.',
+    done: '[data-testid="prefs-saved"]', skipClick: '[data-testid="prefs-editor"] .btn-primary',
+    doneBody: 'Saved. Find Startups will use this, plus what she has built.' },
+  { as: MAYA, url: '/profile', target: FOOTER('/join'), who: 'Builder profile',
+    title: 'How new people join', body: 'Alumni get an invite link from the Alumni Association.',
+    action: 'Scroll down and click “Join GT Swarm” in the footer.', donePath: '/join', autoNext: true, skipUrl: '/join' },
+  { as: MAYA, url: '/join', target: '[data-testid="profile-draft"] || [data-testid="sample-resume"]', who: 'Builder profile',
+    title: 'A resume becomes a profile', body: 'No forms to fill in from scratch.',
     action: 'Click “Use a sample resume”.',
     done: '[data-testid="profile-draft"]', skipClick: '[data-testid="sample-resume"]',
     doneBody: 'The bio, skills and projects filled in from the resume, ready to review. Nothing is saved until they confirm.' },
 
   // Find Startups: student to alum
-  { as: MAYA, url: '/join?invite=alumni', target: `${RESTWELL_MATCH} || [data-testid="mode-startups"] || ${NAV('/match')}`, who: 'Find Startups · Student → Alum',
-    title: 'Find startups that need Maya',
-    body: 'No typing needed: Find Startups uses her profile.',
+  { as: MAYA, url: '/join', target: `${RESTWELL_MATCH} || [data-testid="mode-startups"] || ${NAV('/match')}`, who: 'Find Startups · Student → Alum',
+    title: 'Find startups that need Maya', body: 'No typing needed: Find Startups uses her profile.',
     action: 'Click “Find Matches”, then the “Find Startups” tab.',
     done: RESTWELL_MATCH, skipUrl: FOR_MAYA,
     doneBody: 'Restwell is looking for the BLE firmware skills Maya already has. That is Elena’s startup.' },
   { as: MAYA, url: '/match', target: RESTWELL_MATCH, who: 'Find Startups · Student → Alum',
-    title: 'Request to join Restwell',
-    body: 'A student reaching an alumni founder.',
+    title: 'Request to join Restwell', body: 'A student reaching an alumni founder.',
     action: 'Click “Request to join”, then “Send request”.',
     done: `${RESTWELL_MATCH} [role="status"]`, skipClick: `${RESTWELL_MATCH} [data-testid="collab-button"] && ${RESTWELL_MATCH} .btn-primary`,
     doneBody: 'Sent to Elena.' },
 
   // Connect: alum to alum
   { as: MAYA, url: '/match', target: PERSONA, corner: true, who: 'Connect · Alum ↔ Alum',
-    title: 'Now be Dana, the alum Elena invited',
-    body: '',
+    title: 'Now be Dana, the alum Elena invited', body: '',
     action: 'Open “Viewing as” and pick Dana Whitfield.',
     done: viewing('Dana'), autoNext: true, skipAs: DANA },
   { as: DANA, url: '/match', target: NAV('/inbox'), who: 'Connect · Alum ↔ Alum',
     title: 'Open Dana’s inbox', body: '',
     action: 'Click “Inbox”.', donePath: '/inbox', autoNext: true, skipUrl: '/inbox' },
   { as: DANA, url: '/inbox', target: RESTWELL_REQUEST, who: 'Connect · Alum ↔ Alum',
-    title: 'Elena’s invite, with the reason',
-    body: 'Nothing happens without a yes.',
+    title: 'Elena’s invite, with the reason', body: 'Nothing happens without a yes.',
     action: 'Click Accept.',
     done: RESTWELL_ACCEPTED, skipClick: `${RESTWELL_REQUEST} button`,
     doneBody: 'Two alumni, connected.' },
@@ -147,12 +159,16 @@ const STEPS: Step[] = [
     done: RESTWELL_ACCEPTED, skipClick: `${RESTWELL_REQUEST} button`,
     doneBody: 'Connected. Adding Maya to the team stays Elena’s choice.' },
 
+  // The network
+  { as: ELENA, url: '/inbox', target: FOOTER('/swarm'), who: 'The network',
+    title: 'See Elena’s network', body: '',
+    action: 'Scroll down and click “My Swarm” in the footer.', donePath: '/swarm', autoNext: true, skipUrl: '/swarm' },
   { as: ELENA, url: '/swarm', target: '[data-testid="relevance-web"]', corner: true, who: 'The network',
     title: 'Two new connections, mapped',
     body: 'Dana and Maya now sit on Elena’s map. Every connection improves the next match.' },
   { as: ELENA, url: '/', target: '[data-testid="find-match-cta"]', who: 'GT Swarm',
     title: 'The right people for every GT startup',
-    body: 'Alum to alum, alum to student, student to alum: matched on what they have built and what they want.' },
+    body: 'Alum to alum, alum to student, student to alum: matched on what they have built and what they want. Click around; everything you just did is real.' },
 ];
 
 const KEY = 'gtswarm-tour';
@@ -234,7 +250,8 @@ export default function DemoTour({ current }: { current: string }) {
   useEffect(() => {
     setMissing(false);
     if (!s || !onPage || !s.target) { setRect(null); return; }
-    let found: Element | null = null, tries = 0, prepIdx = 0;
+    let tries = 0, prepIdx = 0, lastScroll = 0;
+    const started = Date.now();
     const prep = s.prepare ? s.prepare.split(' && ') : [];
     const tick = () => {
       setVp({ w: window.innerWidth, h: window.innerHeight });
@@ -246,12 +263,20 @@ export default function DemoTour({ current }: { current: string }) {
         setRect(null); return;
       }
       setMissing(false);
-      if (el !== found) {
-        found = el;
-        const r0 = el.getBoundingClientRect();
-        if (r0.top < 90 || r0.bottom > window.innerHeight - 40) {
+      // bring the target into view; retry for the first few seconds in case a page refresh undid it,
+      // then leave scrolling to the visitor
+      const r0 = el.getBoundingClientRect();
+      const now = Date.now();
+      const tallTarget = r0.height > window.innerHeight - 200;
+      const outOfView = tallTarget ? r0.top < 60 || r0.top > window.innerHeight * 0.5 : r0.top < 90 || r0.bottom > window.innerHeight - 40;
+      if (outOfView && now - started < 6000 && now - lastScroll > 1200) {
+        lastScroll = now;
+        {
           const tall = r0.height > window.innerHeight - 200;
-          window.scrollTo({ top: window.scrollY + r0.top - (tall ? 96 : Math.max(96, (window.innerHeight - r0.height) / 2)), behavior: 'smooth' });
+          const goal = Math.max(0, Math.min(document.documentElement.scrollHeight - window.innerHeight, window.scrollY + r0.top - (tall ? 96 : Math.max(96, (window.innerHeight - r0.height) / 2))));
+          window.scrollTo({ top: goal, behavior: 'smooth' });
+          // browsers can drop a smooth scroll (busy page, background tab): jump if it did not get there
+          setTimeout(() => { if (Math.abs(window.scrollY - goal) > 40) window.scrollTo({ top: goal }); }, 700);
         }
       }
       const r = el.getBoundingClientRect();

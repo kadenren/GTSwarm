@@ -40,7 +40,7 @@ export default function PrefsEditor({ options, initial }: { options: readonly Op
       </div>
       <div className="mt-4 flex items-center gap-3">
         <button className="btn-primary" onClick={save} disabled={busy}>{busy ? 'Saving…' : 'Save preferences'}</button>
-        {status && <span className="text-sm text-teal" role="status">{status}</span>}
+        {status && <span className="text-sm text-teal" role="status" data-testid={status.startsWith("Saved") ? "prefs-saved" : undefined}>{status}</span>}
       </div>
     </section>
   );
