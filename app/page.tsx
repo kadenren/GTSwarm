@@ -6,6 +6,7 @@ import { HeroPattern } from '@/components/PageHero';
 import { listBuilds } from '@/lib/builds';
 import { snapshot } from '@/lib/data';
 import { roleLabel } from '@/lib/roles';
+import { PHASES, PRIVACY, REAL, SIMULATED, PROGRAMS, PROPOSED_NOTE } from '@/lib/pitch';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,48 +21,6 @@ const PROBLEM = [
     icon: <path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM2.5 19c.6-3 2.8-5 5.5-5s4.9 2 5.5 5m-.6-4.6c.9-.3 1.9-.4 3.1-.4 2.7 0 4.9 2 5.5 5" /> },
 ];
 
-const PHASES = [
-  { n: 1, title: 'Voluntary pilot', when: 'One semester', items: [
-    'Recruit a small cohort of student- and alumni-founded startups',
-    'Invite interested students and alumni to create profiles',
-    'Use only opt-in profiles and founder-submitted needs',
-    'Run without access to protected Georgia Tech databases',
-  ] },
-  { n: 2, title: 'Validate meaningful connections', when: 'During and after the pilot', items: [
-    'Measure accepted introductions',
-    'Track startup roles filled through the platform',
-    'Count collaborations that come from matches',
-    'Collect feedback on match quality',
-  ] },
-  { n: 3, title: 'Explore university partnerships', when: 'Only if the pilot shows value', items: [
-    'Explore partnerships with CREATE-X, Startup Exchange, the Alumni Association and other GT organizations',
-    'Investigate approved sign-in and onboarding',
-    'Expand only after addressing data governance',
-  ] },
-];
-
-const PRIVACY = [
-  'Opt-in participation only',
-  'People control what their profile shows',
-  'Every invitation and request can be declined',
-  'No assumed access to private student or alumni records',
-  'Founders choose what to share about their startup and its IP',
-];
-
-const REAL = [
-  'Two-way matching engine with an explanation for every match',
-  'Knowledge graph of people, projects, skills and solved problems',
-  'Resume and document reading that drafts profiles and startups',
-  'Consent-based invites, requests and inbox',
-  'Get Unstuck search over solved problems',
-  'A private demo session for every visitor',
-];
-const SIMULATED = [
-  'Every person, startup and outcome is fictional',
-  'The “Viewing as” switcher stands in for Georgia Tech sign-in',
-  'Requests appear in the in-app inbox; no email is sent',
-  'Gemini embeddings are optional and turned off on this site',
-];
 
 /** Home: the problem, what makes GT Swarm different, the two ways it works, how GT could pilot it, then the startup feed. */
 export default async function Home() {
@@ -87,7 +46,10 @@ export default async function Home() {
       <section className="relative overflow-hidden bg-navy text-white">
         <HeroPattern opacity={0.1} />
         <div className="relative mx-auto max-w-7xl px-4 pb-12 pt-12 sm:pt-14">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">Georgia Tech entrepreneurship network</p>
+          <p className="inline-flex flex-wrap items-center gap-x-2 rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-xs font-semibold text-gold-light">
+            <span className="uppercase tracking-[0.16em] text-gold">Campus Solutions proposal</span>
+            <span className="text-white/70">Designed for SGA to run, alongside CREATE-X and other GT programs</span>
+          </p>
           <h1 className="mt-3 max-w-4xl text-4xl font-bold leading-[1.06] tracking-tight sm:text-[3.4rem]">
             Georgia Tech has the talent. <span className="text-gold">GT Swarm makes the connections.</span>
           </h1>
@@ -164,7 +126,8 @@ export default async function Home() {
                 </ul>
               </div>
             </div>
-            <Link href="/match#how" className="mt-5 inline-block text-sm font-semibold text-navy underline decoration-gold underline-offset-4">How the matching works →</Link>
+            <p className="mt-4 rounded-lg bg-paper px-4 py-3 text-sm text-ink/75"><strong className="text-navy">And it does not replace CREATE-X or Startup Exchange.</strong> Programs run cohorts and events a few times a year; GT Swarm keeps the matching going between them.</p>
+            <Link href="/match#how" className="mt-4 inline-block text-sm font-semibold text-navy underline decoration-gold underline-offset-4">How the matching works →</Link>
           </div>
 
           {dana && (
@@ -234,8 +197,16 @@ export default async function Home() {
         <div className="mx-auto max-w-7xl px-4 py-14">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">Implementation plan</p>
           <h2 id="plan-h" className="mt-2 text-3xl font-bold">Built for Georgia Tech. Designed to grow.</h2>
-          <p className="mt-2 max-w-2xl text-white/70">A realistic path that starts small, proves value with real measurements, and only then asks for institutional support.</p>
-          <ol className="mt-8 grid gap-4 md:grid-cols-3">
+          <p className="mt-2 max-w-2xl text-white/70">The Student Government Association runs it as a one-semester, opt-in pilot. Existing programs bring the people. It needs no university records and no new university systems to start.</p>
+          <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="How GT Swarm fits existing programs (proposed)">
+            {PROGRAMS.map((p) => (
+              <li key={p.name} className="rounded-xl border border-gold/30 bg-gold/[0.07] p-4">
+                <p className="font-display font-bold text-gold-light">{p.name}</p>
+                <p className="mt-1 text-sm text-white/75">{p.adds}</p>
+              </li>
+            ))}
+          </ul>
+          <ol className="mt-6 grid gap-4 md:grid-cols-3">
             {PHASES.map((p) => (
               <li key={p.n} className="relative rounded-xl border border-white/10 bg-white/[0.04] p-5">
                 <div className="flex items-center gap-3">
@@ -249,7 +220,10 @@ export default async function Home() {
               </li>
             ))}
           </ol>
-          <p className="mt-3 text-xs text-white/50">Partnerships in phase 3 are proposals. GT Swarm is an independent student project with no existing Georgia Tech partnership or endorsement.</p>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-xs text-white/50">{PROPOSED_NOTE}</p>
+            <Link href="/pilot" className="btn-gold" data-testid="pilot-link">See the full SGA pilot plan →</Link>
+          </div>
 
           <div className="mt-8 grid gap-4 lg:grid-cols-3">
             <div className="rounded-xl bg-white p-5 text-ink">

@@ -2,6 +2,8 @@
 
 **Live site:** https://gtswarm.vercel.app. Click **Try Demo** for a hands-on tour: the judge clicks the real site (navigation, example buttons, Find People, Find Startups, invites, the persona menu, Accept) and the tour moves on when they do. Every step also has **Skip, do it for me**. Every person, startup and request is **fictional**.
 
+**Who runs it:** the Student Government Association, as a one-semester opt-in pilot, with CREATE-X, Startup Exchange, the Alumni Association and project courses bringing people in (proposed; no existing partnership). Details at `/pilot`.
+
 **The point to land:** Georgia Tech already has the people and the answers startups need, but founders, alumni and students can't see each other, so connections happen by luck. GT Swarm learns what each person has built and solved, matches them in both directions with reasons, and turns matches into real, consented connections. Connection is not only hiring: when a founder hits a wall (a bug, a hospital security review, a fundraising question), GT Swarm finds the student or alum who already solved it, and the ask is just 15 minutes.
 
 | # | Chapter | The judge does | What they see |
@@ -14,7 +16,8 @@
 | 6 | Builder → Opportunity | As Maya: **Find Your Startup** tab | Restwell recommended from her profile |
 | 7 | Builder → Opportunity | **Request to join → Send request** | "Sent to Elena" |
 | 8 | Consent | As Elena: **Accept** | Accepted; joining the team stays her choice |
-| 9 | Introduction made | **Finish** | Maya in Elena's connections; Dana's invite waiting |
+| 9 | Introduction made | Reads, **Next** | Maya in Elena's connections; Dana's invite waiting |
+| 10 | How GT gets this | **Finish** | The SGA pilot plan: a one-semester, opt-in pilot run by SGA with existing programs (proposed) |
 
 The tour opens pages and switches personas itself; the judge only does the actions above (about 60 to 90 seconds). Every action has **Skip, do it for me**. Get Unstuck, profile building from a resume, the network map and Impact for GT are left for the judge to explore.
 

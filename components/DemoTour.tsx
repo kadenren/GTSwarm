@@ -41,8 +41,9 @@ const RESTWELL_REQUEST = `[data-testid="request-received"]:has(a[href="${RESTWEL
 const RESTWELL_ACCEPTED = `[data-testid="request-received"][data-status="accepted"]:has(a[href="${RESTWELL_PAGE}"])`;
 
 /**
- * The judge story in nine steps (about 60 to 90 seconds): discover a startup, Elena finds and invites a cofounder,
- * Maya finds Restwell through reverse matching and asks to join, Elena accepts, and the introduction is made.
+ * The judge story in ten steps (about 60 to 90 seconds): discover a startup, Elena finds and invites a cofounder,
+ * Maya finds Restwell through reverse matching and asks to join, Elena accepts, the introduction is made,
+ * and the SGA pilot plan shows how Georgia Tech could run it.
  * The tour opens pages and switches personas itself; the judge does the actions.
  */
 const STEPS: Step[] = [
@@ -89,7 +90,11 @@ const STEPS: Step[] = [
     doneBody: 'Accepted. Adding Maya to the team stays Elena’s choice.' },
   { as: ELENA, url: '/inbox', target: '[data-testid="connections"]', who: 'Introduction made',
     title: 'Elena and Maya are connected',
-    body: 'The introduction is made, and Dana has Elena’s invite waiting. In this demo introductions appear in each person’s inbox; a real deployment would also send an email. Explore Get Unstuck, the network map and Impact for GT on your own.' },
+    body: 'The introduction is made, and Dana has Elena’s invite waiting. In this demo introductions appear in each person’s inbox; a real deployment would also send an email.' },
+
+  { as: ELENA, url: '/pilot', target: '[data-tour="pilot-timeline"]', who: 'How GT gets this',
+    title: 'SGA could pilot this next semester',
+    body: 'SGA runs a one-semester, opt-in pilot. CREATE-X, Startup Exchange and the Alumni Association bring the people (proposed). No university records needed. Explore Get Unstuck, the network map and Impact for GT on your own.' },
 ];
 
 const KEY = 'gtswarm-tour';
