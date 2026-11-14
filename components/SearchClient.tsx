@@ -72,7 +72,7 @@ export default function SearchClient({
   const roleLabel = kind === 'stuck' ? 'I’m stuck' : `${data?.role ?? role}${data && data.audience !== 'both' ? ` · ${data.audience}` : ''}`;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
+    <div className="relative z-10 mx-auto -mt-6 max-w-7xl px-4 pb-8">
       <form
         className="card p-5"
         onSubmit={(e) => { e.preventDefault(); run(q, role, audience, log); }}
@@ -140,6 +140,43 @@ export default function SearchClient({
       </form>
 
       {error && <p className="mt-6 rounded-lg bg-red-50 p-4 text-sm text-red-800" role="alert">{error}</p>}
+
+      {!data && !loading && (
+        <section className="mt-6 grid gap-4 md:grid-cols-3" aria-label="How to read results">
+          {[
+            { t: 'Closer to the center = stronger match', d: 'People are ranked on what they actually built and solved, plus role fit, shared ties and availability.', icon: (
+              <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="#003057" strokeOpacity=".15" strokeDasharray="2 3" /><circle cx="20" cy="20" r="9" fill="none" stroke="#003057" strokeOpacity=".2" strokeDasharray="2 3" /><rect x="13" y="17" width="14" height="6" rx="3" fill="#B3A369" /><circle cx="20" cy="9" r="3.5" fill="#1B8A8F" /><line x1="20" y1="17" x2="20" y2="12.5" stroke="#B3A369" strokeWidth="2.5" /><circle cx="35" cy="26" r="2.5" fill="#6B4FA3" /></svg>) },
+            { t: 'Teal alumni, purple students', d: 'Dashed lines show people in your results who already know each other, so you see the whole cluster.', icon: (
+              <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="11" cy="20" r="6" fill="#1B8A8F" /><circle cx="29" cy="20" r="6" fill="#6B4FA3" /><line x1="17" y1="20" x2="23" y2="20" stroke="#5B6B7C" strokeDasharray="2 2" strokeWidth="1.5" /></svg>) },
+            { t: 'Click anyone to see why', d: 'Each person comes with a plain-English connection, a score breakdown and the warm path from you.', icon: (
+              <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect x="6" y="8" width="28" height="24" rx="4" fill="none" stroke="#003057" strokeOpacity=".3" /><rect x="10" y="13" width="14" height="3" rx="1.5" fill="#003057" /><rect x="10" y="19" width="20" height="2" rx="1" fill="#003057" fillOpacity=".3" /><rect x="10" y="24" width="16" height="2" rx="1" fill="#003057" fillOpacity=".3" /></svg>) },
+          ].map((x) => (
+            <div key={x.t} className="card flex gap-4 p-5">
+              <div className="shrink-0">{x.icon}</div>
+              <div>
+                <h3 className="font-display font-bold text-navy">{x.t}</h3>
+                <p className="mt-1 text-sm text-ink/65">{x.d}</p>
+              </div>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {data && !loading && data.results[0] && !expanded && (
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gold/50 bg-gradient-to-r from-gold/15 to-transparent px-5 py-3" data-testid="best-match">
+          <div className="flex items-center gap-3">
+            <span className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white ring-4 ring-gold ${data.results[0].type === 'alum' ? 'bg-teal' : 'bg-plum'}`}>
+              {data.results[0].name.split(' ').map((w) => w[0]).join('')}
+            </span>
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-wide text-gold-dark">Best match</div>
+              <div className="font-display text-lg font-bold text-navy">{data.results[0].name} <span className="text-sm font-medium text-ink/55">{data.results[0].label}</span></div>
+              <div className="text-sm text-ink/70">{data.results[0].description.short.split(' · ')[0]}{data.results[0].path ? ` · ${data.results[0].path.hops} ${data.results[0].path.hops === 1 ? 'hop' : 'hops'} from you` : ''}</div>
+            </div>
+          </div>
+          <button className="btn-gold" onClick={() => setSelected(data.results[0].personId)}>See why {data.results[0].name.split(' ')[0]} matched</button>
+        </div>
+      )}
 
       {data && !loading && data.results.length === 0 && (
         <div className="card mt-6 p-10 text-center">

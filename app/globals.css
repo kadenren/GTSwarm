@@ -26,3 +26,16 @@ h1, h2, h3, h4 { @apply font-display; }
 
 @keyframes drift { 0% { transform: translate(0,0); } 50% { transform: translate(12px,-10px); } 100% { transform: translate(0,0); } }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* home hero web preview */
+@keyframes hwNode { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes hwGrow { from { stroke-dasharray: 0 400; } to { stroke-dasharray: 400 0; } }
+@keyframes hwFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes hwPulse { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.25); opacity: 0; } }
+.hw-node { animation: hwNode 700ms cubic-bezier(.2,.8,.2,1) both; }
+.hw-grow { animation: hwGrow 700ms ease-out both; }
+.hw-fade { animation: hwFade 500ms ease-out 700ms both; }
+.hw-best { stroke-dasharray: 160; stroke-dashoffset: 160; animation: hwBest 500ms ease-in-out 800ms forwards; }
+@keyframes hwBest { to { stroke-dashoffset: 0; } }
+.hw-pulse { animation: hwPulse 2.4s ease-in-out 1.4s infinite; }
+@media (prefers-reduced-motion: reduce) { .hw-best { stroke-dashoffset: 0; } }

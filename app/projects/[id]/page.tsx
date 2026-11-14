@@ -45,6 +45,13 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
           <div className="mt-3 flex flex-wrap gap-1.5">
             {p.technologies.map((t) => <span key={t} className="tag">{t}</span>)}
           </div>
+          {v.links.length > 0 && (
+            <ul className="mt-3 flex flex-wrap gap-2 text-sm">
+              {v.links.map((l) => (
+                <li key={l.url}><a href={l.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-md border border-navy/15 bg-white px-2.5 py-1 text-navy hover:border-gold">{l.title || l.url} <span aria-hidden="true">↗</span></a></li>
+              ))}
+            </ul>
+          )}
         </div>
       </header>
 

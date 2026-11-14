@@ -146,7 +146,7 @@ export function confirmMilestone(milestoneId: string, viewerId: string) {
 }
 
 /** Save a confirmed project: the viewer becomes a builder (founder for startups); skills, problems and embeddings join the graph. */
-export async function createProject(viewerId: string, input: { name: string; year: number; team_type: string; team_name: string; summary: string; technologies: string[]; problems: { description: string; solution: string }[] }) {
+export async function createProject(viewerId: string, input: { name: string; year: number; team_type: string; team_name: string; summary: string; technologies: string[]; problems: { description: string; solution: string }[]; links?: { url: string; title?: string }[] }) {
   const db = getDb();
   const name = input.name.trim(), summary = input.summary.trim();
   const TYPES = ['VIP', 'Capstone', 'CREATE-X', 'Lab', 'Club', 'Invention Studio', 'Startup'];
@@ -169,6 +169,9 @@ export async function createProject(viewerId: string, input: { name: string; yea
       if (!skill) { skill = { id: nextId('skills', 'skill:s') }; db.prepare('INSERT INTO skills (id, name) VALUES (?,?)').run(skill.id, t); }
       db.prepare('INSERT OR IGNORE INTO project_skill VALUES (?,?)').run(id, skill.id);
       db.prepare('INSERT OR IGNORE INTO person_skill VALUES (?,?)').run(viewerId, skill.id);
+    }
+    for (const l of (input.links ?? []).slice(0, 5)) {
+      if (/^https?:\/\//.test(l.url)) db.prepare('INSERT OR IGNORE INTO project_link (project_id, url, title) VALUES (?,?,?)').run(id, l.url, (l.title ?? '').slice(0, 200) || null);
     }
     problems.forEach((p, i) => {
       const pid = nextId('problems', 'problem:pb');

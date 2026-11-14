@@ -90,6 +90,12 @@ CREATE TABLE IF NOT EXISTS milestones (
   date TEXT NOT NULL,
   confirmed_by TEXT REFERENCES people(id)
 );
+CREATE TABLE IF NOT EXISTS project_link (
+  project_id TEXT NOT NULL REFERENCES projects(id),
+  url TEXT NOT NULL,
+  title TEXT,
+  PRIMARY KEY (project_id, url)
+);
 CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 CREATE INDEX IF NOT EXISTS idx_pp_project ON person_project(project_id);
@@ -131,6 +137,7 @@ export function resetFromSeed(db: Database.Database = getDb()) {
   try {
     db.pragma('foreign_keys = OFF');
     db.transaction(() => {
+      db.exec('DELETE FROM main.project_link'); // the seed has no links; anything here was added during a demo
       // polished wording is keyed by the exact template text, so it stays valid across resets; keep it
       for (const t of tables) db.exec(t === 'cache' ? "DELETE FROM main.cache WHERE key NOT LIKE 'polish:%'" : `DELETE FROM main.${t}`);
       for (const t of [...tables].reverse()) db.exec(`INSERT OR IGNORE INTO main.${t} SELECT * FROM seed.${t}`);

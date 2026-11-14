@@ -1,13 +1,16 @@
 import AddProject from '@/components/AddProject';
+import PageHero from '@/components/PageHero';
 
 export const dynamic = 'force-dynamic';
 
 export default function AddPage() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <h1 className="text-3xl font-bold text-navy">Add a project</h1>
-      <p className="mb-6 mt-1 max-w-3xl text-sm text-ink/70">Map something you built. Paste its abstract, confirm the extracted details, and it joins the graph as a project you built, with its technologies and solved problems.</p>
-      <AddProject aiEnabled={!!process.env.ANTHROPIC_API_KEY} />
-    </div>
+    <>
+      <PageHero eyebrow="Grow the swarm" title="Add a project you built"
+        subtitle="Drop in your capstone report, poster, slides, README or a few sentences. GT Swarm reads them, fills in the project, and links it to the people, skills and problems already in the graph." />
+      <div className="mx-auto max-w-7xl px-4 py-8">
+        <AddProject aiEnabled={!!process.env.ANTHROPIC_API_KEY} />
+      </div>
+    </>
   );
 }

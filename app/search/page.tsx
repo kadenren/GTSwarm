@@ -1,4 +1,5 @@
 import SearchClient from '@/components/SearchClient';
+import PageHero from '@/components/PageHero';
 import { viewerContext } from '@/lib/context';
 import { suggestIntros } from '@/lib/graph/circles';
 import { snapshot, personLabel } from '@/lib/data';
@@ -19,12 +20,8 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         ];
   return (
     <>
-      <div className="border-b border-navy/10 bg-white/50">
-        <div className="mx-auto max-w-7xl px-4 py-6">
-          <h1 className="text-3xl font-bold text-navy">Find expertise</h1>
-          <p className="mt-1 text-sm text-ink/70">Search a skill, pick the role you need, and see who in the swarm has actually built it, and how you are connected.</p>
-        </div>
-      </div>
+      <PageHero eyebrow="Find expertise" title="Who at GT has built what you need?"
+        subtitle={`Search ${s.projects.length} projects and ${s.people.filter((p) => p.claimed).length} builders by what they actually did. Pick the role you are filling and see how you are connected.`} />
       <SearchClient kind="expertise" aiPolish={!!process.env.ANTHROPIC_API_KEY} intros={intros} viewerName={me.name} viewerProjects={projects} suggestions={suggestions}
         initial={{ q: sp.q ?? '', role: sp.role ?? 'Cofounder', audience: sp.aud ?? 'both', log: '' }} />
     </>

@@ -90,5 +90,6 @@ export function projectView(projectId: string, viewerId: string) {
     problems: (s.problemsOf.get(projectId) ?? []).map((pb) => ({ id: pb.id, description: pb.description, solution: pb.solution, by: pb.solved_by ? s.person.get(pb.solved_by)?.name : null, helper: pb.helper_id ? s.person.get(pb.helper_id)?.name : null })),
     record: buildRecord(projectId),
     handoff: handoffBrief(projectId),
+    links: getDb().prepare('SELECT url, title FROM project_link WHERE project_id = ?').all(projectId) as { url: string; title: string | null }[],
   };
 }

@@ -4,7 +4,9 @@
     {
       "name": "gt-swarm",
       "runtimeExecutable": "C:/Users/kaden/AppData/Local/Programs/node-v22.23.5-win-x64/node.exe",
-      "runtimeArgs": ["node_modules/next/dist/bin/next", "dev", "-p", "3000"],
+      "runtimeArgs": [
+        "C:/Users/kaden/OneDrive - Georgia Institute of Technology/Desktop/GT Swarm/scripts/dev.mjs"
+      ],
       "port": 3000
     }
   ]
