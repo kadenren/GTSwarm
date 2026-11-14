@@ -1,8 +1,10 @@
 import { handle } from '@/lib/api';
 import { snapshot } from '@/lib/data';
+import { ready } from '@/lib/session';
 
 /** Whole-swarm graph for the network explorer: projects, people and skills (problems are summarized on project pages). */
 export async function GET() {
+  await ready();
   return handle(() => {
     const s = snapshot();
     const nodes = [

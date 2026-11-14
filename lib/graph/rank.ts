@@ -119,7 +119,7 @@ function describeEvidence(s: Snapshot, e: Evidence, query: string): string {
   return `Profile and skills match "${query}"`;
 }
 
-async function rank(kind: 'expertise' | 'problem', query: string, role: Role | null, viewerId: string, audience: Audience): Promise<RankOutput> {
+async function rank(kind: 'expertise' | 'problem', query: string, role: Role | null, viewerId: string, audience: Audience, opts: RankOptions = {}): Promise<RankOutput> {
   const s = snapshot();
   const q = query.trim();
   if (!q) return { query: q, role, audience, mode: s.searchMode, matcher: 'graph', results: [] };
@@ -130,7 +130,7 @@ async function rank(kind: 'expertise' | 'problem', query: string, role: Role | n
     .sort((a, b) => b[1] - a[1])
     .slice(0, TOP_DOCS);
   const ctx: Ctx = { s, sims, viewerId, topDocs: new Set(docs.map(([id]) => id)) };
-  const people = eligible(s, viewerId, audience);
+  const people = eligible(s, viewerId, audience).filter((p) => !(opts.requireRole && role && kind === 'expertise') || p.open_to.includes(role!));
   const maxHours = Math.max(1, ...people.map((p) => p.availability_hours));
   const fitRole: Role = kind === 'problem' ? 'Helper' : role ?? 'Helper';
 
@@ -167,7 +167,7 @@ async function rank(kind: 'expertise' | 'problem', query: string, role: Role | n
   // Gemini matchmaker: rescore the graph's shortlist by reading each candidate's record against the request
   let matcher: 'gemini' | 'graph' = 'graph';
   const aiReasons = new Map<string, string>();
-  if (geminiEnabled()) {
+  if (geminiEnabled() && opts.ai !== false) {
     const pool = scored.slice(0, MATCH_POOL).filter((r) => r.eRaw > 0);
     const verdicts = await geminiMatch({ request: q, role: kind === 'problem' ? null : role, kind, candidates: pool.map((r) => ({ id: r.p.id, name: r.p.name, summary: candidateSummary(s, r.p) })) });
     if (verdicts) {
@@ -217,9 +217,13 @@ async function rank(kind: 'expertise' | 'problem', query: string, role: Role | n
   return { query: q, role, audience, mode, matcher, results };
 }
 
-export function rankForExpertise(query: string, role: Role, viewerId: string, audience: Audience = 'both') {
-  return rank('expertise', query, role, viewerId, audience);
+/** ai: false skips the Gemini matchmaker (used for pages that run several rankings at once). exclude: people to leave out. */
+/** ai: allow the Gemini rerank. requireRole: only people who said they are open to the role (an eligibility check, not a score). */
+export interface RankOptions { ai?: boolean; requireRole?: boolean }
+
+export function rankForExpertise(query: string, role: Role, viewerId: string, audience: Audience = 'both', opts: RankOptions = {}) {
+  return rank('expertise', query, role, viewerId, audience, opts);
 }
-export function rankForProblem(problemText: string, viewerId: string, audience: Audience = 'both') {
-  return rank('problem', problemText, null, viewerId, audience);
+export function rankForProblem(problemText: string, viewerId: string, audience: Audience = 'both', opts: RankOptions = {}) {
+  return rank('problem', problemText, null, viewerId, audience, opts);
 }

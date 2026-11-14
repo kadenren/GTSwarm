@@ -195,7 +195,7 @@ function JoinAnimation({ saved }: { saved: Saved }) {
       <div className="flex flex-wrap items-center justify-between gap-3 p-5">
         <div>
           <h2 className="text-lg font-bold text-navy">{saved.name} joined the swarm</h2>
-          <p className="text-sm text-ink/70">It is now searchable, linked to its closest projects, and its solved problems show up in I&apos;m stuck.</p>
+          <p className="text-sm text-ink/70">It is now searchable, linked to its closest projects, and its solved problems show up in Get Unstuck.</p>
         </div>
         <Link className="btn-primary" href={`/projects/${encodeURIComponent(saved.id)}`}>Open project page</Link>
       </div>

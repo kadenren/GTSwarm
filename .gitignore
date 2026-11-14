@@ -7,3 +7,6 @@ data/models
 next-env.d.ts
 *.tsbuildinfo
 .next-build
+.next-hosted
+.vercel
+.env*.local

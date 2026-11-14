@@ -1,75 +1,61 @@
-# GT Swarm show-through (about 8 minutes)
+# GT Swarm demo script (about 2 minutes)
 
-All people, projects and files in this demo are fictional. Sample files live in [demo-files/](demo-files/).
+GT Swarm is a startup matchmaking exchange for Georgia Tech students and alumni. Discovery brings people in, matching creates value, and connections turn matches into opportunities. Every person, startup, request and outcome in the demo is **fictional**.
 
-## Before the judges arrive (5 minutes)
+## Before you present
 
-1. Open a terminal in the **GT Swarm** folder and run `npm run dev`. Open http://localhost:3000 in a full-size browser window.
-2. **Gemini:** the key is already in `.env.local`. After any re-seed, run `npm run ai:warm` once (about 7 minutes on the free tier) and restart `npm run dev`. It embeds the swarm with Gemini and pre-runs every demo search, so nothing waits on the network on stage. The footer should read "Matching: Gemini embeddings + Gemini matchmaker".
-3. Click the gold **Demo guide** button (bottom right) → **Reset data**. You are now viewing as **Leo Martinez**, a student cofounder of PulseBand.
-4. Keep the **demo-files** folder open next to the browser so you can drag files in.
+1. In the **GT Swarm** folder, run `npm run dev` and open http://localhost:3000 full screen.
+2. Click the gold **Demo** button (top right). It resets the data and starts a guided tour: each step dims the page, highlights what to click, and points an arrow at it, switching demo accounts for you. Run it once to warm up the searches, then click **Demo** again to reset before judges arrive.
+3. Present with the tour on, or close it (X) and follow this script by hand. The matching that drives the story is deterministic and works offline.
 
-Without a key, everything still works: matching uses the graph and keyword search, and only the poster photo and screenshot need Gemini (use the report PDF and log file instead).
+## Scene 1: Discover (15 s)
+- **Discover** is the homepage: student- and alumni-founded startups, each with stage, industry, founder, technologies and open roles.
+- Point at the filters (industry, skills needed, stage, founder, actively recruiting) and at **Restwell Patch**, Elena Brooks's medical wearable startup.
+- **Say:** "Anyone can browse what Yellow Jackets are building, without committing to anything."
 
-## The story
+## Scene 2: Alum finds an alum cofounder (35 s), the main wow moment
+- **Viewing as → Elena Brooks** (alum founder). **Find Matches → Find People.**
+- Type: `I'm building a wearable medical device startup and need an alumni cofounder with embedded hardware or medical-device expertise.` Role **Cofounder**, from **Alumni**. **Find people.**
+- **Dana Whitfield** leads, with a reason built from her record (she solved battery drain on a wearable sensor board, has embedded hardware experience, and is open to cofounding). Only alumni open to cofounding are ranked.
+- Click **View connections**: her real network and the warm path, with documented ties kept separate from inferred similarity. Close it.
+- **Invite to connect → Send invite.**
 
-> "Georgia Tech builds hundreds of projects a year: capstones, VIP teams, CREATE-X startups. When a team gets stuck or needs a cofounder, the person who already solved it is usually one or two introductions away, but nobody can see that. GT Swarm maps everything Yellow Jackets have built into one graph, and finds the right person at every step of building."
+## Scene 3: Alum finds a student engineer (15 s)
+- Change the text to `wearable firmware engineer`, role **Engineer**, from **Students**. Maya Okafor, Jordan Kim and Sofia Alvarez lead, each with firmware work on record. Optionally invite one.
 
-## 1. Home (20 seconds)
-Point at the hero: search is right there, the web on the right is the product, and the numbers are the swarm: 150 projects, 205 builders, 266 solved problems, 23 handoffs.
+## Scene 4: Student finds the startup (20 s)
+- **Viewing as → Maya Okafor** (student). **Find Matches → Find Startups.**
+- Type: `I'm a computer engineering student interested in embedded systems, wearable devices, and early-stage hardware startups.` (or leave it empty to use her saved profile). **Find startups.**
+- Restwell Patch is a top match: "Strong match because you have Wearables, BLE, nRF52 experience and Restwell Patch is seeking an engineer." **Request to join → Engineer → Send request.**
 
-## 2. Find a cofounder (90 seconds) — student to alum
-- Click **Find expertise**. Role **Cofounder**, search `low-power embedded hardware, has shipped a product` (or click the suggestion).
-- **Say:** "Closer to the center means a stronger match. Teal are alumni, purple are students, dashed lines mean these people already know each other."
-- Hover **Dana Whitfield** (inner ring, gold line): her one-line connection appears.
-- Click Dana. Read the top of the panel: she built the 2017 sensor board PulseBand continued from, then shipped a consumer wearable.
-  - With Gemini: point at **"Gemini's read of Dana's record"** and the **AI fit (Gemini)** score.
-  - Show the score breakdown and the warm path ("You → Jordan Kim → Dana").
-- Click **Request Cofounder conversation** → **Send request**.
-- **Say:** "Every match is explainable: what they built, why they ranked, and who can introduce you."
+## Scene 5: Connection, then collaboration (20 s)
+- **Viewing as → Elena** → **Inbox**. Maya's request to join. **Accept.**
+- Maya appears under **Your connections**. **Say:** "Accepting creates a connection, not a title." Optionally click **Add to Restwell Patch as…**, the separate step only the founder can take.
 
-## 3. Get unstuck from an error log (60 seconds)
-- Click **I'm stuck**. In **Ask the scout**, click **+ Have an error log or a screenshot?**
-- Drag in `demo-files/6-hydraband-serial-log.txt` (or `7-error-screenshot.png` with Gemini) → **Turn into a problem**. It becomes "BLE connection drops when the device enters sleep mode (nRF52 / Zephyr firmware)".
-- Click **Send the scout**. Watch it search solved problems, rank builders and check warm paths. **Marcus Reyes** solved exactly this in 2020; the fix is right there.
-- **Say:** "You don't need to know what to search for. Paste the log."
+## Scene 6: Close (10 s)
+- Back to **Discover**. "This works alumni to alumni, alumni to students, students to alumni, and students to students."
+> "GT Swarm helps Yellow Jackets find the people they need to build what's next."
 
-## 4. Map a new project from files (75 seconds) — grow the swarm
-- Click **Add**. Drag in `1-HydraBand-capstone-report.pdf` and `3-HydraBand-README.md` (and `2-HydraBand-poster.jpg`, a phone photo of the poster, if Gemini is on).
-- Click **Read and fill in**. Point at "What we read" and the filled-in name, team, technologies and three solved problems. Edit anything, then **Add to the swarm**.
-- The new project animates into its neighborhood.
-- **Say:** "Every capstone becomes searchable for the next team, from documents students already write."
+## Optional extras
+- **View network** on Find People results opens the radial relevance web.
+- **My Profile**: interests (exploring, cofounders, joining, advising, collaborating, investing), roles open to, hours, and the startups you own.
+- Footer links: **Post a startup** and **Join GT Swarm** (fill a profile or startup from a resume, report or poster), **Get Unstuck** (find who already solved your technical problem), **My Swarm**, **Whole network** and **Impact**.
 
-## 5. An alum joins in two minutes (75 seconds) — how real people get in
-- Click **Profile** → **Create your own profile** (or go to `/join`).
-- Type `Rachel Bianchi`, choose **An alum**, drag in `4-resume-Rachel-Bianchi-alum.pdf`. Optionally paste a GitHub or website link.
-- Click **Read and draft my profile**. Show that every field is editable and that **Rachel chooses** what she is open to: pick **Advisor** and **Helper**. **Create my profile**.
-- **Say:** "Alumni and students create their own profiles from their resume, LinkedIn's Save to PDF, GitHub or website. Nothing is saved until they confirm, and we never scrape anyone."
-- Prove it: switch **Viewing as** back to Leo. In **Find expertise**, role **Advisor**, **Alumni**, search `BLE firmware that stays connected through sleep, medical wearable`. **Rachel is rank 1**, seconds after joining.
+## How matching works (for questions)
+- **Founder → people:** a ranking score from what people actually built and solved compared with the request (55%), documented experience (20%), shared GT ties (10%), openness to the role (10%) and availability (5%). A chosen role and the students/alumni filter are eligibility checks, not score boosts. No person is boosted by name.
+- **Person → startup:** text similarity (35%), skills the startup needs that you have (25%), a role it needs that you are open to (20%), industry and startup interest (10%), stage (5%) and shared ties (5%).
+- Every result shows a one-sentence reason built only from stored records, plus a score breakdown under **Why this match?**. Scores are the algorithm's real output, not invented percentages.
 
-## 6. Alum to alum, alum to student (45 seconds)
-- **Viewing as** → **Elena Brooks** (alum founder). Role **Advisor**, `FDA approval for a wearable medical device` → **Priya Natarajan** at rank 1. Scroll to **You should meet**: Priya again, predicted from shared connections.
-- Role **Early engineer**, **Students**, `wearable firmware` → three students with firmware build records fill the inner ring.
-
-## 7. Consent, then connect (45 seconds)
-- **Viewing as** → **Dana**. **Inbox** → **Accept** Leo's request. "Accepting only creates a connection."
-- **Viewing as** → **Leo**. **Inbox** → **Add to project as Cofounder**. Open **My projects → PulseBand**: Dana is on the team.
-
-## 8. The whole swarm and the impact (45 seconds)
-- **Network**: the gold path PulseBand → Wearable Sensing (2017) → Dana. Drag the year slider from 2026 back to 2012 and forward again.
-- **Impact**: 93% of alumni are within three introductions of a current student; 66% of connections cross majors; 44 solved problems were handed to the next team. "Every number is computed live from the graph."
-
-## Close (10 seconds)
-> "GT Swarm turns what Georgia Tech has already built into the fastest way to find the right person: a cofounder, an advisor, or the alum who fixed your exact bug."
-
-## Likely questions
-
-- **Where does the data come from?** People add themselves (resume, LinkedIn PDF, GitHub, website) and their projects (reports, posters, READMEs). A rollout would use GT single sign-on for students and Alumni Association invites for alumni, and could pre-fill records from public Capstone Expo and VIP listings that stay hidden until claimed.
-- **What does the AI do?** Gemini reads messy input (posters, resumes, logs) and does the matching: meaning-based embeddings plus a matchmaker that reads each shortlisted candidate's record and scores the fit, with a reason. The graph supplies the shortlist, warm paths, circles and introductions, so every match stays explainable.
-- **Privacy?** No scraping. Everything is opt-in and confirmed by the person. Requests need consent. LinkedIn and Scholar links are shown, never read automatically.
-- **Does it work offline?** Yes. Without a key it falls back to graph and keyword matching, and every Gemini result used in the demo is cached.
+## Assumptions
+- **Data comes from people opting in.** Alumni and students create their own profiles (resume, GitHub, website; LinkedIn and Scholar are links only). Nothing is scraped. In the demo, every profile is fictional.
+- **Campus partners help with reach, not engineering.** We assume the Alumni Association emails invite links (`/join?invite=alumni`) and that CREATE-X, VIP and SGA share links with students. No access to private alumni databases is assumed.
+- **Sign-in would use GT single sign-on** for students and email invites for alumni. Not built; the "Viewing as" switcher stands in for it.
+- **Founders keep their startup pages current** (stage, open roles, needs). Stale pages make matches worse; owners can edit status in one click.
+- **People are honest about roles and availability.** Willingness to cofound or advise is self-reported, and it gates who appears for that role.
+- **One office could run it.** It is one web app and one database, with an optional Gemini key for meaning-based search and document reading. Matching works without it.
+- **Students use it at specific moments:** looking for a team or startup, needing an advisor or engineer, or stuck on a technical problem, not as a daily feed.
+- **Demo-only tools are off in production.** The data reset works in development, or only when `GTSWARM_DEMO=1` is set.
 
 ## If something goes wrong
-- Anything looks off: **Demo guide → Reset data**, then restart from step 2.
-- A Gemini step is slow or fails: the app falls back automatically; keep talking and continue.
-- Poster photo without a key: use the report PDF instead (the app says so).
+- Click **Demo** again (it resets the data) or open `localhost:3000/demo/reset`.
+- If Gemini is slow or unavailable, the matching still works. Keep going.

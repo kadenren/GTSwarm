@@ -1,11 +1,13 @@
 import { getViewerId } from '@/lib/viewer';
 import { runScout, type ScoutEvent } from '@/lib/scout';
+import { ready } from '@/lib/session';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
 /** Streams scout progress as newline-delimited JSON, one event per line. */
 export async function POST(req: Request) {
+  await ready();
   const viewerId = await getViewerId();
   const { need, web } = (await req.json()) as { need?: string; web?: boolean };
   const encoder = new TextEncoder();

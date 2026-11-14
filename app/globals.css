@@ -39,3 +39,12 @@ h1, h2, h3, h4 { @apply font-display; }
 @keyframes hwBest { to { stroke-dashoffset: 0; } }
 .hw-pulse { animation: hwPulse 2.4s ease-in-out 1.4s infinite; }
 @media (prefers-reduced-motion: reduce) { .hw-best { stroke-dashoffset: 0; } }
+
+/* guided demo */
+@keyframes tour-pulse { 0% { box-shadow: 0 0 0 0 rgba(234, 170, 0, 0.7); } 70% { box-shadow: 0 0 0 14px rgba(234, 170, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(234, 170, 0, 0); } }
+.tour-pulse { animation: tour-pulse 1.6s ease-out infinite; }
+@keyframes tour-bob-y { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes tour-bob-x { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-5px); } }
+.tour-bob-y { animation: tour-bob-y 1s ease-in-out infinite; }
+.tour-bob-x { animation: tour-bob-x 1s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .tour-pulse, .tour-bob-y, .tour-bob-x { animation: none; } }

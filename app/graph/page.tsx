@@ -1,10 +1,12 @@
 import { snapshot } from '@/lib/data';
+import { ready } from '@/lib/session';
 
 import NetworkExplorer from '@/components/NetworkExplorer';
 
 export const dynamic = 'force-dynamic';
 
-export default function GraphPage() {
+export default async function GraphPage() {
+  await ready();
   const s = snapshot();
   const pulse = s.projects.find((p) => p.name === 'PulseBand')!;
   const dana = s.people.find((p) => p.name === 'Dana Whitfield')!;

@@ -1,4 +1,4 @@
-import { getDb, dataVersion, parseJson } from './db';
+import { getDb, dataVersion, parseJson, perDb } from './db';
 import { fromBlob } from './embed';
 
 export type Role = 'Cofounder' | 'Advisor' | 'Helper' | 'Early engineer' | 'First customer';
@@ -46,7 +46,7 @@ export interface Snapshot {
   searchMode: 'semantic' | 'keyword';
 }
 
-const g = globalThis as unknown as { __gtSnap?: Snapshot };
+const g = perDb<{ __gtSnap?: Snapshot }>(); // one cache per database (each demo session has its own)
 
 const push = <K, V>(m: Map<K, V[]>, k: K, v: V) => {
   const a = m.get(k);

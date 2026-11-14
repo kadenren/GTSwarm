@@ -3,10 +3,13 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import 'd3-transition'; // registers selection.transition() (side effect can be dropped by the bundler otherwise)
 
-export interface WebNode { id: string; name: string; label: string; type: 'student' | 'alum'; score: number; rank: number; ring: 1 | 2 | 3; short: string }
+export interface WebNode { id: string; name: string; label: string; type: 'student' | 'alum' | 'project'; score: number; rank: number; ring: 1 | 2 | 3; short: string; kind?: 'person' | 'project' }
 export interface WebEdge { source: string; target: string; kind: string; label: string }
 
-const COLORS = { alum: '#1B8A8F', student: '#6B4FA3', gold: '#B3A369', navy: '#003057' };
+const COLORS = { alum: '#1B8A8F', student: '#6B4FA3', project: '#003057', gold: '#B3A369', navy: '#003057' };
+const EDGE_STYLE: Record<string, { stroke: string; dash: string | null; width: number }> = {
+  built: { stroke: '#5B6B7C', dash: null, width: 1.3 }, continued: { stroke: '#B3A369', dash: '6 4', width: 1.8 },
+};
 const BANDS: Record<1 | 2 | 3, [number, number]> = { 1: [0.3, 0.4], 2: [0.54, 0.68], 3: [0.8, 0.97] };
 
 function hash(s: string) {
@@ -106,7 +109,7 @@ export default function RelevanceWeb({
       .attr('data-a', (d) => d.source).attr('data-b', (d) => d.target)
       .attr('x1', (d) => byId.get(d.source)!.x).attr('y1', (d) => byId.get(d.source)!.y)
       .attr('x2', (d) => byId.get(d.target)!.x).attr('y2', (d) => byId.get(d.target)!.y)
-      .attr('stroke', '#5B6B7C').attr('stroke-width', 1.4).attr('stroke-dasharray', '5 5').attr('stroke-opacity', 0)
+      .attr('stroke', (d) => EDGE_STYLE[d.kind]?.stroke ?? '#5B6B7C').attr('stroke-width', (d) => EDGE_STYLE[d.kind]?.width ?? 1.4).attr('stroke-dasharray', (d) => (d.kind in EDGE_STYLE ? EDGE_STYLE[d.kind].dash : '5 5')).attr('stroke-opacity', 0)
       .call((sel) => sel.append('title').text((d) => `${byId.get(d.source)!.name} and ${byId.get(d.target)!.name}: ${d.label}`))
       .transition().delay(dur).duration(still ? 0 : 350).attr('stroke-opacity', 0.55);
 
@@ -142,9 +145,20 @@ export default function RelevanceWeb({
       .style('opacity', 0);
     nodeG.transition().duration(dur).delay((d) => (still ? 0 : d.rank * 25)).ease(ease)
       .attr('transform', (d) => `translate(${d.x},${d.y})`).style('opacity', 1);
-    nodeG.append('circle').attr('class', 'halo').attr('r', (d) => d.r + 6).attr('fill', 'none').attr('stroke', COLORS.gold).attr('stroke-width', 3).attr('opacity', 0);
-    nodeG.append('circle').attr('class', 'dot').attr('r', (d) => d.r)
-      .attr('fill', (d) => COLORS[d.type]).attr('stroke', (d) => (d.rank === 1 ? COLORS.gold : '#fff')).attr('stroke-width', (d) => (d.rank === 1 ? 4 : 2.5));
+    // people are circles; projects are rounded squares
+    nodeG.each(function (d) {
+      const g = d3.select(this);
+      if (d.kind === 'project') {
+        const h = d.r * 0.92;
+        g.append('rect').attr('class', 'halo').attr('x', -h - 6).attr('y', -h - 6).attr('width', 2 * h + 12).attr('height', 2 * h + 12).attr('rx', 8).attr('fill', 'none').attr('stroke', COLORS.gold).attr('stroke-width', 3).attr('opacity', 0);
+        g.append('rect').attr('class', 'dot').attr('x', -h).attr('y', -h).attr('width', 2 * h).attr('height', 2 * h).attr('rx', 6)
+          .attr('fill', COLORS.project).attr('stroke', d.rank === 1 ? COLORS.gold : '#D6CC9E').attr('stroke-width', d.rank === 1 ? 4 : 2.5);
+      } else {
+        g.append('circle').attr('class', 'halo').attr('r', d.r + 6).attr('fill', 'none').attr('stroke', COLORS.gold).attr('stroke-width', 3).attr('opacity', 0);
+        g.append('circle').attr('class', 'dot').attr('r', d.r)
+          .attr('fill', COLORS[d.type]).attr('stroke', d.rank === 1 ? COLORS.gold : '#fff').attr('stroke-width', d.rank === 1 ? 4 : 2.5);
+      }
+    });
     nodeG.append('text').attr('text-anchor', 'middle').attr('dy', '0.35em').attr('font-size', (d) => Math.max(9, d.r * 0.75)).attr('font-weight', 700).attr('fill', '#fff')
       .attr('pointer-events', 'none').text((d) => d.name.split(' ').map((w) => w[0]).join('').slice(0, 2));
     nodeG.append('text').attr('class', 'lbl')
@@ -171,7 +185,7 @@ export default function RelevanceWeb({
       svg.select('line.best').transition().duration(150).attr('opacity', !keep || best?.id === id ? 1 : 0.25);
       svg.selectAll<SVGLineElement, WebEdge>('g.peers line').transition().duration(150)
         .attr('stroke-opacity', (d) => (!id ? 0.55 : d.source === id || d.target === id ? 0.95 : 0.06))
-        .attr('stroke', (d) => (id && (d.source === id || d.target === id) ? COLORS.navy : '#5B6B7C'));
+        .attr('stroke', (d) => (id && (d.source === id || d.target === id) ? COLORS.navy : EDGE_STYLE[d.kind]?.stroke ?? '#5B6B7C'));
     };
     nodeG
       .on('mouseenter', (_e, d) => { highlight(d.id); setHover(d); })
@@ -185,7 +199,7 @@ export default function RelevanceWeb({
   }, [placed, edges, query, roleLabel, reduced, centerKind, cx, cy, R, kx]);
 
   useEffect(() => {
-    d3.select(svgRef.current!).selectAll<SVGGElement, Placed>('g.node').select('circle.halo').attr('opacity', (d) => (d.id === selectedId ? 1 : 0));
+    d3.select(svgRef.current!).selectAll<SVGGElement, Placed>('g.node').select('.halo').attr('opacity', (d) => (d.id === selectedId ? 1 : 0));
   }, [selectedId, placed]);
 
   return (
@@ -207,11 +221,12 @@ export default function RelevanceWeb({
   );
 }
 
-export function WebLegend({ center = 'search' }: { center?: 'search' | 'person' }) {
+export function WebLegend({ center = 'search', projects = false }: { center?: 'search' | 'person'; projects?: boolean }) {
   return (
     <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-ink/70" aria-label="Legend">
       <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-teal" />Alumni</span>
       <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-plum" />Students</span>
+      {projects && <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-[3px] border-2 border-gold-light bg-navy" />Projects</span>}
       <span className="flex items-center gap-1.5"><span className="h-1.5 w-6 rounded bg-gold" />Best match path</span>
       <span className="flex items-center gap-1.5">
         <svg width="26" height="6" aria-hidden="true"><line x1="0" y1="3" x2="26" y2="3" stroke="#5B6B7C" strokeWidth="1.6" strokeDasharray="5 4" /></svg>

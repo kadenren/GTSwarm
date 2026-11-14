@@ -10,7 +10,8 @@
     "ai:warm": "tsx scripts/ai-warm.ts",
     "demo:files": "tsx scripts/make-demo-files.ts",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:seed": "tsx scripts/db-seed.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.8.0",
@@ -26,6 +27,7 @@
     "graphology-types": "^0.24.8",
     "mammoth": "^1.13.0",
     "next": "^15.5.29",
+    "postgres": "^3.4.7",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-force-graph-2d": "^1.29.2",

@@ -21,7 +21,7 @@ export default function HomeSearch() {
         {(['expertise', 'stuck'] as const).map((m) => (
           <button key={m} type="button" role="tab" aria-selected={mode === m} onClick={() => setMode(m)}
             className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition ${mode === m ? 'bg-navy text-white' : 'text-navy/60 hover:text-navy'}`}>
-            {m === 'expertise' ? 'Find expertise' : "I'm stuck"}
+            {m === 'expertise' ? 'Find people' : 'Get unstuck'}
           </button>
         ))}
       </div>

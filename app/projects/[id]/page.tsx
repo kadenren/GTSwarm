@@ -5,7 +5,14 @@ import { getViewerId } from '@/lib/viewer';
 import { snapshot, personLabel } from '@/lib/data';
 import LogProgress from '@/components/LogProgress';
 import ConfirmMilestone from '@/components/ConfirmMilestone';
-import TeamBuilder from '@/components/TeamBuilder';
+import BuildStatusEditor from '@/components/BuildStatusEditor';
+import { CollaborateButton } from '@/components/BuildCard';
+import { StageBar, STAGE_STYLE } from '@/components/stage';
+import { buildFor } from '@/lib/builds';
+import { recommendCollaborators } from '@/lib/matching';
+import { getDb } from '@/lib/db';
+import { InviteButton } from '@/components/MatchFinder';
+import { roleLabel } from '@/lib/roles';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,12 +27,21 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   const viewerId = await getViewerId();
   const v = projectView(id, viewerId);
   if (!v) notFound();
-  const { project: p, team, lineage, record, handoff, problems, viewerRole } = v;
+  const { project: p, team, lineage, record, problems, viewerRole } = v;
   const s = snapshot();
   const people = s.people.filter((x) => x.claimed && x.id !== viewerId).map((x) => ({ id: x.id, name: x.name, label: personLabel(x) })).sort((a, b) => a.name.localeCompare(b.name));
   const builders = team.filter((t) => t.role !== 'advisor');
   const advisors = team.filter((t) => t.role === 'advisor');
   const canLog = !!viewerRole;
+  const build = buildFor(p.id);
+  const onTeam = !!viewerRole && viewerRole !== 'advisor';
+  const me = s.person.get(viewerId);
+  const viewer = me ? { name: me.name, type: me.type, openTo: me.open_to } : null;
+  const recs = build && build.open ? await recommendCollaborators(p.id, viewerId) : [];
+  const joinRequests = build && onTeam
+    ? (getDb().prepare("SELECT id, from_person, role, status, created_at FROM requests WHERE project_id = ? AND to_person = ? ORDER BY created_at DESC").all(p.id, viewerId) as { id: string; from_person: string; role: string | null; status: string; created_at: string }[])
+        .filter((r) => !(s.membersOf.get(p.id) ?? []).some((m) => m.person_id === r.from_person))
+    : [];
   const isAdvisor = viewerRole === 'advisor';
 
   return (
@@ -55,6 +71,58 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
         </div>
       </header>
 
+      {build && (
+        <section className="card mt-6 overflow-hidden" aria-label="Collaboration hub" data-testid="collab-hub">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-navy/10 bg-paper/60 px-5 py-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className={`rounded-md px-2 py-0.5 text-xs font-semibold ${STAGE_STYLE[build.stage]}`}>{build.stage}</span>
+              <StageBar stage={build.stage} />
+              <span className="text-xs text-ink/60">{build.industry} · {build.domain}</span>
+              <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${build.open ? 'bg-gold/20 text-gold-dark' : 'bg-navy/5 text-ink/50'}`}>{build.open ? 'Open to collaborators' : 'Not taking collaborators'}</span>
+            </div>
+            {onTeam ? <BuildStatusEditor projectId={p.id} initial={{ stage: build.stage, open: build.open, roles: build.rolesNeeded, help: build.helpNeeded }} /> : <CollaborateButton build={build} />}
+          </div>
+          <div className="grid gap-6 p-5 lg:grid-cols-[1fr_1.2fr]">
+            <div>
+              <h2 className="label">Looking for</h2>
+              <div className="flex flex-wrap gap-1.5">{build.rolesNeeded.map((r) => <span key={r} className="tag bg-gold/20 text-gold-dark">{r}</span>)}</div>
+              {build.helpNeeded && <p className="mt-2 text-sm text-ink/80">{build.helpNeeded}</p>}
+              {joinRequests.length > 0 && (
+                <div className="mt-4">
+                  <h3 className="label">Requests to collaborate ({joinRequests.length})</h3>
+                  <ul className="space-y-1 text-sm">
+                    {joinRequests.map((r) => <li key={r.id} className="flex justify-between gap-2"><span className="text-navy">{s.person.get(r.from_person)?.name} <span className="text-ink/50">as {r.role ?? 'collaborator'}</span></span><Link href="/inbox" className="text-xs font-semibold text-navy underline decoration-gold underline-offset-4">{r.status === 'sent' ? 'Review' : r.status}</Link></li>)}
+                  </ul>
+                </div>
+              )}
+            </div>
+            {recs.length > 0 && (
+              <div data-tour="hub-recommended">
+                <h2 className="label">Recommended collaborators</h2>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {recs.filter((r) => r.people.length).map(({ role, people }) => (
+                    <div key={role}>
+                      <div className="text-xs font-semibold text-navy">{roleLabel(role)}s</div>
+                      <ul className="mt-1 space-y-1.5">
+                        {people.map((r) => (
+                          <li key={r.personId} className="text-xs">
+                            <span className={`mr-1.5 inline-block h-2 w-2 rounded-full ${r.type === 'alum' ? 'bg-teal' : 'bg-plum'}`} aria-hidden="true" />
+                            <span className="font-semibold text-navy">{r.name}</span> <span className="text-ink/50">{r.label}</span>
+                            <div className="pl-3.5 text-ink/65">{r.description.short.split(' · ')[0]}</div>
+                            {onTeam && viewer && <div className="mt-1 pl-3.5"><InviteButton person={{ id: r.personId, name: r.name }} role={role} query="" viewer={viewer} ownedBuilds={[{ id: p.id, name: p.name }]} /></div>}
+                          </li>
+                        ))}
+                      </ul>
+                      <Link href={`/match?mode=people&q=${encodeURIComponent(build.helpNeeded || p.summary)}&role=${encodeURIComponent(role)}&aud=both`} className="mt-1 inline-block pl-3.5 text-[11px] font-semibold text-navy underline decoration-gold underline-offset-4">See all matches</Link>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_380px]">
         <div className="min-w-0 space-y-6">
           {lineage.length > 1 && (
@@ -81,21 +149,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
             </section>
           )}
 
-          <section className="card p-5" aria-label="Handoff brief">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-navy">Handoff brief</h2>
-              <span className="text-[11px] text-ink/50">{handoff.source === 'cached' ? 'AI-polished, cached from graph facts' : 'Generated from graph facts'}</span>
-            </div>
-            <p className="mt-2 text-sm leading-relaxed text-ink/85">{handoff.text}</p>
-            {handoff.contacts.length > 0 && (
-              <ul className="mt-3 flex flex-wrap gap-2 text-xs">
-                {handoff.contacts.map((c) => (
-                  <li key={c.id} className="rounded-full border border-navy/15 bg-white px-3 py-1"><span className="font-semibold text-navy">{c.name}</span> <span className="text-ink/60">{c.why}</span></li>
-                ))}
-              </ul>
-            )}
-          </section>
-
           <section className="card p-5" aria-label="Build record">
             <h2 className="text-lg font-bold text-navy">Build record</h2>
             <p className="text-xs text-ink/60">Milestones and solved problems. A gold check means an advisor confirmed it.</p>
@@ -116,7 +169,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-baseline justify-between gap-2">
-                        <span className="font-medium text-navy">{r.title}</span>
+                        <span className="font-medium text-navy">{r.title}{r.simulated && <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wide text-amber-800" title="Logged during this demo session; not a verified real-world outcome">Simulated · added in this demo</span>}</span>
                         <span className="text-xs tabular-nums text-ink/50">{r.date}</span>
                       </div>
                       {r.detail && <p className="text-sm text-ink/75">{r.detail}</p>}
@@ -131,7 +184,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
             )}
           </section>
 
-          {p.is_startup && <TeamBuilder projectId={p.id} />}
 
           <section className="card p-5" aria-label="Solved problems">
             <h2 className="text-lg font-bold text-navy">Solved problems</h2>

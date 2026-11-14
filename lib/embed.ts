@@ -15,7 +15,7 @@ type Extractor = (text: string | string[], opts: { pooling: 'mean'; normalize: b
 const g = globalThis as unknown as { __gtEmbed?: Promise<Extractor | null>; __gtEmbedError?: string };
 
 export function loadEmbedder(allowDownload = false): Promise<Extractor | null> {
-  if (process.env.GTSWARM_FORCE_KEYWORD === '1') return Promise.resolve(null);
+  if (process.env.GTSWARM_FORCE_KEYWORD === '1' || process.env.DATABASE_URL || process.env.VERCEL) return Promise.resolve(null);
   if (!g.__gtEmbed) {
     g.__gtEmbed = (async () => {
       try {

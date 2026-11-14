@@ -4,10 +4,12 @@ import ConnectionsChart from '@/components/ConnectionsChart';
 import DirectionFlow from '@/components/DirectionFlow';
 import CountUp from '@/components/CountUp';
 import { HeroPattern } from '@/components/PageHero';
+import { ready } from '@/lib/session';
 
 export const dynamic = 'force-dynamic';
 
-export default function ImpactPage() {
+export default async function ImpactPage() {
+  await ready();
   const st = impactStats();
   const net = networkStats();
   const hero = [

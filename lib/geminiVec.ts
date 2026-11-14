@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { GoogleGenAI } from '@google/genai';
-import { getDb } from './db';
+import { getDb, perDb } from './db';
 import { geminiEnabled } from './gemini';
 import type { Snapshot } from './data';
 
@@ -70,7 +70,7 @@ export async function embedMissing(s: Snapshot, onProgress?: (done: number, tota
 }
 
 /** Stored vectors that still match their document text. */
-const g = globalThis as unknown as { __gtGemVec?: { version: string; vecs: Map<string, Float32Array> } };
+const g = perDb<{ __gtGemVec?: { version: string; vecs: Map<string, Float32Array> } }>(); // one cache per database (each demo session has its own)
 export function geminiVectors(s: Snapshot): Map<string, Float32Array> {
   if (g.__gtGemVec?.version === s.version) return g.__gtGemVec.vecs;
   const rows = getDb().prepare('SELECT id, text_hash, vec FROM gemini_vec').all() as { id: string; text_hash: string; vec: Buffer }[];

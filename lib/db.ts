@@ -1,6 +1,8 @@
 import Database from 'better-sqlite3';
 import path from 'node:path';
 import fs from 'node:fs';
+import { hosted } from './pgstore';
+import { currentDb } from './session';
 
 export const DATA_DIR = path.join(process.cwd(), 'data');
 export const DB_PATH = process.env.GTSWARM_DB ?? path.join(DATA_DIR, 'gtswarm.db');
@@ -102,6 +104,22 @@ CREATE TABLE IF NOT EXISTS person_link (
   url TEXT NOT NULL,
   PRIMARY KEY (person_id, kind)
 );
+CREATE TABLE IF NOT EXISTS person_pref (
+  person_id TEXT PRIMARY KEY REFERENCES people(id),
+  interests TEXT NOT NULL DEFAULT '[]',
+  looking_for TEXT NOT NULL DEFAULT ''
+);
+CREATE TABLE IF NOT EXISTS project_status (
+  project_id TEXT PRIMARY KEY REFERENCES projects(id),
+  stage TEXT NOT NULL CHECK (stage IN ('Idea','Prototype','Testing','Pilot','Launched')),
+  owner_id TEXT REFERENCES people(id),
+  industry TEXT NOT NULL,
+  domain TEXT NOT NULL,
+  open_to_collab INTEGER NOT NULL DEFAULT 1,
+  roles_needed TEXT NOT NULL DEFAULT '[]',
+  help_needed TEXT NOT NULL DEFAULT '',
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
 CREATE TABLE IF NOT EXISTS gemini_vec (
   id TEXT PRIMARY KEY,
   text_hash TEXT NOT NULL,
@@ -115,7 +133,7 @@ CREATE INDEX IF NOT EXISTS idx_conn_from ON connections(from_person);
 CREATE INDEX IF NOT EXISTS idx_conn_to ON connections(to_person);
 `;
 
-const g = globalThis as unknown as { __gtswarmDb?: Database.Database; __gtswarmDbVersion?: number };
+const g = globalThis as unknown as { __gtswarmDb?: Database.Database };
 
 export function openDb(file = DB_PATH): Database.Database {
   fs.mkdirSync(path.dirname(file), { recursive: true });
@@ -127,6 +145,7 @@ export function openDb(file = DB_PATH): Database.Database {
 }
 
 export function getDb(): Database.Database {
+  if (hosted()) return currentDb(); // the visitor's own copy (see lib/session.ts)
   if (!g.__gtswarmDb) g.__gtswarmDb = openDb();
   // apply new tables to an already-open database (all statements are CREATE ... IF NOT EXISTS)
   const gs = g as unknown as { __gtswarmSchema?: string };
@@ -134,15 +153,32 @@ export function getDb(): Database.Database {
   return g.__gtswarmDb;
 }
 
+/** In-memory caches (snapshot, graph, search index) are kept per database, so each demo session has its own. */
+const stores = new WeakMap<Database.Database, Record<string, unknown>>();
+export function dbStore(db: Database.Database = getDb()): Record<string, unknown> {
+  let s = stores.get(db);
+  if (!s) { s = {}; stores.set(db, s); }
+  return s;
+}
+/** A view of the current database's cache store, usable like a module-level object. */
+export function perDb<T extends object>(): T {
+  return new Proxy({} as T, {
+    get: (_t, k) => dbStore()[k as string],
+    set: (_t, k, v) => { dbStore()[k as string] = v; return true; },
+  });
+}
+
 /** Changes after every write (this process or another, e.g. a re-seed) so in-memory caches rebuild. */
 export function dataVersion(): string {
-  const external = getDb().pragma('data_version', { simple: true });
-  return `${g.__gtswarmDbVersion ?? 0}:${external}`;
+  const db = getDb();
+  const external = db.pragma('data_version', { simple: true });
+  return `${(dbStore(db).__version as number | undefined) ?? 0}:${external}`;
 }
-export function bumpDataVersion() {
-  g.__gtswarmDbVersion = (g.__gtswarmDbVersion ?? 0) + 1;
-  // keep Gemini vectors in step with new or edited records (no-op without a key)
-  import('./geminiVec').then((m) => m.embedNewInBackground()).catch(() => undefined);
+export function bumpDataVersion(db: Database.Database = getDb()) {
+  const s = dbStore(db);
+  s.__version = ((s.__version as number | undefined) ?? 0) + 1;
+  // keep Gemini vectors in step with new or edited records (no-op without a key; off on the hosted demo)
+  if (!hosted()) import('./geminiVec').then((m) => m.embedNewInBackground()).catch(() => undefined);
 }
 
 /** Restore the database from the pristine seed snapshot (used by /demo/reset and tests). */
@@ -153,7 +189,7 @@ export function resetFromSeed(db: Database.Database = getDb()) {
   try {
     db.pragma('foreign_keys = OFF');
     db.transaction(() => {
-      db.exec('DELETE FROM main.project_link; DELETE FROM main.person_link;'); // the seed has no links; anything here was added during a demo
+      db.exec('DELETE FROM main.project_link; DELETE FROM main.person_link; DELETE FROM main.project_status; DELETE FROM main.person_pref;'); // re-derived after reset; anything here was added during a demo
       // polished wording is keyed by the exact template text, so it stays valid across resets; keep it
       for (const t of tables) db.exec(t === 'cache' ? "DELETE FROM main.cache WHERE key NOT LIKE 'polish:%' AND key NOT LIKE 'gq:%' AND key NOT LIKE 'mm:%'" : `DELETE FROM main.${t}`);
       for (const t of [...tables].reverse()) db.exec(`INSERT OR IGNORE INTO main.${t} SELECT * FROM seed.${t}`);

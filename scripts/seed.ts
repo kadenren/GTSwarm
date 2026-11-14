@@ -184,7 +184,7 @@ const ecg2011 = addProject({ name: 'Ambulatory ECG Monitor', year: 2011, team_ty
 const vitaltag = addProject({ name: 'VitalTag', year: 2019, team_type: 'CREATE-X', team_name: 'CREATE-X Startup Launch', field: W, continued_from: null, hero: true,
   summary: 'Adhesive vital-signs tag for emergency department triage.', technologies: ['ECG', 'BLE', 'FDA regulatory', 'Medical devices'], outcome: 'Raised a pre-seed round' });
 const restwell = addProject({ name: 'Restwell Patch', year: 2024, team_type: 'Startup', team_name: 'Restwell Health', field: W, continued_from: null, hero: true,
-  summary: 'Medical wearable patch that monitors post-surgical patients at home and alerts care teams.', technologies: ['Medical devices', 'BLE', 'PPG sensor', 'Injection molding'], outcome: 'Pilot with two Atlanta hospitals' });
+  summary: 'Medical wearable patch that monitors post-surgical patients at home and alerts care teams. The alumni founding team is hiring wearable firmware engineers to make its nRF52 BLE firmware last a full week on one charge.', technologies: ['Medical devices', 'BLE', 'PPG sensor', 'Firmware', 'nRF52', 'Injection molding'], outcome: 'Pilot with two Atlanta hospitals' });
 const elenaCap = addProject({ name: 'Ergonomic Power Tool Grip', year: 2015, team_type: 'Capstone', team_name: 'ME Capstone', field: MFG, continued_from: null, hero: true,
   summary: 'Vibration-damping grip for handheld power tools, injection molded and tested with trade workers.', technologies: ['SolidWorks', 'Injection molding', 'Design for manufacturing'], outcome: 'Demoed at the Capstone Expo' });
 const stride = addProject({ name: 'StrideSense Gait Wearable', year: 2025, team_type: 'Capstone', team_name: 'ECE Senior Design', field: W, continued_from: null, hero: true,
@@ -420,6 +420,65 @@ for (const p of genericPeople) {
 }
 
 // =====================================================================
+// 3b. ACTIVE BUILDS (startup exchange): alumni- and student-founded projects looking for collaborators.
+// Every value is fixed (no RNG calls), so the generated network above is unchanged.
+// =====================================================================
+const fixedProblem = (project_id: string, description: string, solution: string, solved_by: string, created_at: string) =>
+  problems.push({ id: `problem:pb${pad(problems.length + 1)}`, project_id, description, solution, solved_by, created_at });
+const firstGeneric = (fieldKey: string, type: 'alum' | 'student', skip = 0) =>
+  genericPeople.filter((p) => p.field.key === fieldKey && p.type === type && p.claimed)[skip]?.id;
+
+const nadia = addPerson({ name: 'Nadia Okoro', type: 'alum', major: 'EE', grad_year: 2012, current_role: 'Founder and CEO of Voltline Robotics', company_type: 'startup', city: 'Atlanta', field: ROB, fixedBio: true, availability_hours: 4, open_to: ['Cofounder', 'Advisor'],
+  bio: 'Robotics founder building autonomous mobile robots for warehouses. Previously led motor control firmware for industrial robots. Hiring student embedded engineers who like motor control and ROS 2.' });
+const carlos = addPerson({ name: 'Carlos Medina', type: 'alum', major: 'AE', grad_year: 2014, current_role: 'Founder of Skyward Avionics', company_type: 'startup', city: 'Huntsville', field: AE, fixedBio: true, availability_hours: 3, open_to: ['Cofounder', 'Advisor'],
+  bio: 'Aerospace engineer building an autopilot for agricultural survey drones. Wrote flight software for launch vehicles before starting Skyward.' });
+const tara = addPerson({ name: 'Tara Holloway', type: 'alum', major: 'CS', grad_year: 2017, current_role: 'Founder of Tessera Health AI', company_type: 'startup', city: 'Atlanta', field: SW, fixedBio: true, availability_hours: 3, open_to: ['Cofounder', 'Advisor'],
+  bio: 'Machine learning engineer turned founder. Tessera predicts patient deterioration from wearable and bedside signals; looking for a clinical cofounder and student ML engineers.' });
+const jamal = addPerson({ name: 'Jamal Reed', type: 'alum', major: 'EE', grad_year: 2011, current_role: 'Founder of GridWise Energy', company_type: 'startup', city: 'Atlanta', field: F.energy, fixedBio: true, availability_hours: 3, open_to: ['Advisor', 'Cofounder'],
+  bio: 'Power engineer building microgrid controllers for community solar. Spent ten years at a utility on grid modernization.' });
+const lena = addPerson({ name: 'Lena Hartmann', type: 'alum', major: 'AE', grad_year: 2016, current_role: 'Founder of OrbitLab', company_type: 'startup', city: 'Boston', field: AE, fixedBio: true, availability_hours: 2, open_to: ['Advisor', 'Cofounder'],
+  bio: 'Spacecraft power engineer building low-cost CubeSat power buses for university and startup missions.' });
+const ravi = addPerson({ name: 'Ravi Krishnan', type: 'alum', major: 'ME', grad_year: 2018, current_role: 'Founder of AutoNav Mobility', company_type: 'startup', city: 'Atlanta', field: ROB, fixedBio: true, availability_hours: 4, open_to: ['Cofounder', 'Advisor'],
+  bio: 'Autonomous vehicles engineer building a low-speed autonomous shuttle for campuses. Previously worked on perception and embedded systems for self-driving cars.' });
+const kenji = addPerson({ name: 'Kenji Watanabe', type: 'student', major: 'ME', grad_year: 2027, current_role: null, company_type: null, city: 'Atlanta', field: ROB, fixedBio: true, availability_hours: 10, open_to: ['Cofounder', 'Early engineer', 'Helper'],
+  bio: 'Mechanical engineering student leading an autonomous go-kart team in RoboJackets. Looking for teammates in embedded systems and computer vision.' });
+const isabel = addPerson({ name: 'Isabel Moreno', type: 'student', major: 'EE', grad_year: 2027, current_role: null, company_type: null, city: 'Atlanta', field: E, fixedBio: true, availability_hours: 12, open_to: ['Early engineer', 'Helper'],
+  bio: 'Electrical engineering student interested in robotics, embedded systems and autonomous vehicles. Built an STM32 motor controller and wrote FreeRTOS firmware for a RoboJackets robot. Looking for a startup or project to join.' });
+const tyler = addPerson({ name: 'Tyler Brooks-Nguyen', type: 'student', major: 'CS', grad_year: 2026, current_role: null, company_type: null, city: 'Atlanta', field: SW, fixedBio: true, availability_hours: 10, open_to: ['Early engineer', 'Helper'],
+  bio: 'Computer science student focused on machine learning for health signals; trained PyTorch models on wearable heart-rate data in a VIP team. Wants to join an early-stage startup.' });
+
+const voltline = addProject({ name: 'Voltline AMR', year: 2025, team_type: 'Startup', team_name: 'Voltline Robotics', field: ROB, continued_from: null, hero: true, is_startup: 1,
+  summary: 'Autonomous mobile robot that moves totes between warehouse stations; alumni-founded startup piloting with two Atlanta logistics companies.', technologies: ['ROS 2', 'STM32', 'Motor control', 'LiDAR', 'C++'], outcome: 'Pilot with two Atlanta logistics companies' });
+const skyward = addProject({ name: 'Skyward Autopilot', year: 2025, team_type: 'Startup', team_name: 'Skyward Avionics', field: AE, continued_from: null, hero: true, is_startup: 1,
+  summary: 'Autopilot and flight computer for agricultural survey drones that fly preplanned crop-scouting routes.', technologies: ['Flight software', 'STM32', 'Kalman filter', 'GPS'], outcome: null });
+const tessera = addProject({ name: 'Tessera Early Warning', year: 2026, team_type: 'Startup', team_name: 'Tessera Health AI', field: SW, continued_from: null, hero: true, is_startup: 1,
+  summary: 'Machine learning model that predicts patient deterioration from wearable heart-rate and bedside signals, built with a hospital research partner.', technologies: ['Python', 'PyTorch', 'Signal processing', 'AWS'], outcome: null });
+const gridwise = addProject({ name: 'GridWise Controller', year: 2025, team_type: 'Startup', team_name: 'GridWise Energy', field: F.energy, continued_from: null, hero: true, is_startup: 1,
+  summary: 'Microgrid controller that balances community solar, batteries and the grid for apartment complexes.', technologies: ['Battery storage', 'Solar PV', 'Modbus', 'Python', 'Power electronics'], outcome: 'Pilot with an Atlanta housing nonprofit' });
+const orbitlab = addProject({ name: 'OrbitLab Power Bus', year: 2026, team_type: 'Startup', team_name: 'OrbitLab', field: AE, continued_from: null, hero: true, is_startup: 1,
+  summary: 'Plug-and-play CubeSat electrical power system with peak power tracking, sold to university satellite teams.', technologies: ['CubeSat', 'PCB design', 'Battery management', 'Solar arrays'], outcome: null });
+const autonav = addProject({ name: 'AutoNav Campus Shuttle', year: 2026, team_type: 'Startup', team_name: 'AutoNav Mobility', field: ROB, continued_from: null, hero: true, is_startup: 1,
+  summary: 'Low-speed autonomous shuttle for campuses, with LiDAR perception and embedded safety controllers; alumni-founded and testing on a closed course.', technologies: ['LiDAR', 'ROS 2', 'Embedded C', 'OpenCV', 'Motor control'], outcome: null });
+const gokart = addProject({ name: 'Autonomous Go-Kart', year: 2026, team_type: 'Club', team_name: 'RoboJackets', field: ROB, continued_from: null, hero: true, is_startup: 0,
+  summary: 'Student team converting an electric go-kart to drive autonomously around a track using cameras and LiDAR.', technologies: ['ROS 2', 'OpenCV', 'LiDAR', 'Motor control'], outcome: null });
+
+member(nadia, voltline, 'founder', 'Founder and CEO'); member(carlos, skyward, 'founder', 'Founder'); member(tara, tessera, 'founder', 'Founder');
+member(jamal, gridwise, 'founder', 'Founder'); member(lena, orbitlab, 'founder', 'Founder'); member(ravi, autonav, 'founder', 'Founder'); member(kenji, gokart, 'founder', 'Team lead');
+for (const [proj, fieldKey] of [[voltline, 'robotics'], [gridwise, 'energy'], [autonav, 'robotics']] as const) {
+  const mate = firstGeneric(fieldKey, 'alum', 3);
+  if (mate) member(mate, proj, 'builder', 'Engineer');
+}
+const kartMate = firstGeneric('robotics', 'student', 1);
+if (kartMate) member(kartMate, gokart, 'builder');
+member(isabel, projects.find((p) => p.name === 'Mars Rover Prototype' && p.year === 2018)?.id ?? gokart, 'builder');
+member(tyler, projects.find((p) => p.team_name === 'VIP Machine Learning for Health' && p.year >= 2024)?.id ?? tessera, 'builder');
+
+fixedProblem(voltline, 'Robot drifts off its path on shiny warehouse floors', 'Fused wheel odometry with LiDAR scan matching and lowered the trust in wheel encoders when slip was detected.', nadia, '2025-06-18');
+fixedProblem(skyward, 'Drone altitude oscillates in gusty wind', 'Retuned the altitude controller with a feedforward term from the barometer and filtered accelerometer noise in a Kalman filter.', carlos, '2025-08-02');
+fixedProblem(gridwise, 'Battery inverter trips when the microgrid islands from the grid', 'Added a soft transfer with droop control and a synchronization check before reclosing.', jamal, '2025-09-21');
+fixedProblem(autonav, 'LiDAR misses low curbs at night', 'Tilted the lower LiDAR down five degrees and fused it with a wide-angle camera for curb detection.', ravi, '2026-03-11');
+
+// =====================================================================
 // 4. CONNECTIONS, REQUESTS, MILESTONES
 // =====================================================================
 // shared-project connections derived from co-builders and advisors
@@ -515,6 +574,13 @@ const heroSkills: [string, string[]][] = [
   [sofia, ['Firmware', 'PPG sensor', 'Battery management', 'Wearables']],
   [leo, ['Customer discovery', 'Fundraising', 'Wearables']],
 ];
+heroSkills.push(
+  [nadia, ['Robotics', 'Motor control', 'ROS 2', 'Fundraising']], [carlos, ['Aerospace', 'Flight software', 'Kalman filter']],
+  [tara, ['Machine learning and software', 'PyTorch', 'Signal processing']], [jamal, ['Energy systems', 'Battery storage', 'Power electronics']],
+  [lena, ['Aerospace', 'CubeSat', 'Battery management']], [ravi, ['Robotics', 'LiDAR', 'OpenCV', 'Embedded C']],
+  [kenji, ['Robotics', 'ROS 2', 'SolidWorks']], [isabel, ['Embedded systems', 'STM32', 'FreeRTOS', 'Motor control', 'C', 'Robotics']],
+  [tyler, ['Machine learning and software', 'PyTorch', 'Python', 'Signal processing']],
+);
 for (const [pid, names] of heroSkills) for (const n of names) personSkills.add(`${pid}|${skillId(n)}`);
 
 // =====================================================================
@@ -524,7 +590,7 @@ async function main() {
   // quick integrity checks
   const lineageCount = new Set(projects.filter((p) => p.continued_from).map((p) => p.continued_from)).size;
   console.log(`people=${people.length} (alumni ${countType('alum')}, students ${countType('student')}) projects=${projects.length} problems=${problems.length} connections=${connections.length} explicit=${connections.filter((c) => c.source !== 'shared-project').length} milestones=${milestones.length} lineage-links=${lineageCount} skills=${skillIds.size}`);
-  if (people.length !== 220 || projects.length !== 150) throw new Error('unexpected counts');
+  if (people.length !== 229 || projects.length !== 157) throw new Error(`unexpected counts: ${people.length} people, ${projects.length} projects`);
   void lineages; void heroProjectIds;
 
   // texts used for embeddings

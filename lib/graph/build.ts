@@ -1,3 +1,4 @@
+import { perDb } from '../db';
 import Graph from 'graphology';
 import { snapshot, type Snapshot } from '../data';
 
@@ -9,7 +10,7 @@ export interface EdgeAttrs { weight: number; kind: string; label?: string }
  * Weights are costs for shortest paths (lower = stronger tie).
  */
 const ROLE_WEIGHT: Record<string, number> = { builder: 1.0, founder: 1.0, maintainer: 1.2, advisor: 1.5 };
-const g = globalThis as unknown as { __gtGraph?: { version: string; graph: Graph } };
+const g = perDb<{ __gtGraph?: { version: string; graph: Graph } }>(); // one cache per database (each demo session has its own)
 
 export function buildGraph(s: Snapshot): Graph {
   const graph = new Graph({ type: 'undirected', multi: false });

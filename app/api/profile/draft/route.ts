@@ -3,11 +3,13 @@ import { draftProfile } from '@/lib/profile';
 import { textFromFile, type SourceInfo } from '@/lib/ingest';
 import { geminiEnabled, mediaFor, isImageName, type MediaPart } from '@/lib/gemini';
 import { ActionError } from '@/lib/actions';
+import { ready } from '@/lib/session';
 
 export const maxDuration = 60;
 
 /** Reads the user's own resume (PDF, Word, text or a photo) and returns a draft profile for them to confirm. */
 export async function POST(req: Request) {
+  await ready();
   return handle(async () => {
     const form = await req.formData();
     const pasted = String(form.get('text') ?? '').trim();

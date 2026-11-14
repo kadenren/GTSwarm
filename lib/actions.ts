@@ -32,8 +32,10 @@ export function sendRequest(input: { from: string; to: string; kind: 'expertise'
   const db = getDb();
   if (input.from === input.to) throw new ActionError('You cannot send a request to yourself.');
   if (!snapshot().person.get(input.to)) throw new ActionError('Unknown person.', 404);
-  if (input.projectId && !isMember(input.from, input.projectId)) throw new ActionError('You can only send requests for projects you belong to.', 403);
-  const existing = db.prepare("SELECT id FROM requests WHERE from_person = ? AND to_person = ? AND status = 'sent'").get(input.from, input.to) as { id: string } | undefined;
+  // a request is about the sender's project (asking for help) or the recipient's project (asking to collaborate)
+  if (input.projectId && !isMember(input.from, input.projectId) && !isMember(input.to, input.projectId)) throw new ActionError('Requests must be about a project you or they belong to.', 403);
+  // a pending request about the same project is a duplicate; a request about a different project is new
+  const existing = db.prepare("SELECT id FROM requests WHERE from_person = ? AND to_person = ? AND status = 'sent' AND project_id IS ?").get(input.from, input.to, input.projectId) as { id: string } | undefined;
   if (existing) return { id: existing.id, duplicate: true };
   const id = nextId('requests', 'request:r');
   db.prepare('INSERT INTO requests (id, from_person, to_person, project_id, kind, role, message, status, created_at) VALUES (?,?,?,?,?,?,?,?,?)')
@@ -79,9 +81,10 @@ export function addToProject(requestId: string, viewerId: string, addAs: AddAs) 
   if (r.status !== 'accepted') throw new ActionError('Only accepted requests can lead to adding someone.');
   if (!r.project_id) throw new ActionError('This request is not tied to a project.');
   if (!(addAs in ADD_AS)) throw new ActionError('Unknown role.');
-  const sender = r.from_person === viewerId;
-  if (!sender || !isOwner(viewerId, r.project_id)) throw new ActionError('Only the project owner who sent the request can add people to the project.', 403);
-  const person = r.to_person;
+  // the owner of the project adds the other person: the recipient of a help request, or the sender of a collaboration request
+  const party = r.from_person === viewerId || r.to_person === viewerId;
+  if (!party || !isOwner(viewerId, r.project_id)) throw new ActionError('Only the project owner can add people to the project.', 403);
+  const person = r.from_person === viewerId ? r.to_person : r.from_person;
   if (isMember(person, r.project_id)) throw new ActionError('Already on the project team.');
   db.transaction(() => {
     db.prepare('INSERT INTO person_project (person_id, project_id, role, title) VALUES (?,?,?,?)').run(person, r.project_id, ADD_AS[addAs], addAs);
@@ -160,9 +163,14 @@ export async function createProject(viewerId: string, input: { name: string; yea
   const pVec = semantic ? await embedText(`${name}. ${summary} Technologies: ${techs.join(', ')}.`) : null;
   const probVecs = semantic ? await Promise.all(problems.map((p) => embedText(`${p.description}. ${p.solution}`))) : [];
   const id = nextId('projects', 'project:pr');
+  // join an existing project family: same name, an earlier version exists -> continue from the latest earlier one
+  const bare = name.replace(/^vip\s+/i, '').toLowerCase();
+  const earlier = snapshot().projects
+    .filter((p) => p.name.toLowerCase() === bare && p.year < year)
+    .sort((a, b) => b.year - a.year)[0];
   db.transaction(() => {
-    db.prepare('INSERT INTO projects (id, name, year, team_type, team_name, summary, technologies, outcome, is_startup, continued_from, embedding) VALUES (?,?,?,?,?,?,?,NULL,?,NULL,?)')
-      .run(id, name, year, input.team_type, input.team_name.trim() || input.team_type, summary, JSON.stringify(techs), isStartup ? 1 : 0, pVec ? toBlob(pVec) : null);
+    db.prepare('INSERT INTO projects (id, name, year, team_type, team_name, summary, technologies, outcome, is_startup, continued_from, embedding) VALUES (?,?,?,?,?,?,?,NULL,?,?,?)')
+      .run(id, earlier ? earlier.name : name, year, input.team_type, input.team_name.trim() || (earlier ? earlier.team_name : input.team_type), summary, JSON.stringify(techs), isStartup ? 1 : 0, earlier?.id ?? null, pVec ? toBlob(pVec) : null);
     db.prepare('INSERT INTO person_project (person_id, project_id, role, title) VALUES (?,?,?,?)').run(viewerId, id, isStartup ? 'founder' : 'builder', isStartup ? 'Founder' : null);
     for (const t of techs) {
       let skill = db.prepare('SELECT id FROM skills WHERE lower(name) = lower(?)').get(t) as { id: string } | undefined;

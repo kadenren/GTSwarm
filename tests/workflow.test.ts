@@ -55,6 +55,6 @@ describe('demo workflow', () => {
     expect(count('SELECT COUNT(*) n FROM requests')).toBe(reqs + 1);
     resetFromSeed();
     expect(count('SELECT COUNT(*) n FROM requests')).toBe(reqs);
-    expect(snapshot().people.length).toBe(220);
+    expect(snapshot().people.length).toBe(229);
   });
 });

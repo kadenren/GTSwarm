@@ -1,16 +1,19 @@
 import { cookies } from 'next/headers';
 import { getDb } from './db';
+import { ready } from './session';
 
+/** The three fictional demo personas a visitor can switch between. */
 export const VIEWERS = [
-  { id: 'person:p001', label: 'Leo Martinez', sub: 'PulseBand student' },
-  { id: 'person:p008', label: 'Elena Brooks', sub: 'Alum founder' },
-  { id: 'person:p005', label: 'Dana Whitfield', sub: 'Alum' },
+  { id: 'person:p008', label: 'Elena Brooks', sub: 'Alumni founder (demo)' },
+  { id: 'person:p010', label: 'Maya Okafor', sub: 'Student looking for startups (demo)' },
+  { id: 'person:p005', label: 'Dana Whitfield', sub: 'Alumni cofounder candidate (demo)' },
 ] as const;
 export const DEFAULT_VIEWER = VIEWERS[0].id;
 export const VIEWER_COOKIE = 'gtswarm_viewer';
 
-/** The demo identity. Any real person can be the viewer (for example someone who just joined); unknown ids fall back to Leo. */
+/** The demo identity: a persona, or someone who joined during this visitor's session. Unknown ids fall back to Elena. */
 export async function getViewerId(): Promise<string> {
+  await ready();
   const c = (await cookies()).get(VIEWER_COOKIE)?.value;
   if (!c) return DEFAULT_VIEWER;
   if (VIEWERS.some((v) => v.id === c)) return c;

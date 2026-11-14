@@ -3,11 +3,13 @@ import { extractProject } from '@/lib/extract';
 import { textFromFile, textFromLink, type SourceInfo } from '@/lib/ingest';
 import { ActionError } from '@/lib/actions';
 import { geminiEnabled, mediaFor, isImageName, type MediaPart } from '@/lib/gemini';
+import { ready } from '@/lib/session';
 
 export const maxDuration = 60;
 
 /** Accepts a description, uploaded files and links (multipart form), and returns extracted project fields for confirmation. */
 export async function POST(req: Request) {
+  await ready();
   return handle(async () => {
     const ct = req.headers.get('content-type') ?? '';
     let description = '';

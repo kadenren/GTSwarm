@@ -1,3 +1,4 @@
+import { perDb } from '../db';
 import Graph from 'graphology';
 import louvain from 'graphology-communities-louvain';
 import { snapshot, type Snapshot } from '../data';
@@ -11,7 +12,7 @@ import { getGraph } from './build';
 export interface Circle { id: string; name: string; people: string[]; projects: string[]; topSkills: string[] }
 
 const DOMAINS = new Set(['Robotics', 'Power electronics', 'Wearables', 'Embedded systems', 'Aerospace', 'Energy systems', 'Machine learning and software', 'Manufacturing', 'Medical devices', 'FDA regulatory']);
-const g = globalThis as unknown as { __gtCircles?: { version: string; circles: Circle[]; of: Map<string, string> } };
+const g = perDb<{ __gtCircles?: { version: string; circles: Circle[]; of: Map<string, string> } }>(); // one cache per database (each demo session has its own)
 
 function seeded(seed: number) {
   return () => {

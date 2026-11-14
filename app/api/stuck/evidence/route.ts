@@ -2,11 +2,13 @@ import { handle } from '@/lib/api';
 import { problemFromEvidence } from '@/lib/problem';
 import { geminiEnabled, mediaFor, isImageName, type MediaPart } from '@/lib/gemini';
 import { ActionError } from '@/lib/actions';
+import { ready } from '@/lib/session';
 
 export const maxDuration = 60;
 
 /** Log text and/or a screenshot -> a one-line problem statement for the solved-problem search. */
 export async function POST(req: Request) {
+  await ready();
   return handle(async () => {
     const form = await req.formData();
     let log = String(form.get('log') ?? '');

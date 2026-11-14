@@ -1,3 +1,4 @@
+import { perDb } from './db';
 import { snapshot, type Snapshot } from './data';
 import { embedText, cosine, loadEmbedder } from './embed';
 import { geminiEnabled } from './gemini';
@@ -50,7 +51,7 @@ export function tokenize(text: string): string[] {
 }
 
 interface Bm25Index { version: string; docs: { id: string; tf: Map<string, number>; len: number }[]; df: Map<string, number>; avgLen: number }
-const g = globalThis as unknown as { __gtBm25?: Bm25Index };
+const g = perDb<{ __gtBm25?: Bm25Index }>(); // one cache per database (each demo session has its own)
 
 export function docText(s: Snapshot, id: string): string {
   if (id.startsWith('person:')) {

@@ -1,10 +1,12 @@
 import AddProject from '@/components/AddProject';
 import PageHero from '@/components/PageHero';
 import { geminiEnabled } from '@/lib/gemini';
+import { ready } from '@/lib/session';
 
 export const dynamic = 'force-dynamic';
 
-export default function AddPage() {
+export default async function AddPage() {
+  await ready();
   return (
     <>
       <PageHero eyebrow="Grow the swarm" title="Add a project you built"

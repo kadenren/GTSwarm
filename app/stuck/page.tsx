@@ -1,13 +1,11 @@
 import SearchClient from '@/components/SearchClient';
-import ScoutPanel from '@/components/ScoutPanel';
-import StuckTabs from '@/components/StuckTabs';
 import PageHero from '@/components/PageHero';
 import { viewerContext } from '@/lib/context';
 import { snapshot } from '@/lib/data';
-import { geminiEnabled } from '@/lib/gemini';
 
 export const dynamic = 'force-dynamic';
 
+/** Get Unstuck: one search over problems the community has already solved, and the people who solved them. */
 export default async function StuckPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
   const { me, projects } = await viewerContext();
@@ -15,16 +13,12 @@ export default async function StuckPage({ searchParams }: { searchParams: Promis
   return (
     <>
       <PageHero eyebrow="Get unstuck" title="I'm stuck on a problem"
-        subtitle={`Someone at Georgia Tech has probably hit this before. GT Swarm indexes ${s.problems.length} solved problems and the ${s.people.filter((p) => p.claimed).length} builders who solved them.`} />
-      <StuckTabs
-        initial={sp.q ? 'web' : 'scout'}
-        scout={<ScoutPanel webAvailable={!!process.env.ANTHROPIC_API_KEY} evidenceAi={geminiEnabled()} initialNeed={sp.scout ?? ''} />}
-        web={
-          <SearchClient kind="stuck" aiPolish={geminiEnabled() || !!process.env.ANTHROPIC_API_KEY} viewerName={me.name} viewerProjects={projects}
-            suggestions={[{ q: "Bluetooth drops when the sensor sleeps" }]}
-            initial={{ q: sp.q ?? '', role: 'Helper', audience: sp.aud ?? 'both', log: '' }} />
-        }
-      />
+        subtitle={`Someone at Georgia Tech has probably hit this before. Describe the problem and GT Swarm finds who solved it, from ${s.problems.length} solved problems on record.`} />
+      <div className="pt-6">
+        <SearchClient kind="stuck" aiPolish={false} viewerName={me.name} viewerProjects={projects}
+          suggestions={[{ q: 'Bluetooth disconnects when the microcontroller enters sleep mode' }]}
+          initial={{ q: sp.q ?? '', role: 'Helper', audience: sp.aud ?? 'both', log: '' }} />
+      </div>
     </>
   );
 }

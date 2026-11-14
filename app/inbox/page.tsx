@@ -5,6 +5,7 @@ import { snapshot } from '@/lib/data';
 import { isOwner } from '@/lib/actions';
 import { AcceptDecline, AddToProject } from '@/components/RequestActions';
 import PageHero from '@/components/PageHero';
+import { roleLabel } from '@/lib/roles';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +21,9 @@ export default async function InboxPage() {
   const received = db.prepare('SELECT * FROM requests WHERE to_person = ? ORDER BY created_at DESC').all(viewerId) as Req[];
   const sent = db.prepare('SELECT * FROM requests WHERE from_person = ? ORDER BY created_at DESC').all(viewerId) as Req[];
   const me = s.person.get(viewerId)!;
+  // consented connections (accepted requests); both people see them
+  const connections = (db.prepare("SELECT from_person, to_person, created_at FROM connections WHERE source = 'request' AND status = 'active' AND (from_person = ? OR to_person = ?) ORDER BY created_at DESC").all(viewerId, viewerId) as { from_person: string; to_person: string; created_at: string }[])
+    .map((c) => ({ person: s.person.get(c.from_person === viewerId ? c.to_person : c.from_person)!, at: c.created_at })).filter((c) => c.person);
   const kindOf = (id: string) => (s.person.get(id)!.type === 'alum' ? 'alum' : 'student');
   const dir = (a: string, b: string) => `${kindOf(a) === 'alum' ? 'Alum' : 'Student'} to ${kindOf(b)}`;
 
@@ -27,7 +31,10 @@ export default async function InboxPage() {
     const other = s.person.get(mode === 'received' ? r.from_person : r.to_person)!;
     const proj = r.project_id ? s.project.get(r.project_id) : null;
     const onTeam = proj ? (s.membersOf.get(proj.id) ?? []).some((m) => m.person_id === other.id) : false;
-    const canAdd = mode === 'sent' && r.status === 'accepted' && !r.added_as && !!proj && isOwner(viewerId, proj.id) && !onTeam;
+    // the project owner can add the other person once the request is accepted (help request they sent, or collaboration request they received)
+    const canAdd = r.status === 'accepted' && !r.added_as && !!proj && isOwner(viewerId, proj.id) && !onTeam;
+    const isCollab = !!proj && (s.membersOf.get(proj.id) ?? []).some((m) => m.person_id === r.to_person) && !(s.membersOf.get(proj.id) ?? []).some((m) => m.person_id === r.from_person && m.role !== 'advisor');
+    const isInvite = !!proj && !isCollab && (s.membersOf.get(proj.id) ?? []).some((m) => m.person_id === r.from_person && m.role !== 'advisor');
     const statusText = r.status === 'sent' ? (mode === 'received' ? 'Waiting for you' : 'Pending') : r.status === 'accepted' ? 'Accepted · connected' : 'Declined';
     const statusClass = r.status === 'accepted' ? 'bg-teal-light text-teal' : r.status === 'declined' ? 'bg-navy/5 text-ink/50' : 'bg-gold/20 text-gold-dark';
     const who = other.type === 'alum' ? `Alum, class of ${other.grad_year}` : 'Student';
@@ -39,7 +46,7 @@ export default async function InboxPage() {
             <div>
               <div className="font-display font-bold text-navy">{mode === 'received' ? `From ${other.name}` : `To ${other.name}`}</div>
               <div className="text-xs text-ink/60">
-                {who} · {r.kind === 'stuck' ? 'Asking for help' : `${r.role ?? 'Expertise'} conversation`}
+                {who} · {r.kind === 'stuck' ? 'Asking for help' : isCollab ? `Wants to join as ${roleLabel(r.role ?? 'Helper').toLowerCase()}` : isInvite ? `Invite: ${roleLabel(r.role ?? 'Helper').toLowerCase()} role` : `${roleLabel(r.role ?? 'Helper')} conversation`}
                 {proj ? (
                   <>
                     {' · '}
@@ -53,7 +60,7 @@ export default async function InboxPage() {
           </div>
           <div className="text-right">
             <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusClass}`}>{statusText}</span>
-            <div className="mt-1 text-[11px] text-ink/50">{fmt(r.created_at)}</div>
+            <div className="mt-1 text-[11px] text-ink/50">{fmt(r.created_at)} · <span title="All people and requests in this demo are fictional">simulated</span></div>
           </div>
         </div>
         <p className="mt-3 rounded-lg bg-paper p-3 text-sm leading-relaxed text-ink/85">{r.message}</p>
@@ -61,7 +68,7 @@ export default async function InboxPage() {
           {mode === 'received' && r.status === 'sent' && <AcceptDecline id={r.id} name={other.name} />}
           {canAdd && <AddToProject id={r.id} name={other.name} projectName={proj!.name} suggested={r.role} />}
           {r.added_as && <p className="text-sm font-medium text-teal">Added to {proj?.name} as {r.added_as}.</p>}
-          {mode === 'received' && r.status === 'accepted' && !r.added_as && (
+          {mode === 'received' && r.status === 'accepted' && !r.added_as && !canAdd && (
             <p className="text-xs text-ink/55">Accepting created a connection. Joining a project is a separate step the project owner takes.</p>
           )}
         </div>
@@ -71,9 +78,22 @@ export default async function InboxPage() {
 
   return (
     <>
-      <PageHero eyebrow="Inbox" title="Requests and introductions" subtitle={`For ${me.name}. Accepting creates a consented connection, nothing more. Joining a project is a separate step.`} />
+      <PageHero eyebrow="Inbox" title="Invites, requests and connections" subtitle={`For ${me.name}. Accepting creates a consented connection, nothing more. Joining a project is a separate step.`} />
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <section className="mt-6">
+      <section aria-label="Your connections" data-testid="connections">
+        <h2 className="label">Your connections ({connections.length})</h2>
+        {connections.length ? (
+          <ul className="flex flex-wrap gap-2">
+            {connections.map((c) => (
+              <li key={c.person.id} className="flex items-center gap-2 rounded-full border border-navy/10 bg-white py-1 pl-1 pr-3 text-sm">
+                <span className={`flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold text-white ${c.person.type === 'alum' ? 'bg-teal' : 'bg-plum'}`}>{initials(c.person.name)}</span>
+                <span className="font-semibold text-navy">{c.person.name}</span><span className="text-xs text-ink/50">{c.person.type === 'alum' ? 'Alum' : 'Student'} · since {fmt(c.at)}</span>
+              </li>
+            ))}
+          </ul>
+        ) : <p className="text-sm text-ink/60">No connections yet. When someone accepts your request, or you accept theirs, they show up here.</p>}
+      </section>
+      <section className="mt-8">
         <h2 className="label">Received ({received.length})</h2>
         {received.length ? <ul className="space-y-3">{received.map((r) => card(r, 'received'))}</ul> : <p className="card p-6 text-sm text-ink/60">No requests yet.</p>}
       </section>
@@ -83,7 +103,7 @@ export default async function InboxPage() {
           <ul className="space-y-3">{sent.map((r) => card(r, 'sent'))}</ul>
         ) : (
           <p className="card p-6 text-sm text-ink/60">
-            You have not sent any requests. Find someone in <Link className="underline" href="/search">Find expertise</Link>.
+            You have not sent any requests. Find someone in <Link className="underline" href="/match">Find Matches</Link>.
           </p>
         )}
       </section>

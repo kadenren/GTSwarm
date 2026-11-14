@@ -250,7 +250,7 @@ export default function SearchClient({
                 aiPolish={aiPolish}
                 matcher={data.matcher}
                 result={selectedResult} kind={kind} role={data.role} query={data.query} viewerName={viewerName} viewerProjects={viewerProjects}
-                onClose={() => setSelected(null)} onExpand={(id) => { setExpanded(id); setView('web'); }}
+                onClose={() => setSelected(null)}
               />
             </div>
           )}

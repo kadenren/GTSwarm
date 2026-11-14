@@ -1,7 +1,22 @@
-import { getDb } from './db';
+import fs from 'node:fs';
+import Database from 'better-sqlite3';
+import { getDb, SEED_DB_PATH } from './db';
 import { snapshot, firstName, type Snapshot } from './data';
 
-export interface BuildEntry { kind: 'milestone' | 'problem'; id: string; date: string; title: string; detail?: string; confirmedBy?: string | null; helper?: string | null; by?: string | null }
+export interface BuildEntry { kind: 'milestone' | 'problem'; id: string; date: string; title: string; detail?: string; confirmedBy?: string | null; helper?: string | null; by?: string | null; simulated?: boolean }
+
+/** Ids present in the pristine seed. Anything else was added during a demo session and is labeled as simulated. */
+let seedIdCache: Set<string> | null = null;
+function seedIds(): Set<string> {
+  if (seedIdCache) return seedIdCache;
+  if (!fs.existsSync(SEED_DB_PATH)) return new Set();
+  const seed = new Database(SEED_DB_PATH, { readonly: true, fileMustExist: true });
+  try {
+    const rows = [...seed.prepare('SELECT id FROM milestones').all(), ...seed.prepare('SELECT id FROM problems').all()] as { id: string }[];
+    seedIdCache = new Set(rows.map((r) => r.id));
+  } finally { seed.close(); }
+  return seedIdCache;
+}
 
 /** Full lineage tree around a project: walk back to the root, then list every version in the family, oldest first. */
 export function lineageOf(s: Snapshot, projectId: string) {
@@ -65,9 +80,10 @@ export function buildRecord(projectId: string): BuildEntry[] {
   const s = snapshot();
   const name = (id: string | null | undefined) => (id ? s.person.get(id)?.name ?? null : null);
   const ms = getDb().prepare('SELECT * FROM milestones WHERE project_id = ?').all(projectId) as { id: string; title: string; date: string; confirmed_by: string | null }[];
-  const entries: BuildEntry[] = ms.map((m) => ({ kind: 'milestone', id: m.id, date: m.date, title: m.title, confirmedBy: name(m.confirmed_by) }));
+  const seeded = seedIds();
+  const entries: BuildEntry[] = ms.map((m) => ({ kind: 'milestone', id: m.id, date: m.date, title: m.title, confirmedBy: name(m.confirmed_by), simulated: seeded.size > 0 && !seeded.has(m.id) }));
   for (const pb of s.problemsOf.get(projectId) ?? []) {
-    entries.push({ kind: 'problem', id: pb.id, date: pb.created_at.slice(0, 10), title: `Solved: ${pb.description}`, detail: pb.solution, by: name(pb.solved_by), helper: name(pb.helper_id) });
+    entries.push({ kind: 'problem', id: pb.id, date: pb.created_at.slice(0, 10), title: `Solved: ${pb.description}`, detail: pb.solution, by: name(pb.solved_by), helper: name(pb.helper_id), simulated: seeded.size > 0 && !seeded.has(pb.id) });
   }
   return entries.sort((a, b) => b.date.localeCompare(a.date));
 }
