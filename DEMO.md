@@ -2,20 +2,21 @@
 
 **Live site:** https://gtswarm.vercel.app. Click **Try Demo** and the guided tour walks through these ten steps, switching demo accounts for you. Every person, startup and request is **fictional**.
 
-**The point to land:** Georgia Tech builders can't find each other. GT Swarm matches a startup with exactly the people it needs, and people with exactly the startups that need them, and shows why.
+**The point to land:** Georgia Tech already has the talent startups need, but founders, alumni and students can't see each other, so connections happen by luck. GT Swarm learns what each person has built and wants, matches them in both directions with reasons, and turns matches into real, consented connections.
 
-| # | Screen | Do | Say (one line) |
-|---|---|---|---|
-| 1 | Discover | Point at the startup grid | "Every student and alumni startup at GT, in one place, with who they need." |
-| 2 | Join (alumni invite) | Click **Use a sample resume** | "A resume becomes a profile. Skills and projects fill in, the person reviews them." |
-| 3 | Find People, as Elena (alum founder) | Search: alumni cofounder for a medical wearable | "She describes exactly who she needs. Dana fits, and the card says why, from Dana's own record." |
-| 4 | Same results, **View network** | Look at the map | "Closer to the center is a better fit. Lines link people who built together." |
-| 5 | Same results | **Invite to connect → Send invite** | "One click to reach the right alum." |
-| 6 | Find Startups, as Maya (student) | Look at Restwell's card | "It works both ways: Restwell needs Maya's BLE firmware experience." |
-| 7 | Same | **Request to join → Send request** | |
-| 8 | Inbox, as Elena | **Accept** | "The founder decides. Accepting connects them; joining the team is a separate choice." |
-| 9 | My Swarm, as Elena | Look at the map | "Her whole network, mapped: people and startups linked by real work together." |
-| 10 | Discover | | "Alum to alum, alum to student, student to student. The right people for every GT startup." |
+| # | Chapter | Screen | Do | Say (one line) |
+|---|---|---|---|---|
+| 1 | Why | Discover (hero numbers) | Point at 47 startups, 72 open roles | "The talent is here. The connections aren't. Today it happens by luck." |
+| 2 | Profile | Join (alumni invite) | **Use a sample resume** | "A resume becomes a profile: what you've built, plus what you're open to. That's what matching runs on." |
+| 3 | Matching | Find People, as Elena (alum founder) | Alumni cofounder for a medical wearable | "She describes exactly who she needs. Only alumni open to cofounding are ranked." |
+| 4 | Matching | Dana's card, **Why this match?** | Read the reason and score | "Matched on real work, not keywords: Dana solved a battery problem on a wearable board and wants to cofound." |
+| 5 | Matching | **View network** | Look at the map | "Best fits sit at the center; lines link people who built together." |
+| 6 | Connection | Dana's card | **Invite to connect → Send invite** | "One click to reach the right alum." |
+| 7 | Connection | Find Startups, as Maya (student), no search typed | Restwell's card | "Students are matched from their profile alone: Restwell needs Maya's firmware experience." |
+| 8 | Connection | Same | **Request to join → Send request** | |
+| 9 | Connection | Inbox, as Elena | **Accept** | "Nothing happens without a yes. Joining the team stays the founder's choice." |
+| 10 | Network | My Swarm, as Elena | Look at the map | "Maya is now on Elena's map. Every connection improves the next match." |
+| 11 | Close | Discover | | "The right people for every GT startup: alum to alum, alum to student, student to student." |
 
 **Before presenting:** click **Try Demo** once to warm the site up, then click it again. Each click starts a fresh private session, so a judge clicking along never sees your changes and you never see theirs.
 

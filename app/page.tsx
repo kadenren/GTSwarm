@@ -32,7 +32,7 @@ export default async function Discover() {
             <Link href="/match" className="btn border border-gold/70 px-6 py-3 text-base text-gold hover:bg-gold/10" data-testid="find-match-cta">Find Your Match</Link>
             <Link href="/add" className="btn border border-white/30 px-5 py-3 text-white hover:border-white">Post your startup</Link>
           </div>
-          <dl className="mt-9 flex flex-wrap gap-x-10 gap-y-3">
+          <dl className="mt-9 flex flex-wrap gap-x-10 gap-y-3" data-tour="stats">
             {[[builds.length, 'active startups and projects'], [alumni, 'alumni-founded'], [builds.length - alumni, 'student-founded'], [openRoles, 'open roles']].map(([n, l]) => (
               <div key={l as string}>
                 <dd className="font-display text-3xl font-bold">{n}</dd>
