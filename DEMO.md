@@ -7,23 +7,18 @@
 | # | Chapter | The judge does | What they see |
 |---|---|---|---|
 | 1 | Why | Reads, **Next** | Startups and open roles nobody can see |
-| 2–3 | Discover | Clicks **View startup** on Restwell Patch | A startup's page: stage, open roles, needs, recommended people |
-| 4 | Find People · alum → alum | Clicks **Find Matches** (as Elena, alum founder) | The Find Matches page |
-| 5 | Find People · alum → alum | Types a need or clicks the example, then **Find people** | Dana Whitfield on top, with a reason from her record |
-| 6 | Find People · alum → alum | **Why this match?** | The score, built from her real work |
-| 7 | Find People · alum → alum | **View network** | The match map |
-| 8 | Find People · alum → alum | **Matches → Invite to connect → Send invite** | "Sent" |
-| 9 | Find People · alum → student | **Student firmware engineer**, then **Find people** | Students with firmware work lead |
-| 10 | Switch sides | Picks **Maya Okafor** in **Viewing as** | Now a student |
-| 11–12 | Builder profile | **My Profile** | Projects, skills, roles open to |
-| 13 | Builder profile | Turns on interests, **Save preferences** | "Saved"; her matches use it |
-| 14–15 | Builder profile | Footer **Join GT Swarm**, **Use a sample resume** | A profile drafted from a resume |
-| 16 | Find Startups · student → alum | **Find Matches → Find Startups** | Restwell, matched from her profile |
-| 17 | Find Startups · student → alum | **Request to join → Send request** | "Sent to Elena" |
-| 18–20 | Connect · alum ↔ alum | Picks **Dana**, **Inbox**, **Accept** | Two alumni connected |
-| 21–22 | Connect · student ↔ alum | Picks **Elena**, **Accept** | Connected; team membership stays Elena's choice |
-| 23–24 | Network | Footer **My Swarm** | Dana and Maya on Elena's map |
-| 25 | Close | **Finish** | "Click around; everything you just did is real" |
+| 2 | Find People · alum → alum | Fills the example (or types), **Find people** | Dana Whitfield, an alum, on top |
+| 3 | Find People · alum → alum | **Why this match?** | The reason, from her real work |
+| 4 | Find People · alum → alum | **View network** | The match map |
+| 5 | Find People · alum → alum | **Matches → Invite to connect → Send invite** | "Sent" |
+| 6 | Builder profile | **Use a sample resume** (as Maya, a student) | A profile drafted from a resume |
+| 7 | Find Startups · student → alum | **Find Startups** tab | Restwell, matched from her profile |
+| 8 | Find Startups · student → alum | **Request to join → Send request** | "Sent to Elena" |
+| 9 | Connect · alum ↔ alum | **Accept** (as Dana) | Two alumni connected |
+| 10 | Connect · student ↔ alum | **Accept** (as Elena) | Connected; joining the team stays her choice |
+| 11 | Network | **Finish** | Dana and Maya on Elena's map |
+
+The tour opens pages and switches personas itself; the judge only does the actions above. Every action has **Skip, do it for me**.
 
 **Before presenting:** click **Try Demo** once to warm the site up, then click it again. Each click starts a fresh private session, so a judge clicking along never sees your changes and you never see theirs.
 
