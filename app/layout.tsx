@@ -30,13 +30,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en">
       <body className="flex min-h-screen flex-col">
         <header className="sticky top-0 z-40 border-b border-white/10 bg-navy-900/95 text-white backdrop-blur">
-          <div className="mx-auto flex max-w-[1400px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5">
+          <div className="relative mx-auto flex max-w-[1400px] items-center gap-x-3 px-4 py-2.5 md:gap-x-4">
             <Link href="/" className="flex flex-col leading-tight" aria-label="GT Swarm home">
               <Wordmark />
-              <span className="text-[11px] tracking-wide text-gold-light/90">Where Yellow Jackets build together</span>
+              <span className="hidden text-[11px] tracking-wide text-gold-light/90 sm:block">Where Yellow Jackets build together</span>
             </Link>
             <NavLinks links={links} />
-            <div className="ml-auto flex items-center gap-3">
+            <div className="ml-auto flex items-center gap-2 md:gap-3">
               <DemoButton />
               <ViewerSwitcher viewers={viewerOptions(viewerId)} current={viewerId} />
             </div>

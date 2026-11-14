@@ -60,7 +60,7 @@ export default async function InboxPage() {
           </div>
           <div className="text-right">
             <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusClass}`}>{statusText}</span>
-            <div className="mt-1 text-[11px] text-ink/50">{fmt(r.created_at)} · <span title="All people and requests in this demo are fictional">simulated</span></div>
+            <div className="mt-1 text-[11px] text-ink/50">{fmt(r.created_at)}</div>
           </div>
         </div>
         <p className="mt-3 rounded-lg bg-paper p-3 text-sm leading-relaxed text-ink/85">{r.message}</p>

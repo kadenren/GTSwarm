@@ -204,7 +204,7 @@ export default function RelevanceWeb({
 
   return (
     <div ref={wrapRef} className="relative w-full select-none" data-testid="relevance-web">
-      <svg ref={svgRef} width={size.W} height={size.H} viewBox={`0 0 ${size.W} ${size.H}`} role="img" aria-label={`Relevance web for ${query}`} />
+      <svg ref={svgRef} width={size.W} height={size.H} className="block max-w-full" viewBox={`0 0 ${size.W} ${size.H}`} role="img" aria-label={`Relevance web for ${query}`} />
       {hover && (
         <div
           className="pointer-events-none absolute z-10 w-72 -translate-x-1/2 rounded-lg border border-navy/10 bg-white/95 px-3 py-2 text-xs shadow-lg backdrop-blur"

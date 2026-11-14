@@ -27,7 +27,7 @@ function explainPerson(s: Snapshot, r: RankedPerson, asked: Set<string>, role: R
     : /^Profile and skills match/.test(r.reasons[0] ?? '') ? projectLead(s, r) : (r.reasons[0] ?? '').replace(/, a close match for ".*"$/, '');
   const leadText = lead ? lead.charAt(0).toLowerCase() + lead.slice(1) : 'has related work on record';
   const parts = [`${first} ${leadText}`];
-  if (matchedSkills.length) parts.push(`has ${matchedSkills.slice(0, 3).join(', ')} experience`);
+  if (matchedSkills.length) parts.push(`has experience in ${andList(matchedSkills.slice(0, 3))}`);
   if (role && r.openTo.includes(role)) parts.push(`is open to ${ROLE_LABEL[role].toLowerCase()} roles`);
   const why = `${strength}: ${parts.length > 1 ? parts.slice(0, -1).join(', ') + ', and ' + parts.at(-1) : parts[0]}.`;
   const ties = r.reasons.filter((x) => /^(Worked with you|Same team as you|Same project family|Same major|Already connected)/.test(x));
@@ -35,9 +35,14 @@ function explainPerson(s: Snapshot, r: RankedPerson, asked: Set<string>, role: R
 }
 
 /** match: Find Matches mode: the role (when chosen) is an eligibility check and ranking is deterministic (no Gemini rerank). */
+/** "A", "A and B", "A, B and C" */
+const andList = (xs: string[]) => (xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`);
 export interface SearchRequest { kind: 'expertise' | 'stuck'; query: string; role?: Role | 'any'; audience?: Audience; log?: string; match?: boolean }
 
 /** Ranking plus everything the relevance web and side panel need, in one payload. */
+/** Share of the best text match a result needs to count as relevant (text match is scaled so the best result is 1). */
+export const RELEVANT_TEXT_MATCH = 0.45;
+
 export async function runSearch(viewerId: string, req: SearchRequest) {
   const audience: Audience = req.audience === 'students' || req.audience === 'alumni' ? req.audience : 'both';
   const chosen = ROLES.includes(req.role as Role) ? (req.role as Role) : null;
@@ -57,6 +62,8 @@ export async function runSearch(viewerId: string, req: SearchRequest) {
       .map(({ p, role, title }) => ({ id: p.id, name: p.name, year: p.year, team: p.team_name, teamType: p.team_type, role, title, outcome: p.outcome })),
     solved: (s.problemsBy.get(r.personId) ?? []).slice(0, 4).map((pb) => ({ id: pb.id, description: pb.description })),
     links: linksOf(r.personId),
+    // lists show only people whose own work clearly matches the request; the map still shows everyone, weaker ones farther out
+    relevant: r.rank === 1 || r.components.E >= RELEVANT_TEXT_MATCH,
   }));
   return {
     kind: req.kind,

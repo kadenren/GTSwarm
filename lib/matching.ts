@@ -14,6 +14,8 @@ import { prefsOf } from './prefs';
  */
 // S text similarity · K skills they need that you have · R a role they need that you are open to
 // I industry and startup interest · O open and at an early stage · T shared ties
+/** "A", "A and B", "A, B and C" */
+const andList = (xs: string[]) => (xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`);
 export const BUILD_WEIGHTS = { S: 0.35, K: 0.25, R: 0.2, I: 0.1, O: 0.05, T: 0.05 } as const;
 
 const ROLE_WORDS: [RegExp, Role][] = [
@@ -99,7 +101,7 @@ export async function recommendBuilds(input: { viewerId: string; personId?: stri
     const roleText = (r: Role) => (r === 'Early engineer' ? 'an engineer' : r === 'Advisor' ? 'an advisor' : r === 'Helper' ? 'a collaborator' : `a ${r.toLowerCase()}`);
     const strength = score >= 0.7 ? 'Strong match' : score >= 0.5 ? 'Good match' : 'Possible match';
     const yours = person ? 'you have' : 'you mentioned';
-    const sentence = matchedSkills.length && matchedRoles.length ? `${strength} because ${yours} ${matchedSkills.slice(0, 3).join(', ')} experience and ${b.name} is seeking ${roleText(matchedRoles[0])}.`
+    const sentence = matchedSkills.length && matchedRoles.length ? `${strength}: ${b.name} is looking for ${roleText(matchedRoles[0])}, and ${yours} experience in ${andList(matchedSkills.slice(0, 3))}.`
       : matchedRoles.length ? `${strength} because ${b.name} is seeking ${roleText(matchedRoles[0])}, a role you are open to${c.S > 0.5 ? ', and its work is close to yours' : ''}.`
       : matchedSkills.length ? `${strength} because ${b.name} needs ${matchedSkills.slice(0, 3).join(', ')}, which ${person ? 'is on your record' : 'you mentioned'}.`
       : `${strength} because what ${b.name} is building is close to ${person ? 'your past work' : 'what you described'}.`;

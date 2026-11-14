@@ -32,7 +32,8 @@ export default function SearchClient({
   const [data, setData] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<'web' | 'list'>('web');
+  const [view, setView] = useState<'web' | 'list'>('list');
+  const [showAll, setShowAll] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
 
   const run = useCallback(async (query: string, r: string, a: string) => {
@@ -41,6 +42,7 @@ export default function SearchClient({
     setLoading(true);
     setError(null);
     setSelected(null);
+    setShowAll(false);
     const params = new URLSearchParams({ q: query });
     if (kind === 'expertise') { params.set('role', r); params.set('aud', a); } else if (a !== 'both') params.set('aud', a);
     router.replace(`?${params.toString()}`, { scroll: false });
@@ -188,30 +190,30 @@ export default function SearchClient({
         <div className="card mt-6 p-10 text-center">
           <h2 className="text-xl font-bold text-navy">No matches yet</h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-ink/70">
-            Nobody in the swarm has documented work close to &ldquo;{data.query}&rdquo;{data.audience !== 'both' ? ` among ${data.audience}` : ''}. Try broader words, switch to Both, or log what you learn on your project page so the next builder can find it.
+            Nobody on GT Swarm has solved something close to &ldquo;{data.query}&rdquo;{data.audience !== 'both' ? ` among ${data.audience}` : ''}. Try broader words, switch to Both, or log what you learn on your project page so the next builder can find it.
           </p>
         </div>
       )}
 
       {data && data.results.length > 0 && (
-        <div className={`mt-6 grid gap-6 ${selectedResult ? 'lg:grid-cols-[1fr_420px]' : ''}`}>
+        <div className={`mt-6 grid grid-cols-[minmax(0,1fr)] gap-6 ${selectedResult ? 'lg:grid-cols-[minmax(0,1fr)_420px]' : ''}`}>
           <section id="results" className="card min-w-0 scroll-mt-20 p-4" aria-label="Results">
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h2 className="text-lg font-bold text-navy">
-                  {`${data.results.length} builders ranked for "${data.query}"`}
+                  {(() => { const n = data.results.filter((r) => r.relevant).length; return `${n} ${n === 1 ? 'person has' : 'people have'} solved something close to "${data.query}"`; })()}
                 </h2>
                 <p className="text-xs text-ink/60">
-                  {data.matcher === 'gemini' ? 'The graph shortlisted candidates; Gemini read each record against your request and scored the fit. Shared ties, role fit and availability still count. Click a person for details.' : 'Ranked by graph evidence: what people built and solved, shared ties, role fit and availability. Click a person for details.'}
+                  {view === 'list' ? 'Ranked by the problems they solved and the work they did. Click a person to see how they solved it.' : 'Closer to the center means a closer match. Click a person to see how they solved it.'}
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 {(
                   <div className="flex rounded-lg border border-navy/15 p-0.5" role="tablist" aria-label="Result view">
-                    {(['web', 'list'] as const).map((v) => (
+                    {(['list', 'web'] as const).map((v) => (
                       <button key={v} role="tab" aria-selected={view === v} onClick={() => setView(v)}
                         className={`rounded-md px-3 py-1 text-sm font-medium ${view === v ? 'bg-navy text-white' : 'text-navy/70 hover:text-navy'}`}>
-                        {v === 'web' ? 'Web view' : 'List view'}
+                        {v === 'web' ? 'Map' : 'List'}
                       </button>
                     ))}
                   </div>
@@ -225,8 +227,9 @@ export default function SearchClient({
                 <WebLegend />
               </>
             ) : (
+              <>
               <ol className="grid gap-3 sm:grid-cols-2" data-testid="result-list">
-                {data.results.map((r) => (
+                {data.results.filter((r) => showAll || r.relevant).map((r) => (
                   <li key={r.personId}>
                     <button onClick={() => setSelected(r.personId)}
                       className={`card w-full p-4 text-left transition hover:border-gold ${selected === r.personId ? 'border-gold ring-2 ring-gold/40' : ''}`}>
@@ -235,16 +238,21 @@ export default function SearchClient({
                         <div className="min-w-0 flex-1">
                           <div className="flex items-baseline justify-between gap-2">
                             <span className="truncate font-display font-bold text-navy">{r.name}</span>
-                            <span className="text-xs tabular-nums text-ink/60">{r.score.toFixed(2)}</span>
                           </div>
-                          <div className="text-xs text-ink/60">{r.label} · ring {r.ring}</div>
+                          <div className="text-xs text-ink/60">{r.type === 'alum' ? `Alum '${String(r.gradYear).slice(2)}` : 'Student'}{r.currentRole && r.type === 'alum' ? ` · ${r.currentRole}` : ''}</div>
                         </div>
                       </div>
-                      <p className="mt-2 text-sm leading-snug text-ink/85">{r.description.short}</p>
+                      <p className="mt-2 text-sm leading-snug text-ink/85">{r.matchedProblem ? `Solved “${r.matchedProblem.description}” on ${r.matchedProblem.projectName} (${r.matchedProblem.year})` : r.description.short.split(' · ')[0]}</p>
                     </button>
                   </li>
                 ))}
               </ol>
+              {data.results.some((r) => !r.relevant) && (
+                <div className="mt-3 text-center">
+                  <button className="btn-ghost" onClick={() => setShowAll((v) => !v)} data-testid="show-weaker">{showAll ? 'Hide weaker matches' : (() => { const n = data.results.filter((r) => !r.relevant).length; return `Show ${n} weaker ${n === 1 ? 'match' : 'matches'}`; })()}</button>
+                </div>
+              )}
+              </>
             )}
           </section>
           {selectedResult && (

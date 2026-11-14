@@ -72,7 +72,7 @@ export default function ProfileClaim({ aiEnabled, mode = 'update', current }: {
     const d = await res.json();
     setBusy(false);
     if (!res.ok) { setMsg({ ok: false, text: d.error }); return; }
-    const added = d.created?.length ? ` and ${d.created.length} ${d.created.length === 1 ? 'project' : 'projects'} added to the swarm` : '';
+    const added = d.created?.length ? ` and ${d.created.length} ${d.created.length === 1 ? 'project' : 'projects'} added to GT Swarm` : '';
     const bad = d.invalidLinks?.length ? ` Check your ${d.invalidLinks.join(', ')} link${d.invalidLinks.length > 1 ? 's' : ''}; ${d.invalidLinks.length > 1 ? 'they were' : 'it was'} not saved.` : '';
     if (join) { router.push('/profile?joined=1'); router.refresh(); return; }
     setMsg({ ok: true, text: `Profile saved${added}. You are now searchable for what you built.${bad}` });
@@ -155,7 +155,7 @@ export default function ProfileClaim({ aiEnabled, mode = 'update', current }: {
           <label className="block"><span className="label">Skills (comma separated)</span><input className="input" value={skillsText} onChange={(e) => setSkillsText(e.target.value)} /></label>
           {draft.projects.length > 0 && (
             <div>
-              <span className="label">Projects found: add to the swarm?</span>
+              <span className="label">Projects found: add them to your profile?</span>
               <ul className="space-y-2">
                 {draft.projects.map((p, i) => (
                   <li key={i} className="rounded-lg border border-navy/10 p-3">

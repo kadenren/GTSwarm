@@ -83,7 +83,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
           <div className="grid gap-6 p-5 lg:grid-cols-[1fr_1.2fr]">
             <div>
               <h2 className="label">Looking for</h2>
-              <div className="flex flex-wrap gap-1.5">{build.rolesNeeded.map((r) => <span key={r} className="tag bg-gold/20 text-gold-dark">{r}</span>)}</div>
+              <div className="flex flex-wrap gap-1.5">{build.rolesNeeded.map((r) => <span key={r} className="tag bg-gold/20 text-gold-dark">{roleLabel(r)}</span>)}</div>
               {build.helpNeeded && <p className="mt-2 text-sm text-ink/80">{build.helpNeeded}</p>}
               {joinRequests.length > 0 && (
                 <div className="mt-4">

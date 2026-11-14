@@ -125,6 +125,10 @@ export default function MatchFinder({ initialMode, initialQuery, initialRole, in
 function PeopleResults({ data, viewer, viewerProjects, ownedBuilds }: { data: SearchResponse; viewer: Viewer; viewerProjects: ViewerProject[]; ownedBuilds: OwnedBuild[] }) {
   const [view, setView] = useState<'cards' | 'network'>('cards');
   const [selected, setSelected] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
+  const relevant = data.results.filter((r) => r.relevant);
+  const weaker = data.results.length - relevant.length;
+  const listed = showAll ? data.results : relevant;
   const nodes: WebNode[] = useMemo(() => data.results.map((r) => ({ id: r.personId, name: r.name, label: r.label, type: r.type, score: r.score, rank: r.rank, ring: r.ring, short: r.why })), [data]);
   const sel = data.results.find((r) => r.personId === selected) ?? null;
   if (!data.results.length) {
@@ -134,7 +138,7 @@ function PeopleResults({ data, viewer, viewerProjects, ownedBuilds }: { data: Se
     <section className="mt-8" aria-label="Recommended people">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-navy">{data.results.length} people for your build</h2>
+          <h2 className="text-2xl font-bold text-navy">{relevant.length} {relevant.length === 1 ? 'person' : 'people'} who fit</h2>
           <p className="text-sm text-ink/60">Ranked by what they have actually built and solved{data.role ? `, among people open to ${roleLabel(data.role).toLowerCase()} roles` : ''}. Every reason comes from their record.</p>
         </div>
         <div className="flex rounded-lg border border-navy/15 bg-white p-0.5" role="tablist" aria-label="Result view">
@@ -146,10 +150,16 @@ function PeopleResults({ data, viewer, viewerProjects, ownedBuilds }: { data: Se
       </div>
       {view === 'cards' ? (
         <ol className="mt-4 grid gap-4 lg:grid-cols-2" data-testid="people-results" data-aud={data.audience}>
-          {data.results.map((r) => <li key={r.personId}><PersonMatchCard r={r} role={data.role} query={data.query} viewer={viewer} ownedBuilds={ownedBuilds} /></li>)}
+          {listed.map((r) => <li key={r.personId}><PersonMatchCard r={r} role={data.role} query={data.query} viewer={viewer} ownedBuilds={ownedBuilds} /></li>)}
         </ol>
-      ) : (
-        <div className={`mt-4 grid gap-6 ${sel ? 'lg:grid-cols-[1fr_400px]' : ''}`}>
+      ) : null}
+      {view === 'cards' && weaker > 0 ? (
+        <div className="mt-4 text-center">
+          <button className="btn-ghost" onClick={() => setShowAll((v) => !v)} data-testid="show-weaker">{showAll ? 'Hide weaker matches' : `Show ${weaker} weaker ${weaker === 1 ? 'match' : 'matches'}`}</button>
+        </div>
+      ) : null}
+      {view === 'network' && (
+        <div className={`mt-4 grid grid-cols-[minmax(0,1fr)] gap-6 ${sel ? 'lg:grid-cols-[minmax(0,1fr)_400px]' : ''}`}>
           <div className="card min-w-0 p-4">
             <RelevanceWeb nodes={nodes} edges={data.edges} query={data.query} roleLabel={data.role ? roleLabel(data.role) : 'Matches'} selectedId={selected} onSelect={setSelected} />
             <WebLegend />
@@ -176,10 +186,6 @@ function PersonMatchCard({ r, role, query, viewer, ownedBuilds }: { r: SearchRes
         </div>
         <div className="text-right">
           <span className={`inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${tone}`}>{r.strength}</span>
-          <div className="mt-1 flex items-center justify-end gap-1.5" title="Score from the ranking algorithm (0 to 1)">
-            <span className="h-1.5 w-16 overflow-hidden rounded-full bg-navy/10"><span className="block h-full rounded-full bg-gold" style={{ width: `${Math.round(r.score * 100)}%` }} /></span>
-            <span className="text-[11px] tabular-nums text-ink/50">{r.score.toFixed(2)}</span>
-          </div>
         </div>
       </div>
 

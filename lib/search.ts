@@ -11,7 +11,7 @@ import { geminiVectors, geminiQueryVector } from './geminiVec';
  * Similarities are scaled to 0..1 per query.
  */
 
-const STOP = new Set('a an and are as at be by for from has have i in into is it its me my of on or our that the their them this to was we when where which who will with you your need needs looking someone help how what can do does after before during get got'.split(' '));
+const STOP = new Set('a an and are as at be by for from has have i in into is it its me my of on or our that the their them this to was we when where which who will with you your need needs looking someone help how what can do does after before during get got too very keep keeps kept just only still even so than then there these those us any all some not no up out over again really'.split(' '));
 // small engineering thesaurus: abbreviations and near-synonyms map to one canonical token
 const CANON: Record<string, string> = {
   ble: 'bluetooth', bt: 'bluetooth', mcu: 'microcontroller', microcontrollers: 'microcontroller', uc: 'microcontroller',

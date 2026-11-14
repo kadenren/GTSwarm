@@ -9,8 +9,8 @@ export default async function AddPage() {
   await ready();
   return (
     <>
-      <PageHero eyebrow="Grow the swarm" title="Add a project you built"
-        subtitle="Drop in your capstone report, poster, slides, README or a few sentences. GT Swarm reads them, fills in the project, and links it to the people, skills and problems already in the graph." />
+      <PageHero eyebrow="Post a startup or project" title="Tell GT what you're building and who you need"
+        subtitle="Paste a few sentences or drop in a pitch deck, report or README. GT Swarm fills in the details, you confirm them, and students and alumni with matching skills see what you need." />
       <div className="mx-auto max-w-7xl px-4 py-8">
         <AddProject aiEnabled={geminiEnabled()} />
       </div>

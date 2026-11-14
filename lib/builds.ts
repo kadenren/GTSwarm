@@ -57,7 +57,11 @@ function deriveStatus(s: Snapshot, projectId: string) {
     const gaps = (skillGaps(projectId)?.gaps ?? []).filter((g) => !g.covered).map((g) => g.skill).slice(0, 2);
     const hasAdvisor = team.some((m) => m.role === 'advisor');
     roles = [...new Set<Role>([gaps.length ? 'Early engineer' : 'Helper', ...(hasAdvisor ? [] : ['Advisor' as Role]), ...(p.is_startup && team.length < 3 ? ['Cofounder' as Role] : [])])];
-    help = gaps.length ? `Someone with ${gaps.join(' and ')} experience${hasAdvisor ? '' : ', plus an advisor who has built something similar'}.` : 'Builders who want to join a working team.';
+    // describe the need with the project's own tools, so it reads like the team wrote it
+    const tools = (s.projectSkillNames.get(projectId) ?? []).filter((k) => !DOMAINS.includes(k)).slice(0, 2);
+    help = gaps.length && tools.length
+      ? `An engineer with ${tools.join(' and ')} experience${hasAdvisor ? '' : ', plus an advisor who has built something similar'}.`
+      : 'Builders who want to join a working team.';
   }
   return { stage, owner_id: owner?.person_id ?? null, industry: INDUSTRY_BY_DOMAIN[domain], domain, open: hero ? 1 : pick(projectId + 'open', 5) === 0 ? 0 : 1, roles, help };
 }
@@ -82,7 +86,7 @@ export interface BuildCard {
   id: string; name: string; summary: string; year: number; teamType: string; teamName: string;
   stage: Stage; industry: string; domain: string; open: boolean; rolesNeeded: Role[]; helpNeeded: string;
   owner: { id: string; name: string; type: 'student' | 'alum'; label: string } | null;
-  ownership: 'student' | 'alum' | 'mixed'; skills: string[]; teamSize: number; isStartup: boolean;
+  ownership: 'student' | 'alum' | 'mixed'; skills: string[]; teamSize: number; isStartup: boolean; teamIds: string[];
 }
 
 export function listBuilds(): BuildCard[] {
@@ -100,7 +104,7 @@ export function listBuilds(): BuildCard[] {
       owner: owner ? { id: owner.id, name: owner.name, type: owner.type, label: owner.type === 'alum' ? `alum '${String(owner.grad_year).slice(2)}` : 'student' } : null,
       ownership: (types.size > 1 ? 'mixed' : types.has('alum') ? 'alum' : 'student') as BuildCard['ownership'],
       skills: (s.projectSkillNames.get(p.id) ?? []).filter((k) => !DOMAINS.includes(k)).slice(0, 5),
-      teamSize: team.length, isStartup: p.is_startup,
+      teamSize: team.length, isStartup: p.is_startup, teamIds: team.map((t) => t.id),
     };
   }).sort((a, b) => Number(b.open) - Number(a.open) || b.year - a.year || a.name.localeCompare(b.name));
 }

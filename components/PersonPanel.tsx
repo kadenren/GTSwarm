@@ -72,7 +72,7 @@ export default function PersonPanel({
             </p>
           )}
           <p className="mt-1 text-xs font-semibold text-gold-dark">
-            Rank {result.rank} · {result.ring === 1 ? 'inner ring' : result.ring === 2 ? 'middle ring' : 'outer ring'} · score {result.score.toFixed(2)}
+            {result.rank === 1 ? 'Best match' : result.relevant ? 'Close match' : 'Weaker match'}
           </p>
         </div>
         <button onClick={onClose} className="rounded-md p-1 text-ink/50 hover:bg-navy/5 hover:text-navy" aria-label="Close panel">

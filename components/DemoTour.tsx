@@ -54,7 +54,7 @@ const STEPS: Step[] = [
     body: 'Describe who you need in plain words.',
     action: 'Click “Alumni cofounder for a medical wearable” (or type your own), then “Find people”.',
     done: '[data-testid="people-results"]', skipUrl: FIND_COFOUNDER,
-    doneBody: 'Dana Whitfield, an alum, is the top match, and her card says why: she solved a battery problem on a wearable board and wants to cofound.' },
+    doneBody: 'Dana Whitfield, an alum, is the top match. Her card says why: she built the Lumen Band wearable and is open to cofounding.' },
   { as: ELENA, url: '/match', target: '[data-testid="relevance-web"] || [data-testid="view-network"]', corner: true, who: '1 · Build your team',
     title: 'See the match map', body: '',
     action: 'Click “View network”.',

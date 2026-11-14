@@ -33,7 +33,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
         subtitle="What you have built, what you know, and what you are looking for. Founders find you by this record, and it decides which startups are recommended to you." />
       {sp.joined && (
         <div className="mx-auto max-w-7xl px-4 pt-6">
-          <div className="rounded-xl border border-gold/50 bg-gold/15 px-5 py-3 text-sm text-navy" role="status"><strong>Welcome to GT Swarm, {me.name.split(' ')[0]}.</strong> Your profile is live and you are now viewing as yourself. Below are builds that could use your expertise; their teams will see you as a match.</div>
+          <div className="rounded-xl border border-gold/50 bg-gold/15 px-5 py-3 text-sm text-navy" role="status"><strong>Welcome to GT Swarm, {me.name.split(' ')[0]}.</strong> Your profile is live and you are now viewing as yourself. Below are startups and projects that could use your expertise; their teams will see you as a match.</div>
         </div>
       )}
       <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 lg:grid-cols-[1fr_1.1fr]">
@@ -61,7 +61,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
             {projects.map(({ m, p }) => (
               <li key={p.id} className="flex justify-between gap-2">
                 <Link href={`/projects/${encodeURIComponent(p.id)}`} className="text-navy hover:underline">{p.name}</Link>
-                <span className="text-xs text-ink/50">{m.title ?? m.role} · {p.year}</span>
+                <span className="text-xs text-ink/50">{m.title ?? (m.role.charAt(0).toUpperCase() + m.role.slice(1))} · {p.year}</span>
               </li>
             ))}
           </ul>

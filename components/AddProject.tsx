@@ -1,6 +1,9 @@
 'use client';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
+import { MATCH_ROLES, roleLabel } from '@/lib/roles';
+
+const STAGES = ['Idea', 'Prototype', 'Testing', 'Pilot', 'Launched'];
 
 const TYPES = ['VIP', 'Capstone', 'CREATE-X', 'Lab', 'Club', 'Invention Studio', 'Startup'];
 const SAMPLE = `ThermoCuff: In the 2026 ECE Senior Design capstone, our team built a wearable cuff that tracks skin temperature and heart rate for patients recovering at home. The firmware runs on an nRF52 with BLE and a PPG sensor. The main problem was that readings drifted when the cuff warmed up against the skin, so we fixed it by adding a reference thermistor and a two-point calibration at startup. We also struggled with battery life lasting under a day; we solved it by duty-cycling the PPG sensor and batching radio packets every 30 seconds.`;
@@ -23,6 +26,9 @@ export default function AddProject({ aiEnabled }: { aiEnabled: boolean }) {
   const [err, setErr] = useState<string | null>(null);
   const [saved, setSaved] = useState<Saved | null>(null);
   const [techText, setTechText] = useState('');
+  const [stage, setStage] = useState('Prototype');
+  const [needRoles, setNeedRoles] = useState<string[]>([]);
+  const [help, setHelp] = useState('');
   const fileInput = useRef<HTMLInputElement>(null);
 
   const addFiles = (list: FileList | null) => {
@@ -50,8 +56,10 @@ export default function AddProject({ aiEnabled }: { aiEnabled: boolean }) {
     const body = { ...draft, technologies: techText.split(',').map((t) => t.trim()).filter(Boolean), links };
     const res = await fetch('/api/projects', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
     const d = await res.json();
+    if (!res.ok) { setErr(d.error); setBusy(false); return; }
+    // the startup page shows the stage, the roles it is hiring for and what help it needs
+    await fetch(`/api/builds/${encodeURIComponent(d.id)}/status`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ stage, open: needRoles.length > 0, roles: needRoles, help: help.trim() }) });
     setBusy(false);
-    if (!res.ok) { setErr(d.error); return; }
     setSaved(d);
   }
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => (d ? { ...d, [k]: v } : d));
@@ -150,7 +158,23 @@ export default function AddProject({ aiEnabled }: { aiEnabled: boolean }) {
               </ul>
               <button className="mt-2 text-xs font-semibold text-navy underline decoration-gold underline-offset-4" onClick={() => set('problems', [...draft.problems, { description: '', solution: '' }])}>+ Add a solved problem</button>
             </div>
-            <button className="btn-gold w-full" onClick={save} disabled={busy}>{busy ? 'Adding…' : 'Add to the swarm'}</button>
+            <div className="rounded-lg border border-gold/40 bg-gold/10 p-3" data-testid="add-recruiting">
+              <span className="label">Who are you looking for?</span>
+              <div className="flex flex-wrap gap-1.5">
+                {MATCH_ROLES.map((r) => (
+                  <button key={r} type="button" aria-pressed={needRoles.includes(r)} onClick={() => setNeedRoles((x) => (x.includes(r) ? x.filter((y) => y !== r) : [...x, r]))}
+                    className={`chip text-xs ${needRoles.includes(r) ? 'border-navy bg-navy text-white' : 'border-navy/20 bg-white text-navy'}`}>{roleLabel(r)}</button>
+                ))}
+              </div>
+              <div className="mt-2 grid grid-cols-[120px_1fr] gap-2">
+                <label><span className="label">Stage</span>
+                  <select className="input" value={stage} onChange={(e) => setStage(e.target.value)}>{STAGES.map((s) => <option key={s}>{s}</option>)}</select></label>
+                <label><span className="label">What help do you need?</span>
+                  <input className="input" value={help} onChange={(e) => setHelp(e.target.value)} placeholder="A firmware engineer for battery life" /></label>
+              </div>
+              <p className="mt-1 text-[11px] text-ink/55">Pick no roles if you are not recruiting. Students and alumni with matching skills will see it.</p>
+            </div>
+            <button className="btn-gold w-full" onClick={save} disabled={busy}>{busy ? 'Posting…' : 'Post it'}</button>
           </div>
         )}
       </section>

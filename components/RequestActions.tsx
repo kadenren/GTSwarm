@@ -1,4 +1,5 @@
 'use client';
+import { roleLabel } from '@/lib/roles';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -38,9 +39,9 @@ export function AddToProject({ id, name, projectName, suggested }: { id: string;
     <div className="flex flex-wrap items-center gap-2 rounded-lg bg-gold/10 p-2">
       <span className="text-sm text-navy">Add {name.split(' ')[0]} to {projectName} as</span>
       <select className="rounded-md border border-navy/20 bg-white px-2 py-1 text-sm" value={role} onChange={(e) => setRole(e.target.value)} aria-label="Project role">
-        {ADD_AS.map((r) => <option key={r}>{r}</option>)}
+        {ADD_AS.map((r) => <option key={r} value={r}>{roleLabel(r)}</option>)}
       </select>
-      <button className="btn-gold py-1" onClick={add} disabled={busy} data-testid="add-to-project">{busy ? 'Adding…' : `Add to project as ${role}`}</button>
+      <button className="btn-gold py-1" onClick={add} disabled={busy} data-testid="add-to-project">{busy ? 'Adding…' : `Add to project as ${roleLabel(role)}`}</button>
       {err && <span className="text-xs text-red-700">{err}</span>}
     </div>
   );

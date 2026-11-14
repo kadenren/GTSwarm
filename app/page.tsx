@@ -20,7 +20,7 @@ const WAYS = [
 
 /** Discover: the homepage. What GT Swarm is for, then what Yellow Jackets are building. */
 export default async function Discover() {
-  await getViewerId(); // also loads this visitor's demo session
+  const viewerId = await getViewerId(); // also loads this visitor's demo session
   const builds = listBuilds();
   const s = snapshot();
   const openRoles = builds.filter((b) => b.open).reduce((n, b) => n + b.rolesNeeded.length, 0);
@@ -74,7 +74,7 @@ export default async function Discover() {
           <h2 className="text-2xl font-bold text-navy">Startups building now</h2>
           <Link href="/add" className="btn-ghost">Post your startup</Link>
         </div>
-        <DiscoverBuilds builds={builds} />
+        <DiscoverBuilds builds={builds} viewerId={viewerId} />
       </div>
     </div>
   );
