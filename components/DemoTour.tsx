@@ -107,54 +107,62 @@ const STEPS: Step[] = [
     body: 'SGA runs a one-semester, opt-in pilot. CREATE-X, Startup Exchange and the Alumni Association bring the people (proposed). No university records needed. Explore Get Unstuck, the network map and Impact for GT on your own.' },
 ];
 
-const SOFIA = 'person:p012';
-const STUCK_SECURITY_Q = '/stuck?q=Hospital+IT+security+review+stalled+our+pilot';
+const SOFIA = 'person:p012', NOAH = 'person:p039', KENJI = 'person:p227', JAMIE = 'person:p097';
+const SEATTLE = '/communities/group%3Ag04';
+const JAMIE_CARD = '[data-testid="circle-member"][data-id="person:p097"]';
+const NOAH_REQUEST = '[data-testid="request-received"]:has([data-testid="request-purpose"]):has(a[href="/people/person%3Ap039"])';
+const KENJI_SEARCH = '/people?q=robotics+career+advice&purpose=mentorship';
+const MENTOR_RESULTS = '[data-testid="people-results"][data-purpose="mentorship"]';
+const FIRST_MENTOR = `${MENTOR_RESULTS} > li:first-child`;
 /**
- * The lifelong-network tour (about 90 to 120 seconds): a student's dashboard, a mentor request and an internship,
- * then an alum's view with alumni discovery, an alumni-only event and Get Unstuck, then a simulated graduation.
+ * The community tour (about 60 to 90 seconds), three short stories:
+ * 1. Noah, an alum who moved to Seattle, finds GT in Seattle, sees why a member fits, and asks to connect; Jamie accepts.
+ * 2. Kenji, a robotics student, finds an alum open to mentoring students, asks for career advice, then sees internships and a restriction.
+ * 3. Sofia graduates: same account, now a verified alum (simulated).
  */
 const NETWORK_STEPS: Step[] = [
-  { as: MAYA, url: '/', target: '[data-tour="lifecycle"]', who: 'GT Swarm',
-    title: 'Your Georgia Tech network. For life.',
-    body: 'One profile from first year to decades after graduation: mentors, internships, jobs, groups, events, startups and expertise, matched on what people have actually done.' },
-  { as: MAYA, url: '/home', target: '[data-tour="dashboard"]', who: 'Student · Home',
-    title: 'Maya, an upper-year student, opens her home', body: 'Mentors, internships, alumni, events, groups and startups, each picked from her skills and projects, each with a reason.' },
-  { as: MAYA, url: '/mentorship', target: '[data-testid="my-mentorship"] || [data-tour="mentor-recs"] [data-testid="mentor-card"]', who: 'Student · Mentorship',
-    title: 'A mentor matched on real experience', body: 'Marcus solved BLE problems like the ones Maya works on, and he opted in to mentor students.',
-    action: 'Click “Request mentorship” on the first mentor, then “Send request”.',
-    done: '[data-testid="my-mentorship"][data-status="requested"]', skipClick: '[data-tour="mentor-recs"] [data-testid="mentor-request-button"] && [data-tour="mentor-recs"] [data-testid="mentor-request-send"]',
-    doneBody: 'Sent with her note. The mentor accepts or declines in their inbox; nothing starts without a yes.' },
-  { as: MAYA, url: '/opportunities', target: '[data-testid="opportunity-card"][data-id="opp:o001"]', who: 'Student · Internships',
-    title: 'An internship that fits what she has built', body: 'Recommended because her firmware, BLE and nRF52 experience matches the posting. Expired and ineligible postings are never recommended.',
-    action: 'Click “Save” on the Embedded Firmware Intern posting.',
-    done: '[data-id="opp:o001"] [data-testid="save-opportunity"][aria-pressed="true"]', skipClick: '[data-id="opp:o001"] [data-testid="save-opportunity"]',
-    doneBody: 'Saved. Postings are synthetic in this demo and clearly labeled.' },
+  { as: NOAH, url: '/', target: '[data-testid="hero-preview"]', who: 'GT Swarm',
+    title: 'Your Georgia Tech community, for life.',
+    body: 'GT Swarm helps Yellow Jackets find their people, join a community, and stay connected after graduation. Three short stories, with fictional members.' },
 
-  { as: ELENA, url: '/home', target: '[data-tour="dashboard"]', who: 'Alum · Home',
-    title: 'Now Elena, a verified alum', body: 'Her home is different: alumni with complementary experience, roles, alumni events, professional groups, and startups seeking advisors.' },
-  { as: ELENA, url: '/match', target: '[data-testid="people-results"] > li:first-child || [data-tour="match-form"]', who: 'Alum → alum',
-    title: 'Alumni build companies together too', body: 'Elena needs an alumni cofounder with wearable hardware experience.',
-    action: 'Click “Alumni cofounder for a medical wearable”, then “Find people”.',
-    done: '[data-testid="people-results"]', skipUrl: "/match?mode=people&q=I%27m+building+a+wearable+medical+device+startup+and+need+an+alumni+cofounder+with+embedded+hardware+or+medical-device+expertise.&role=Cofounder&aud=alumni",
-    doneBody: 'Dana Whitfield, class of ’18, built a shipped wearable and is open to cofounding. A 2015 alum and a 2018 alum, matched on experience.' },
-  { as: ELENA, url: '/events', target: '[data-testid="event-card"][data-id="event:e03"]', who: 'Alum · Events',
-    title: 'Alumni-only events', body: 'Students see only a teaser for this dinner: no location, no description. Verified alumni can register, and capacity is enforced.',
-    action: 'Click “RSVP” on the Alumni Founders Dinner.',
-    done: '[data-id="event:e03"] [data-testid="rsvp-going"]', skipClick: '[data-id="event:e03"] [data-testid="rsvp"]',
-    doneBody: 'Registered, and that was the last seat.' },
-  { as: ELENA, url: '/stuck', target: '[data-testid="best-match"] || form[aria-label="Describe your problem"]', who: 'Get Unstuck',
-    title: 'Stuck? Find who already solved it', body: 'Her hospital pilot is stuck in a security review.',
-    action: 'Click “Hospital security review stalled our pilot”.',
-    done: '[data-testid="best-match"]', skipUrl: STUCK_SECURITY_Q,
-    doneBody: 'Tara, an alum founder, solved the same problem, and her fix is on record. Matched on the problem, with keyword and semantic relevance.' },
+  { as: NOAH, url: '/communities', target: `[data-testid="circle-card"][data-id="group:g04"]`, who: '1 · Noah, alum ’24',
+    title: 'Noah just moved to Seattle', body: 'Communities suggests GT in Seattle because he chose to share his city. Every suggestion says why.',
+    action: 'Click “Explore community” on GT in Seattle.',
+    done: '[data-tour="circle-members"]', autoNext: true, skipUrl: SEATTLE },
+  { as: NOAH, url: SEATTLE, target: `${JAMIE_CARD} [data-testid="connect-sent"] || ${JAMIE_CARD} [data-testid="connect-form"] || ${JAMIE_CARD}`, who: '1 · Noah, alum ’24',
+    title: 'People who welcome a hello', body: 'Only members who chose to accept requests appear here, each with a reason based on what they shared.',
+    action: 'On Jamie’s card, click “Ask to connect”, then “Send request”.',
+    done: `${JAMIE_CARD} [data-testid="connect-sent"]`, skipClick: `${JAMIE_CARD} [data-testid="ask-to-connect"] && ${JAMIE_CARD} [data-testid="connect-send"]`,
+    doneBody: 'Sent, with a purpose (“Meet fellow Yellow Jackets”) and a short note Noah could edit.' },
+  { as: JAMIE, url: '/inbox', target: NOAH_REQUEST, who: '1 · Jamie decides',
+    title: 'Jamie sees why Noah reached out', body: 'Nothing happens without a yes. Jamie can accept or decline.',
+    action: 'Click Accept.',
+    done: `${NOAH_REQUEST}[data-status="accepted"]`, skipClick: `${NOAH_REQUEST} button`,
+    doneBody: 'Connected. Both of them now see each other in My Network.' },
 
-  { as: SOFIA, url: '/profile', target: '[data-testid="lifecycle-panel"]', who: 'Graduation',
-    title: 'Sofia graduates in December', body: 'Her projects, connections, mentorship and groups are all here. Graduation is verified by an authorized source; here it is simulated and labeled.',
+  { as: KENJI, url: '/people', target: `${FIRST_MENTOR} || [data-tour="people-search"]`, who: '2 · Kenji, robotics student',
+    title: 'Kenji wants career advice', body: 'He searches “robotics career advice” and picks the purpose “Career advice or mentorship”.',
+    action: 'Type “robotics career advice”, choose “Career advice or mentorship”, then click Search.',
+    done: MENTOR_RESULTS, skipUrl: KENJI_SEARCH,
+    doneBody: 'Only alumni who chose to mentor students show up. Alumni who are not open to students are left out before anything is ranked.' },
+  { as: KENJI, url: '/people', target: `${FIRST_MENTOR} [data-testid="connect-sent"] || ${FIRST_MENTOR} [data-testid="connect-form"] || ${FIRST_MENTOR}`, who: '2 · Kenji, robotics student',
+    title: 'Why this person?', body: 'The reason comes from facts on the profile: their work, what they offer, and interests they share with Kenji. No scores.',
+    action: 'Click “Ask to connect”, then “Send request”.',
+    done: `${FIRST_MENTOR} [data-testid="connect-sent"]`, skipClick: `${FIRST_MENTOR} [data-testid="ask-to-connect"] && ${FIRST_MENTOR} [data-testid="connect-send"]`,
+    doneBody: 'A mentorship request is on its way. The mentor accepts or declines.' },
+  { as: KENJI, url: '/opportunities?tab=internships', target: '[data-testid="opportunity-card"][data-id="opp:o002"] || [data-testid="opportunity-list"]', who: '2 · Opportunities',
+    title: 'Internships from fellow Yellow Jackets', body: 'Kenji sees internships he is eligible for first. Official listings stay on CareerBuzz through the Career Center; GT Swarm links to it instead of replacing it.' },
+  { as: KENJI, url: '/communities/group%3Ag02', target: '[data-testid="circle-restricted"]', who: '2 · Optional restrictions',
+    title: 'Some spaces are for alumni', body: 'GT Alumni Professionals is for verified alumni. Kenji sees a plain explanation, and the server blocks access even if someone calls the API directly.' },
+
+  { as: SOFIA, url: '/network', target: '[data-testid="lifecycle-panel"]', who: '3 · Sofia graduates',
+    title: 'One account, student to alum', body: 'Graduation is verified by an authorized source. In this demo it is simulated and labeled.',
     action: 'Click “Simulate verified graduation”.',
     done: '[data-testid="lifecycle-panel"][data-status="VERIFIED_ALUMNI"]', skipClick: '[data-testid="simulate-graduation"]',
-    doneBody: 'Verified alum. Same profile, same projects, same connections. Alumni groups and events are now open to her.' },
-  { as: SOFIA, url: '/home', target: '[data-tour="dashboard"]', who: 'GT Swarm',
-    title: 'Your Georgia Tech network shouldn’t end at graduation.', body: 'It should grow with you. Sofia’s recommendations now lean toward professional peers, roles and alumni events.' },
+    doneBody: 'Verified alum. Same profile, same connections. Alumni communities and events are now open to her.' },
+  { as: SOFIA, url: '/', target: '[data-tour="how"]', who: 'GT Swarm',
+    title: 'A Yellow Jacket for life',
+    body: 'Georgia Tech gives us a community. GT Swarm makes it easier to find our place in it—and stay part of it for life.' },
 ];
 
 const TOURS = { network: NETWORK_STEPS, startups: STEPS } as const;

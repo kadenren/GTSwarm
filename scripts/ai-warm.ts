@@ -53,6 +53,12 @@ const DEMO: { viewer: string; kind: 'expertise' | 'problem'; q: string; role?: s
     const top = out.results.slice(0, 3).map((r) => r.name).join(', ');
     console.log(`  [${out.mode}/${out.matcher}] "${d.q}" -> ${top}`);
   }
+  // Find People searches from the community demo (Kenji asks for robotics career advice)
+  const { findPeople } = await import('../lib/people');
+  for (const [viewer, q, purpose] of [['person:p227', 'robotics career advice', 'mentorship'], ['person:p039', 'Seattle', 'meet'], ['person:p039', 'product management', 'networking']] as const) {
+    const r = await findPeople(viewer, { q, purpose });
+    console.log(`  [people] "${q}" -> ${r.slice(0, 3).map((x) => x.name).join(', ')}`);
+  }
   // Find Your Startup embeds each builder's profile as the query: warm the demo personas
   const { recommendBuilds } = await import('../lib/matching');
   for (const id of ['person:p010', 'person:p008', 'person:p005']) {

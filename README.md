@@ -1,6 +1,21 @@
 # GT Swarm
 
-**Your Georgia Tech network, for life.** GT Swarm connects Georgia Tech students and alumni with the people, opportunities and expertise that matter, from first year to decades after graduation: mentorship, internships and jobs, groups, events, startups and Get Unstuck, all matched on demonstrated experience and explained. All demo data is fictional.
+**Your Georgia Tech community, for life.** GT Swarm helps Yellow Jackets find their people, become part of a community, and stay connected after graduation. All demo data is fictional. It is an independent student project, not an official Georgia Tech directory.
+
+## What a visitor sees
+
+Three places, plus **My Network**:
+
+| Place | Question | What is there |
+|---|---|---|
+| **Find People** `/people` | Who can I meet? | Search by interest or career, pick a purpose (Meet fellow Yellow Jackets, Career advice or mentorship, Industry networking, Work on something together), see *Why this person?* from stored facts, **Ask to connect** with an editable note. Profiles at `/people/[id]` show only consented fields and "How you're connected" (or "No confirmed connection path found"). |
+| **Communities** `/communities` | Where do I belong? | Six curated demo communities (Swarm Circles) with plain reasons ("You selected Seattle.", "Suggested because you listed Robotics."), or "Browse communities" when there is nothing to go on. One detail page per community: who it's for, people you can meet, events. |
+| **Opportunities** `/opportunities` | What can I get involved in? | Jobs, Internships, Mentorship, Other resources. Official resources (Career Center / CareerBuzz, CREATE-X, Alumni Association) are external links; GT Swarm does not run applications. |
+| **My Network** `/network` | Who am I and whom do I know? | Membership and graduation status, contact preferences, request counts (Inbox), connections, link to edit the profile. |
+
+Consent comes first: search and community member lists filter by visibility and contact preferences **before** ranking. Students only reach alumni who chose to hear from students; mentorship only shows mentors who opted in for that audience and have room. The server enforces all of it (`lib/people.ts`, `lib/access.ts`), not just the buttons.
+
+Older routes still work: `/groups` redirects to `/communities`; `/events`, `/mentorship`, `/inbox`, `/profile`, `/home`, `/startups`, `/match`, `/stuck` and `/projects/[id]` are reachable from contextual links and highlight their parent tab.
 
 ## GT Swarm 2.0: membership and community
 
@@ -10,12 +25,12 @@
 | Graduation lifecycle | `lib/lifecycle.ts` | A member can only move themselves to pending. Verification needs an ADMIN (a stand-in for an authorized source). The demo persona Sofia Alvarez can run a labeled simulated verification (disable with `GTSWARM_DEMO_DATA=false`). The person record is updated in place, so projects, connections, mentorships and groups carry over. |
 | Mentorship | `lib/community.ts`, `/mentorship` | Opt-in mentor profiles (topics, mentees, capacity, contact), hybrid-ranked recommendations with grounded reasons, request → accept/decline in Inbox → active → ended. |
 | Opportunities | `/opportunities` | Internships, full-time, part-time and startup roles; audience and class-year eligibility; expiry; saving; alumni proposals wait for a moderator. Demo postings are synthetic. |
-| Groups | `/groups` | Explicit per-group policy: eligibility (all, students, verified alumni) and access (open, request). Admin approval for requests; member lists hidden from ineligible viewers. |
+| Communities (groups) | `/communities` | Explicit per-group policy: eligibility (all, students, verified alumni) and access (open, request). Admin approval for requests; member lists hidden from ineligible viewers. |
 | Events | `/events` | Audiences (all, students, verified alumni, group members), capacity, deadlines, duplicate prevention, RSVP and cancel; restricted details hidden. |
 | Dashboards | `/home` | Different for students and verified alumni; all recommendations come from stored records. |
-| Data | `lib/db.ts`, `lib/community-data.ts` | New tables: membership, verification_request, mentor_profile, mentorship, opportunity, saved_opportunity, community_group, group_member, community_event, event_rsvp, content_report. Mirrored to the hosted Postgres like every other table; no new provider. |
+| Data | `lib/db.ts`, `lib/community-data.ts` | New tables: contact_pref, membership, verification_request, mentor_profile, mentorship, opportunity, saved_opportunity, community_group, group_member, community_event, event_rsvp, content_report. Mirrored to the hosted Postgres like every other table; no new provider. |
 
-**Simulated in the demo:** Georgia Tech sign-in (the "Viewing as" switcher), alumni verification (seeded as "Demo seed (simulated verification)"), email delivery, every person, posting, group and event.
+**Simulated in the demo:** Georgia Tech sign-in (the "Demo persona" switcher), alumni verification (seeded as "Demo seed (simulated verification)"), email delivery, every person, posting, group and event.
 **Needs institutional approval before real data:** Georgia Tech identity provider (OIT), alumni verification source (Alumni Association), any use of real student or alumni records, data governance and retention. GT Swarm does not claim FERPA certification or university endorsement.
 
 
@@ -34,7 +49,7 @@ It works alum to alum, alum to student, student to alum and student to student. 
 
 One Next.js app and one SQLite database (swap for Postgres at scale). No other infrastructure.
 
-- **Students** sign in with GT single sign-on (not built in the demo; a "Viewing as" switcher stands in).
+- **Students** sign in with GT single sign-on (not built in the demo; a "Demo persona" switcher stands in).
 - **Alumni** join from an invite link the Alumni Association emails: **/join?invite=alumni** (also `create`, `vip`, `sga`). They upload a resume or LinkedIn PDF, add GitHub, website and Google Scholar links, review every field, and choose what they're open to. Right after joining, the profile shows **Builds that could use you**.
 - **Builds** come from what teams already write: capstone reports, VIP summaries, posters, READMEs (**Post a build**).
 - Everything is opt-in. Requests need a yes. Accepting a request creates a connection; adding someone to a team is a separate step only the team can take. Nothing is scraped.
@@ -65,22 +80,9 @@ Put `GEMINI_API_KEY=...` in `.env.local` (git-ignored), run `npm run ai:warm`, a
 
 Without a key (or when Gemini is busy), everything falls back to the graph plus keyword matching and local file parsing. The build recommendations that drive the demo story are deterministic either way.
 
-## Main pages
-
-| Page | What it does |
-|---|---|
-| Home `/` | The problem, Find Your People / Find Your Startup, how GT Swarm differs from directories (with a real example from the data), the two-way flow, the pilot plan with privacy and what is real vs simulated, and the startup feed |
-| SGA pilot plan `/pilot` | Who runs it (SGA), how it fits CREATE-X, Startup Exchange, the Alumni Association and project courses (proposed), a one-semester timeline, success measures, resources, risks, privacy, and what is real vs simulated |
-| Find Matches `/match` | **Find Your People** (role and students/alumni filters, match cards, Why this match?, View network) and **Find Your Startup** (from text or your saved profile, Request to join), plus a "How the intelligence works" section explaining every scoring factor and the knowledge graph |
-| Get Unstuck `/stuck` | Describe a problem (technical, security, regulatory, fundraising, equity); see who solved it and how; ask them for 15 minutes |
-| My Profile `/profile` | Your record, interests, roles you are open to, hours, what you want to work on, your startups, startups that could use you |
-| Inbox `/inbox` | Invites and join requests, accept or decline, your connections, and the founder's separate "add to team" step |
-| Startup page `/projects/[id]` | Stage, open roles, needs, recommended people with Invite, join requests, solved problems, team, Add a solved problem |
-| Footer | Post a startup, Join GT Swarm, Impact for GT (a few live numbers: opt-ins, alumni engagement, help requests, connections by direction, outcomes) |
-
 ## Full show-through
 
-See **[DEMO.md](DEMO.md)** for the 2-minute demo script, how matching works, and our assumptions. The gold **Demo** button (top right) starts a 10-step guided tour of the same story: it resets the data, switches accounts, and highlights what to click with an arrow at each step.
+See **[DEMO.md](DEMO.md)** for the 2-minute demo script, how matching works, and our assumptions. **Start guided demo** (on the homepage, or in the Demo persona menu at top right) runs a 10-step tour of three short stories. It switches personas and highlights what to click. The startup tour is on `/startups`.
 
 ## How it works
 

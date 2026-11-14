@@ -8,6 +8,7 @@ import PageHero from '@/components/PageHero';
 import { roleLabel } from '@/lib/roles';
 import ActionButton from '@/components/ActionButton';
 import { mentorshipsOf } from '@/lib/community';
+import { PURPOSES } from '@/lib/people';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,9 +50,9 @@ export default async function InboxPage() {
           <div className="flex items-center gap-3">
             <span className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white ${other.type === 'alum' ? 'bg-teal' : 'bg-plum'}`}>{initials(other.name)}</span>
             <div>
-              <div className="font-display font-bold text-navy">{mode === 'received' ? `From ${other.name}` : `To ${other.name}`}</div>
+              <div className="font-display font-bold text-navy">{mode === 'received' ? 'From ' : 'To '}<Link href={`/people/${encodeURIComponent(other.id)}`} className="hover:underline">{other.name}</Link></div>
               <div className="text-xs text-ink/60">
-                {who} · {r.kind === 'stuck' ? 'Asking for help' : isCollab ? `Wants to join as ${roleLabel(r.role ?? 'Helper').toLowerCase()}` : isInvite ? `Invite: ${roleLabel(r.role ?? 'Helper').toLowerCase()} role` : `${roleLabel(r.role ?? 'Helper')} conversation`}
+                {who} · {r.kind === 'stuck' ? 'Asking for help' : isCollab ? `Wants to join as ${roleLabel(r.role ?? 'Helper').toLowerCase()}` : isInvite ? `Invite: ${roleLabel(r.role ?? 'Helper').toLowerCase()} role` : PURPOSES.some((x) => x.label === r.role) ? <span data-testid="request-purpose">Purpose: {r.role}</span> : `${roleLabel(r.role ?? 'Helper')} conversation`}
                 {proj ? (
                   <>
                     {' · '}
@@ -74,7 +75,7 @@ export default async function InboxPage() {
           {canAdd && <AddToProject id={r.id} name={other.name} projectName={proj!.name} suggested={r.role} />}
           {r.added_as && <p className="text-sm font-medium text-teal">Added to {proj?.name} as {r.added_as}.</p>}
           {mode === 'received' && r.status === 'accepted' && !r.added_as && !canAdd && (
-            <p className="text-xs text-ink/55">Accepting created a connection. Joining a project is a separate step the project owner takes.</p>
+            <p className="text-xs text-ink/55">{proj ? 'Accepting created a connection. Joining a project is a separate step the project owner takes.' : 'You are now connected. You can both see each other in My Network.'}</p>
           )}
         </div>
       </li>
@@ -128,7 +129,7 @@ export default async function InboxPage() {
           <ul className="space-y-2">
             {groupRequests.map((g) => (
               <li key={g.id + g.person_id} className="card flex flex-wrap items-center justify-between gap-2 p-4">
-                <span className="text-sm"><strong className="text-navy">{s.person.get(g.person_id)?.name ?? 'A member'}</strong> wants to join <Link href={`/groups/${encodeURIComponent(g.id)}`} className="font-semibold text-navy underline decoration-gold underline-offset-2">{g.name}</Link></span>
+                <span className="text-sm"><strong className="text-navy">{s.person.get(g.person_id)?.name ?? 'A member'}</strong> wants to join <Link href={`/communities/${encodeURIComponent(g.id)}`} className="font-semibold text-navy underline decoration-gold underline-offset-2">{g.name}</Link></span>
                 <span className="flex gap-2">
                   <ActionButton endpoint={`/api/groups/${encodeURIComponent(g.id)}`} body={{ action: 'approve', personId: g.person_id }} label="Approve" className="btn-primary px-3 py-1 text-xs" />
                   <ActionButton endpoint={`/api/groups/${encodeURIComponent(g.id)}`} body={{ action: 'deny', personId: g.person_id }} label="Decline" className="btn-ghost px-3 py-1 text-xs" />
@@ -148,7 +149,7 @@ export default async function InboxPage() {
           <ul className="space-y-3">{sent.map((r) => card(r, 'sent'))}</ul>
         ) : (
           <p className="card p-6 text-sm text-ink/60">
-            You have not sent any requests. Find someone in <Link className="underline" href="/match">Find Matches</Link>.
+            You have not sent any requests. Find someone in <Link className="underline" href="/people">Find People</Link>.
           </p>
         )}
       </section>

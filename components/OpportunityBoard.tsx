@@ -4,21 +4,19 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import type { OpportunityView } from '@/lib/community';
 
-const KINDS = [['all', 'All'], ['internship', 'Internships'], ['full-time', 'Full-time'], ['part-time', 'Part-time'], ['startup', 'Startup roles']] as const;
 const KIND_LABEL: Record<OpportunityView['kind'], string> = { internship: 'Internship', 'full-time': 'Full-time', 'part-time': 'Part-time', startup: 'Startup role' };
 
 /** Browse, filter and save opportunities. The list comes from the server already filtered to what this member may see. */
 export default function OpportunityBoard({ items, why }: { items: OpportunityView[]; why: Record<string, string> }) {
   const router = useRouter();
-  const [kind, setKind] = useState<string>('all');
   const [q, setQ] = useState('');
   const [showExpired, setShowExpired] = useState(false);
   const [savedOnly, setSavedOnly] = useState(false);
   const [saving, setSaving] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const shown = useMemo(() => items.filter((o) =>
-    (kind === 'all' || o.kind === kind) && (showExpired || !o.expired) && (!savedOnly || o.saved) &&
-    (!q || `${o.title} ${o.org} ${o.description} ${o.skills.join(' ')} ${o.location}`.toLowerCase().includes(q.toLowerCase()))), [items, kind, q, showExpired, savedOnly]);
+    (showExpired || !o.expired) && (!savedOnly || o.saved) &&
+    (!q || `${o.title} ${o.org} ${o.description} ${o.skills.join(' ')} ${o.location}`.toLowerCase().includes(q.toLowerCase()))), [items, q, showExpired, savedOnly]);
 
   async function toggleSave(o: OpportunityView) {
     setSaving(o.id); setErr(null);
@@ -29,17 +27,14 @@ export default function OpportunityBoard({ items, why }: { items: OpportunityVie
   }
 
   return (
-    <section aria-label="All opportunities">
+    <section aria-label="Opportunities list">
       <div className="card flex flex-wrap items-center gap-2 p-3">
-        <div className="flex flex-wrap gap-1 rounded-lg bg-paper p-1" role="group" aria-label="Type">
-          {KINDS.map(([v, l]) => <button key={v} aria-pressed={kind === v} onClick={() => setKind(v)} className={`rounded-md px-2.5 py-1 text-sm font-medium ${kind === v ? 'bg-navy text-white' : 'text-navy/70'}`}>{l}</button>)}
-        </div>
         <input className="input min-w-[180px] flex-1" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search title, skills, location" aria-label="Search opportunities" />
         <label className="flex items-center gap-1.5 text-sm text-navy"><input type="checkbox" checked={savedOnly} onChange={(e) => setSavedOnly(e.target.checked)} className="accent-[#003057]" />Saved</label>
         <label className="flex items-center gap-1.5 text-sm text-navy"><input type="checkbox" checked={showExpired} onChange={(e) => setShowExpired(e.target.checked)} className="accent-[#003057]" />Show expired</label>
       </div>
       {err && <p className="mt-2 text-sm text-red-700" role="alert">{err}</p>}
-      <p className="mt-3 text-sm text-ink/60">{shown.length} {shown.length === 1 ? 'opportunity' : 'opportunities'}</p>
+      <p className="mt-3 text-sm text-ink/60">{shown.length} {shown.length === 1 ? 'posting' : 'postings'}</p>
       {shown.length === 0 ? <p className="card mt-3 p-8 text-center text-sm text-ink/60">Nothing matches these filters.</p> : (
         <ul className="mt-3 grid gap-4 md:grid-cols-2" data-testid="opportunity-list">
           {shown.map((o) => (

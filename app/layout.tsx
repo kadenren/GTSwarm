@@ -5,13 +5,12 @@ import Wordmark from '@/components/Wordmark';
 import ViewerSwitcher from '@/components/ViewerSwitcher';
 import NavLinks from '@/components/NavLinks';
 import DemoTour from '@/components/DemoTour';
-import DemoButton from '@/components/DemoButton';
 import { getViewerId, viewerOptions } from '@/lib/viewer';
 import { getDb } from '@/lib/db';
 
 export const metadata: Metadata = {
-  title: 'GT Swarm: your Georgia Tech network, for life',
-  description: 'A lifelong Georgia Tech student and alumni network: mentors, internships, jobs, groups, events, startups and expertise, matched on what people have actually done.',
+  title: 'GT Swarm: your Georgia Tech community, for life',
+  description: 'Help Yellow Jackets find their people, become part of a community, and stay connected for life.',
 };
 export const dynamic = 'force-dynamic';
 
@@ -19,16 +18,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const viewerId = await getViewerId();
   const pending = (getDb().prepare("SELECT COUNT(*) n FROM requests WHERE to_person = ? AND status = 'sent'").get(viewerId) as { n: number }).n;
   const mentorWaiting = (getDb().prepare("SELECT COUNT(*) n FROM mentorship WHERE mentor_id = ? AND status = 'requested'").get(viewerId) as { n: number }).n;
+  // Three destinations, plus My Network as a utility. Older pages stay reachable and highlight their parent.
   const links = [
-    { href: '/home', label: 'Home' },
-    { href: '/people', label: 'People', also: ['/match', '/stuck'] },
-    { href: '/mentorship', label: 'Mentorship' },
-    { href: '/opportunities', label: 'Opportunities' },
-    { href: '/groups', label: 'Groups' },
-    { href: '/events', label: 'Events' },
-    { href: '/startups', label: 'Startups', also: ['/projects', '/add'] },
-    { href: '/inbox', label: 'Inbox', badge: pending + mentorWaiting },
-    { href: '/profile', label: 'Profile' },
+    { href: '/people', label: 'Find People', also: ['/match', '/stuck', '/mentorship'] },
+    { href: '/communities', label: 'Communities', also: ['/groups', '/events'] },
+    { href: '/opportunities', label: 'Opportunities', also: ['/startups', '/projects', '/add'] },
   ];
   return (
     <html lang="en">
@@ -37,11 +31,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <div className="relative mx-auto flex max-w-[1400px] items-center gap-x-3 px-4 py-2.5 md:gap-x-4">
             <Link href="/" className="flex flex-col leading-tight" aria-label="GT Swarm home">
               <Wordmark />
-              <span className="hidden text-[11px] tracking-wide text-gold-light/90 sm:block">Your Georgia Tech network, for life</span>
+              <span className="hidden text-[11px] tracking-wide text-gold-light/90 sm:block">Your Georgia Tech community, for life</span>
             </Link>
-            <NavLinks links={links} />
-            <div className="ml-auto flex items-center gap-2 md:gap-3">
-              <DemoButton />
+            <NavLinks links={links} network={{ href: '/network', label: 'My Network', badge: pending + mentorWaiting, also: ['/inbox', '/profile', '/home'] }} />
+            <div className="ml-auto flex items-center gap-2 md:ml-0 md:gap-3">
               <ViewerSwitcher viewers={viewerOptions(viewerId)} current={viewerId} />
             </div>
           </div>

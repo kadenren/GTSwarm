@@ -114,8 +114,8 @@ export default async function HomeDashboard() {
           <Section title={alum ? 'Alumni and professional events' : 'Events you can attend'} href="/events" cta="All events" testId="dash-events">
             {events.length ? events.map((r) => <Item key={r.event.id} title={r.event.title} sub={fmtDate(r.event.startsAt, r.event.timezone)} why={r.why} href="/events" />) : <Empty text="No upcoming events match yet." />}
           </Section>
-          <Section title={alum ? 'Professional groups to join' : 'Groups to join'} href="/groups" cta="All groups" testId="dash-groups">
-            {groups.length ? groups.map((r) => <Item key={r.group.id} title={r.group.name} sub={r.group.access === 'request' ? 'Request to join' : 'Open'} why={r.why} href={`/groups/${encodeURIComponent(r.group.id)}`} />) : <Empty text="You are in every group that matches your interests." />}
+          <Section title={alum ? 'Professional groups to join' : 'Groups to join'} href="/communities" cta="All communities" testId="dash-groups">
+            {groups.length ? groups.map((r) => <Item key={r.group.id} title={r.group.name} sub={r.group.access === 'request' ? 'Request to join' : 'Open'} why={r.why} href={`/communities/${encodeURIComponent(r.group.id)}`} />) : <Empty text="You are in every group that matches your interests." />}
           </Section>
           <Section title={alum ? 'Startups seeking advisors or cofounders' : 'Startups that need your skills'} href="/startups" cta="All startups" testId="dash-startups">
             {builds.length ? builds.map((b) => <Item key={b.build.id} title={b.build.name} sub={b.build.stage} why={b.why} href={`/projects/${encodeURIComponent(b.build.id)}`} />) : <Empty text="No startups match your roles right now." />}

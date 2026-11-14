@@ -15,6 +15,7 @@ const NAMES = {
   marcus: 'Marcus Reyes', nadia: 'Nadia Okoro', ravi: 'Ravi Krishnan', tara: 'Tara Holloway', hannah: 'Hannah Lee',
   kevin: 'Kevin Osei', jordan: 'Jordan Kim', arjun: 'Arjun Mehta', leo: 'Leo Martinez', isabel: 'Isabel Moreno',
   kenji: 'Kenji Watanabe', omar: 'Omar Haddad', lauren: 'Lauren Mitchell', daniel: 'Daniel Wu', chloe: 'Chloe Nguyen',
+  quinn: 'Quinn Diallo', jamie: 'Jamie Keller', layla: 'Layla Dawson', ethant: 'Ethan Tanaka',
 } as const;
 
 /** Mentors who opted in, with what they help with (topics) and who they mentor. */
@@ -23,7 +24,8 @@ const MENTORS: { who: keyof typeof NAMES; topics: string[]; mentees: string[]; c
   { who: 'priya', topics: ['Industry exploration', 'Career advice', 'Graduate school'], mentees: ['students', 'alumni'], capacity: 2, accepting: true, note: 'Medical devices, regulatory careers, and whether a master’s helps.' },
   { who: 'marcus', topics: ['Technical project guidance', 'Interview preparation', 'Engineering guidance'], mentees: ['students'], capacity: 2, accepting: true, note: 'Embedded firmware, BLE and firmware interviews.' },
   { who: 'grace', topics: ['Product management', 'Career advice', 'Interview preparation'], mentees: ['students', 'alumni'], capacity: 2, accepting: true, note: 'Moving into product management from engineering.' },
-  { who: 'nadia', topics: ['Entrepreneurship', 'Engineering guidance'], mentees: ['students', 'alumni'], capacity: 1, accepting: true, note: 'Robotics startups and motor-control engineering.' },
+  { who: 'nadia', topics: ['Career advice', 'Engineering guidance', 'Entrepreneurship'], mentees: ['students', 'alumni'], capacity: 2, accepting: true, note: 'Careers in robotics, motor-control engineering and robotics startups.' },
+  { who: 'quinn', topics: ['Career advice', 'Industry exploration'], mentees: ['students'], capacity: 2, accepting: true, note: 'Robotics careers at large companies vs startups. Based in Seattle.' },
   { who: 'tara', topics: ['Entrepreneurship', 'Research', 'Industry exploration'], mentees: ['students', 'alumni'], capacity: 2, accepting: true, note: 'Health AI, research-to-startup, hospital pilots.' },
   { who: 'kevin', topics: ['Interview preparation', 'Technical project guidance'], mentees: ['students'], capacity: 2, accepting: false, note: 'Mobile engineering. Not taking new mentees this semester.' },
 ];
@@ -62,45 +64,43 @@ const OPPORTUNITIES: Opp[] = [
     skills: ['Embedded systems', 'Low-power design', 'C'], majors: ['EE', 'CmpE'], audience: 'alumni', poster: 'omar', status: 'pending', published: '2026-11-12', expires: '2027-01-12' },
 ];
 
+/** Curated communities ("Swarm Circles"): Yellow Jackets with something in common. All are fictional demo communities. */
 const GROUPS: { id: string; name: string; description: string; category: string; access: 'open' | 'request'; eligibility: 'all' | 'students' | 'verified_alumni'; admin: keyof typeof NAMES; interests: string[]; members: (keyof typeof NAMES)[] }[] = [
-  { id: 'group:g01', name: 'GT Robotics and Autonomous Systems', category: 'Shared interest', access: 'open', eligibility: 'all', admin: 'ravi',
-    description: 'Students and alumni building robots, drones and autonomous vehicles. Project help, hiring and meetups.', interests: ['Robotics', 'ROS 2', 'LiDAR', 'Motor control', 'Autonomy'],
-    members: ['ravi', 'nadia', 'isabel', 'kenji', 'noah'] },
-  { id: 'group:g02', name: 'GT Alumni in Technology', category: 'Alumni', access: 'open', eligibility: 'verified_alumni', admin: 'grace',
-    description: 'A professional community for verified alumni working in technology. Peer advice, job leads and industry dinners.', interests: ['Software', 'Hardware', 'Product management', 'Careers'],
-    members: ['grace', 'kevin', 'omar', 'dana', 'noah', 'lauren'] },
-  { id: 'group:g03', name: 'GT Startup Founders', category: 'Entrepreneurship', access: 'request', eligibility: 'all', admin: 'elena',
-    description: 'Founders and would-be founders, student and alumni. Admins approve requests so conversations stay candid.', interests: ['Entrepreneurship', 'Fundraising', 'Customer discovery', 'Startups'],
+  { id: 'group:g01', name: 'AI & Robotics', category: 'Interest', access: 'open', eligibility: 'all', admin: 'ravi',
+    description: 'Students and alumni interested in robotics, machine learning and autonomous systems.', interests: ['Robotics', 'Machine learning and software', 'ROS 2', 'Autonomy', 'LiDAR', 'Motor control'],
+    members: ['ravi', 'nadia', 'isabel', 'kenji', 'quinn', 'tara'] },
+  { id: 'group:g02', name: 'GT Alumni Professionals', category: 'Alumni', access: 'open', eligibility: 'verified_alumni', admin: 'grace',
+    description: 'A professional community for verified alumni across industries: peer advice, job leads and dinners.', interests: ['Careers', 'Product management', 'Networking', 'Software', 'Hardware'],
+    members: ['grace', 'kevin', 'omar', 'dana', 'lauren'] },
+  { id: 'group:g03', name: 'Founders & Startups', category: 'Career', access: 'request', eligibility: 'all', admin: 'elena',
+    description: 'Founders and people who want to build or join a startup. Admins approve requests so conversations stay candid.', interests: ['Entrepreneurship', 'Fundraising', 'Customer discovery', 'Startups'],
     members: ['elena', 'nadia', 'tara', 'ravi', 'leo'] },
-  { id: 'group:g04', name: 'GT Electrical and Computer Engineering Network', category: 'Professional', access: 'open', eligibility: 'all', admin: 'marcus',
-    description: 'ECE students and alumni: firmware, hardware, power and signals. Shared across class years on purpose.', interests: ['Firmware', 'Embedded systems', 'PCB design', 'BLE', 'Low-power design'],
-    members: ['marcus', 'dana', 'jordan', 'maya', 'sofia', 'lauren'] },
-  { id: 'group:g05', name: 'GT Product and Entrepreneurship', category: 'Professional', access: 'open', eligibility: 'all', admin: 'grace',
-    description: 'For anyone curious about product management, startups and turning engineering work into products.', interests: ['Product management', 'Customer discovery', 'Entrepreneurship'],
-    members: ['grace', 'leo', 'mei', 'tara'] },
-  { id: 'group:g06', name: 'GT Bay Area Alumni Professionals', category: 'Alumni', access: 'request', eligibility: 'verified_alumni', admin: 'kevin',
-    description: 'Verified alumni in the San Francisco Bay Area. Restricted to verified alumni; admins approve requests.', interests: ['Careers', 'Software', 'Networking'],
-    members: ['kevin', 'grace'] },
-  { id: 'group:g07', name: 'GT First-Year Builders', category: 'Student', access: 'open', eligibility: 'students', admin: 'jordan',
-    description: 'First- and second-year students finding their first project, team or mentor. Student-only.', interests: ['Projects', 'Mentorship', 'Firmware', 'Software'],
-    members: ['jordan', 'mei', 'chloe'] },
+  { id: 'group:g04', name: 'GT in Seattle', category: 'Location', access: 'open', eligibility: 'all', admin: 'jamie',
+    description: 'Yellow Jackets who live in or are moving to the Seattle area and chose to share it.', interests: ['Seattle', 'Networking', 'Meetups'],
+    members: ['jamie', 'quinn', 'layla', 'ethant'] },
+  { id: 'group:g05', name: 'Healthcare & Biotech', category: 'Interest', access: 'open', eligibility: 'all', admin: 'priya',
+    description: 'People in medical devices, digital health, biotech and clinical work, from any major.', interests: ['Medical devices', 'Wearables', 'FDA regulatory', 'Clinical testing', 'Healthcare'],
+    members: ['priya', 'hannah', 'layla', 'daniel', 'maya'] },
+  { id: 'group:g06', name: 'Early Career', category: 'Career stage', access: 'open', eligibility: 'all', admin: 'jordan',
+    description: 'Students and recent graduates figuring out first jobs, internships and what comes next.', interests: ['Careers', 'Internships', 'Interview preparation', 'Mentorship'],
+    members: ['jordan', 'mei', 'chloe', 'jamie', 'sofia'] },
 ];
 
 const EVENTS: { id: string; title: string; description: string; organizer: string; group?: string; category: string; starts: string; ends: string; location: string; virtual?: boolean; audience: 'all' | 'students' | 'verified_alumni' | 'group'; capacity?: number; deadline?: string; interests: string[]; going: (keyof typeof NAMES)[] }[] = [
-  { id: 'event:e01', title: 'Hardware Startup Night', organizer: 'GT Startup Founders (fictional demo event)', group: 'group:g03', category: 'Entrepreneurship',
+  { id: 'event:e01', title: 'Hardware Startup Night', organizer: 'Founders & Startups (fictional demo event)', group: 'group:g03', category: 'Entrepreneurship',
     description: 'Founders demo prototypes; students and alumni meet teams that are hiring.', starts: '2026-12-03T18:00:00-05:00', ends: '2026-12-03T20:30:00-05:00', location: 'Demo venue, Midtown Atlanta', audience: 'all', capacity: 60, deadline: '2026-12-02', interests: ['Entrepreneurship', 'Hardware', 'Wearables', 'Startups'], going: ['elena', 'nadia', 'maya'] },
-  { id: 'event:e02', title: 'Firmware Careers Panel', organizer: 'GT ECE Network (fictional demo event)', group: 'group:g04', category: 'Industry panel',
-    description: 'Alumni firmware engineers on first jobs, interviews and what to learn before graduating.', starts: '2026-12-08T17:30:00-05:00', ends: '2026-12-08T19:00:00-05:00', location: 'Online', virtual: true, audience: 'all', capacity: 200, interests: ['Firmware', 'Embedded systems', 'Careers', 'BLE'], going: ['marcus', 'jordan'] },
-  { id: 'event:e03', title: 'Alumni Founders Dinner', organizer: 'GT Alumni in Technology (fictional demo event)', group: 'group:g02', category: 'Alumni networking',
+  { id: 'event:e02', title: 'Robotics Careers Panel', organizer: 'AI & Robotics (fictional demo event)', group: 'group:g01', category: 'Career panel',
+    description: 'Alumni in robotics and autonomy on first jobs, interviews and what to learn before graduating.', starts: '2026-12-08T17:30:00-05:00', ends: '2026-12-08T19:00:00-05:00', location: 'Online', virtual: true, audience: 'all', capacity: 200, interests: ['Robotics', 'Careers', 'Autonomy', 'Firmware'], going: ['ravi', 'isabel'] },
+  { id: 'event:e03', title: 'Alumni Founders Dinner', organizer: 'GT Alumni Professionals (fictional demo event)', group: 'group:g02', category: 'Alumni networking',
     description: 'A small dinner for verified alumni who are building or thinking about building companies. Location shared with registrants.', starts: '2026-12-10T19:00:00-05:00', ends: '2026-12-10T21:00:00-05:00', location: 'Private venue, Atlanta (shared after RSVP)', audience: 'verified_alumni', capacity: 3, deadline: '2026-12-07', interests: ['Entrepreneurship', 'Fundraising', 'Cofounders'], going: ['nadia', 'tara'] },
-  { id: 'event:e04', title: 'First Project Mixer', organizer: 'GT First-Year Builders (fictional demo event)', group: 'group:g07', category: 'Student networking',
-    description: 'First- and second-year students meet project teams and student mentors.', starts: '2026-12-01T18:00:00-05:00', ends: '2026-12-01T19:30:00-05:00', location: 'Demo venue, campus student center', audience: 'students', capacity: 80, interests: ['Projects', 'Mentorship', 'Software', 'Firmware'], going: ['mei', 'chloe'] },
-  { id: 'event:e05', title: 'Product Management Workshop', organizer: 'GT Product and Entrepreneurship (fictional demo event)', group: 'group:g05', category: 'Workshop',
-    description: 'Write a product spec from customer interviews, with alumni PMs giving feedback.', starts: '2027-01-14T18:00:00-05:00', ends: '2027-01-14T20:00:00-05:00', location: 'Online', virtual: true, audience: 'all', capacity: 40, interests: ['Product management', 'Customer discovery'], going: ['grace', 'mei'] },
-  { id: 'event:e06', title: 'Robotics Industry Meetup', organizer: 'GT Robotics and Autonomous Systems (fictional demo event)', group: 'group:g01', category: 'Community meetup',
-    description: 'Lightning talks from alumni robotics teams and student clubs, then open networking.', starts: '2027-01-21T18:30:00-05:00', ends: '2027-01-21T20:30:00-05:00', location: 'Demo venue, Atlanta', audience: 'all', capacity: 100, interests: ['Robotics', 'ROS 2', 'Autonomy', 'Motor control'], going: ['ravi', 'isabel', 'kenji'] },
-  { id: 'event:e07', title: 'Bay Area Alumni Mixer', organizer: 'GT Bay Area Alumni Professionals (fictional demo event)', group: 'group:g06', category: 'Alumni networking',
-    description: 'Group members only. Details are visible to members of the group.', starts: '2027-01-28T18:00:00-08:00', ends: '2027-01-28T20:00:00-08:00', location: 'San Francisco, CA (members only)', audience: 'group', capacity: 50, interests: ['Networking', 'Careers'], going: ['kevin'] },
+  { id: 'event:e04', title: 'First Internship Mixer', organizer: 'Early Career (fictional demo event)', group: 'group:g06', category: 'Student networking',
+    description: 'Students meet each other and talk about finding a first internship. Students only.', starts: '2026-12-01T18:00:00-05:00', ends: '2026-12-01T19:30:00-05:00', location: 'Demo venue, campus student center', audience: 'students', capacity: 80, interests: ['Internships', 'Careers', 'Mentorship'], going: ['mei', 'chloe'] },
+  { id: 'event:e05', title: 'Product Management Workshop', organizer: 'Early Career (fictional demo event)', group: 'group:g06', category: 'Workshop',
+    description: 'Write a product spec from customer interviews, with alumni product managers giving feedback.', starts: '2027-01-14T18:00:00-05:00', ends: '2027-01-14T20:00:00-05:00', location: 'Online', virtual: true, audience: 'all', capacity: 40, interests: ['Product management', 'Careers'], going: ['grace', 'mei'] },
+  { id: 'event:e06', title: 'Healthcare Innovation Coffee', organizer: 'Healthcare & Biotech (fictional demo event)', group: 'group:g05', category: 'Community meetup',
+    description: 'An informal coffee for people working on medical devices and digital health.', starts: '2027-01-21T08:30:00-05:00', ends: '2027-01-21T09:30:00-05:00', location: 'Demo venue, Atlanta', audience: 'all', capacity: 30, interests: ['Medical devices', 'Healthcare', 'Wearables'], going: ['priya', 'hannah'] },
+  { id: 'event:e07', title: 'Seattle Yellow Jackets Meetup', organizer: 'GT in Seattle (fictional demo event)', group: 'group:g04', category: 'Community meetup',
+    description: 'A casual evening for Yellow Jackets in the Seattle area. Newcomers welcome.', starts: '2027-01-28T18:00:00-08:00', ends: '2027-01-28T20:00:00-08:00', location: 'Demo venue, Capitol Hill, Seattle', audience: 'all', capacity: 40, interests: ['Seattle', 'Networking', 'Meetups'], going: ['jamie', 'quinn'] },
 ];
 
 /** Membership states for the demo: students are current students, alumni are verified by the (simulated) demo seed. */
@@ -113,11 +113,39 @@ const MENTORSHIPS: { id: string; mentor: keyof typeof NAMES; mentee: keyof typeo
   { id: 'mentorship:m002', mentor: 'samuel', mentee: 'jordan', topic: 'Career advice', message: 'I am choosing between a firmware internship and research next summer. Could we talk?', status: 'requested', created: '2026-11-10T14:30:00Z' },
 ];
 
+/** Contact preferences chosen by demo members. Everyone else defaults to open to students, alumni and collaboration. */
+type Pref = { students?: boolean; alumni?: boolean; collab?: boolean; unavailable?: boolean; interests: string[]; canHelp?: string; interestedIn?: string };
+const PREFS: Partial<Record<keyof typeof NAMES, Pref>> = {
+  noah: { interests: ['Robotics', 'Seattle', 'Networking', 'Software'], canHelp: 'Robotics software and first jobs at startups', interestedIn: 'Meeting Yellow Jackets in Seattle after moving there' },
+  kenji: { interests: ['Robotics', 'Autonomy', 'ROS 2'], canHelp: 'RoboJackets autonomy projects', interestedIn: 'Career advice from alumni working in robotics' },
+  nadia: { interests: ['Robotics', 'Entrepreneurship', 'Motor control'], canHelp: 'Robotics careers, motor control, starting a hardware company', interestedIn: 'Students curious about robotics careers' },
+  quinn: { interests: ['Robotics', 'Autonomy', 'Seattle'], canHelp: 'Robotics careers at big tech vs startups', interestedIn: 'Meeting students and Seattle-area alumni' },
+  jamie: { interests: ['Seattle', 'Software', 'Networking', 'Careers'], canHelp: 'Moving to Seattle and early-career questions', interestedIn: 'Meeting new Yellow Jackets in Seattle' },
+  layla: { interests: ['Healthcare', 'Medical devices', 'Seattle'], canHelp: 'Clinical engineering careers', interestedIn: 'Healthcare-minded alumni in the Pacific Northwest' },
+  ethant: { interests: ['Seattle', 'Embedded systems', 'Software'], canHelp: 'Embedded software interviews', interestedIn: 'Seattle meetups' },
+  ravi: { students: false, interests: ['Robotics', 'Autonomy', 'Entrepreneurship'], canHelp: 'Autonomous vehicles', interestedIn: 'Alumni cofounders (not taking student requests right now)' },
+  kevin: { students: false, interests: ['Software', 'Careers'], interestedIn: 'Alumni networking only' },
+  omar: { unavailable: true, interests: ['Embedded systems'], interestedIn: 'Not taking requests right now' },
+  maya: { interests: ['Wearables', 'Firmware', 'Healthcare'], canHelp: 'Wearable firmware', interestedIn: 'Internships in wearables and startups that need firmware' },
+  elena: { interests: ['Healthcare', 'Entrepreneurship', 'Wearables'], canHelp: 'Starting a medical device company', interestedIn: 'An alumni cofounder with hardware experience' },
+  dana: { interests: ['Wearables', 'Hardware', 'Entrepreneurship'], canHelp: 'Low-power hardware and manufacturing', interestedIn: 'Cofounding a hardware startup' },
+  sofia: { interests: ['Wearables', 'Firmware', 'Careers'], canHelp: 'Smart ring firmware', interestedIn: 'First job in hardware after graduating in December' },
+  samuel: { interests: ['Hardware', 'Careers', 'Healthcare'], canHelp: 'Hardware careers and prototyping budgets', interestedIn: 'Mentoring students' },
+  priya: { interests: ['Healthcare', 'Medical devices', 'FDA regulatory'], canHelp: 'FDA clearance and regulatory careers', interestedIn: 'Students and alumni in medical devices' },
+};
+
 export function seedCommunity(db: Database.Database) {
   const ids = new Map((db.prepare('SELECT id, name FROM people').all() as { id: string; name: string }[]).map((r) => [r.name, r.id]));
   const id = (k: keyof typeof NAMES) => { const v = ids.get(NAMES[k]); if (!v) throw new Error(`community seed: ${NAMES[k]} not found`); return v; };
   const projectId = (name: string) => (db.prepare('SELECT id FROM projects WHERE name = ? ORDER BY year DESC LIMIT 1').get(name) as { id: string } | undefined)?.id ?? null;
   const ts = `${DEMO_TODAY}T09:00:00Z`;
+  // story: Noah, a recent alum, just moved to Seattle (fictional)
+  db.prepare("UPDATE people SET city = 'Seattle' WHERE id = ?").run(id('noah'));
+  const cp = db.prepare('INSERT OR REPLACE INTO contact_pref (person_id, open_to_students, open_to_alumni, open_to_collab, unavailable, share_city, interests, can_help, interested_in) VALUES (?,?,?,?,?,?,?,?,?)');
+  for (const p of db.prepare('SELECT id FROM people WHERE claimed = 1').all() as { id: string }[]) cp.run(p.id, 1, 1, 1, 0, 1, '[]', '', '');
+  for (const [k, v] of Object.entries(PREFS) as [keyof typeof NAMES, Pref][]) {
+    cp.run(id(k), v.students === false ? 0 : 1, v.alumni === false ? 0 : 1, v.collab === false ? 0 : 1, v.unavailable ? 1 : 0, 1, JSON.stringify(v.interests), v.canHelp ?? '', v.interestedIn ?? '');
+  }
 
   const people = db.prepare('SELECT id, type, grad_year, claimed FROM people').all() as { id: string; type: string; grad_year: number; claimed: number }[];
   const memb = db.prepare('INSERT OR REPLACE INTO membership (person_id, status, verified_source, verified_at, expected_graduation) VALUES (?,?,?,?,?)');

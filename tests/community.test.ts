@@ -64,8 +64,9 @@ describe('Groups', () => {
     expect(g.members).toBeNull();
   });
 
-  it('blocks alumni from student-only groups (eligibility is an explicit policy, not a guess)', () => {
-    expectDenied(() => joinGroup(ELENA(), 'group:g07'));
+  it('blocks alumni from student-only events (eligibility is an explicit policy, not a guess)', () => {
+    expectDenied(() => rsvp(ELENA(), 'event:e04'));
+    expect(getEvent(ELENA(), 'event:e04')!.access).toBe('teaser');
   });
 
   it('turns request-to-join into a pending request that only a group admin can approve', () => {
@@ -78,7 +79,7 @@ describe('Groups', () => {
 
   it('recommends only groups the member can actually join', () => {
     for (const r of recommendGroups(MAYA(), 7)) expect(['can-join', 'can-request']).toContain(r.group.standing);
-    expect(listGroups(MAYA()).length).toBe(7);
+    expect(listGroups(MAYA()).length).toBe(6);
   });
 });
 
@@ -106,8 +107,9 @@ describe('Events', () => {
   });
 
   it('limits group-only events to active group members', () => {
+    getDb().prepare("UPDATE community_event SET audience = 'group' WHERE id = 'event:e07'").run();
     expectDenied(() => rsvp(ELENA(), 'event:e07'));
-    expect(getEvent(byName('Kevin Osei'), 'event:e07')!.access).toBe('full');
+    expect(getEvent(byName('Jamie Keller'), 'event:e07')!.access).toBe('full');
   });
 
   it('recommends only accessible upcoming events', () => {

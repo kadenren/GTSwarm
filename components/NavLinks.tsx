@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 
 type L = { href: string; label: string; badge?: number; also?: string[] };
 
-/** Main navigation: a row of links on wider screens, a menu button on phones so the header stays one line. */
-export default function NavLinks({ links }: { links: L[] }) {
+/** Main navigation: three destinations plus a My Network utility button. On phones, one menu holds all four. */
+export default function NavLinks({ links, network }: { links: L[]; network: L }) {
   const path = usePathname();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -20,22 +20,27 @@ export default function NavLinks({ links }: { links: L[] }) {
     return () => { document.removeEventListener('click', close); document.removeEventListener('keydown', esc); };
   }, [open]);
   const isActive = (href: string) => {
-    const l = links.find((x) => x.href === href);
+    const l = [...links, network].find((x) => x.href === href);
     return [href, ...(l?.also ?? [])].some((h) => (h === '/' ? path === '/' : path.startsWith(h)));
   };
   const badge = (n?: number) => (n ? <span className="ml-1.5 rounded-full bg-gold px-1.5 py-0.5 text-[10px] font-bold text-navy-900">{n}</span> : null);
-  const pending = links.reduce((n, l) => n + (l.badge ?? 0), 0);
+  const pending = network.badge ?? 0;
 
   return (
     <>
-      <nav aria-label="Main" className="hidden items-center gap-0.5 xl:flex">
+      <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
         {links.map((l) => (
-          <Link key={l.href} href={l.href} className={`relative rounded-md px-2 py-1.5 text-sm font-medium transition ${isActive(l.href) ? 'bg-white/10 text-gold' : 'text-white/80 hover:text-white'}`}>
+          <Link key={l.href} href={l.href} className={`relative rounded-md px-3 py-1.5 text-sm font-semibold transition ${isActive(l.href) ? 'bg-white/10 text-gold' : 'text-white/80 hover:text-white'}`}>
             {l.label}{badge(l.badge)}
           </Link>
         ))}
       </nav>
-      <div className="order-last xl:hidden" ref={ref}>
+      <Link href={network.href} data-testid="my-network" aria-label={pending ? `My Network, ${pending} waiting` : 'My Network'}
+        className={`ml-auto hidden items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-semibold transition md:inline-flex ${isActive(network.href) ? 'border-gold text-gold' : 'border-white/20 text-white/90 hover:border-gold/60'}`}>
+        <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="5.5" r="2.8" fill="none" stroke="currentColor" strokeWidth="1.5" /><path d="M2.5 14c.8-2.8 3-4.2 5.5-4.2s4.7 1.4 5.5 4.2" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
+        {network.label}{badge(network.badge)}
+      </Link>
+      <div className="order-last md:hidden" ref={ref}>
         <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-haspopup="menu" aria-label="Menu"
           className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 text-white" data-testid="nav-menu">
           <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
@@ -46,7 +51,7 @@ export default function NavLinks({ links }: { links: L[] }) {
         </button>
         {open && (
           <nav aria-label="Main" className="absolute inset-x-0 top-full border-b border-white/10 bg-navy-900 px-4 py-2 shadow-xl">
-            {links.map((l) => (
+            {[...links, network].map((l) => (
               <Link key={l.href} href={l.href} className={`flex items-center rounded-md px-2 py-2.5 text-base font-medium ${isActive(l.href) ? 'text-gold' : 'text-white/85'}`}>
                 {l.label}{badge(l.badge)}
               </Link>

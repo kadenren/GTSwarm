@@ -4,19 +4,19 @@ import { ready } from './session';
 
 /** Fictional demo personas across career stages. The first is the default. */
 export const VIEWERS = [
-  { id: 'person:p008', label: 'Elena Brooks', sub: 'Alumni founder seeking an alumni cofounder (demo)' },
-  { id: 'person:p010', label: 'Maya Okafor', sub: 'Upper-year student seeking an internship (demo)' },
-  { id: 'person:p005', label: 'Dana Whitfield', sub: 'Alum open to cofounding (demo)' },
-  { id: 'person:p177', label: 'Mei Ramirez', sub: 'First-year student looking for a mentor (demo)' },
+  { id: 'person:p039', label: 'Noah Bennett', sub: 'Alum who just moved to Seattle (demo)' },
+  { id: 'person:p227', label: 'Kenji Watanabe', sub: 'Robotics student looking for career advice (demo)' },
   { id: 'person:p012', label: 'Sofia Alvarez', sub: 'Student graduating in December (demo)' },
-  { id: 'person:p004', label: 'Samuel Grant', sub: 'Experienced alum and mentor (demo)' },
-  { id: 'person:p039', label: 'Noah Bennett', sub: 'Recent alum building a network (demo)' },
+  { id: 'person:p097', label: 'Jamie Keller', sub: 'Alum in Seattle who welcomes requests (demo)' },
+  { id: 'person:p008', label: 'Elena Brooks', sub: 'Alum founder looking for a cofounder (demo)' },
+  { id: 'person:p010', label: 'Maya Okafor', sub: 'Student engineer looking for an internship (demo)' },
+  { id: 'person:p005', label: 'Dana Whitfield', sub: 'Alum open to cofounding (demo)' },
   { id: 'person:p028', label: 'Amelia Diallo', sub: 'Recent alum, verification pending (demo)' },
 ] as const;
 export const DEFAULT_VIEWER = VIEWERS[0].id;
 export const VIEWER_COOKIE = 'gtswarm_viewer';
 
-/** The demo identity: a persona, or someone who joined during this visitor's session. Unknown ids fall back to Elena. */
+/** The demo identity: a persona, or someone who joined during this visitor's session. Unknown ids fall back to the first persona. */
 export async function getViewerId(): Promise<string> {
   await ready();
   const c = (await cookies()).get(VIEWER_COOKIE)?.value;

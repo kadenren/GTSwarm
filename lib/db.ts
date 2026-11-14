@@ -232,6 +232,18 @@ CREATE TABLE IF NOT EXISTS event_rsvp (
   created_at TEXT NOT NULL,
   PRIMARY KEY (event_id, person_id)
 );
+-- who a member welcomes requests from, what they share, and what they can help with (all chosen by the member)
+CREATE TABLE IF NOT EXISTS contact_pref (
+  person_id TEXT PRIMARY KEY REFERENCES people(id),
+  open_to_students INTEGER NOT NULL DEFAULT 1,
+  open_to_alumni INTEGER NOT NULL DEFAULT 1,
+  open_to_collab INTEGER NOT NULL DEFAULT 1,
+  unavailable INTEGER NOT NULL DEFAULT 0,
+  share_city INTEGER NOT NULL DEFAULT 0,
+  interests TEXT NOT NULL DEFAULT '[]',
+  can_help TEXT NOT NULL DEFAULT '',
+  interested_in TEXT NOT NULL DEFAULT ''
+);
 CREATE TABLE IF NOT EXISTS content_report (
   id TEXT PRIMARY KEY,
   reporter_id TEXT NOT NULL REFERENCES people(id),
@@ -299,7 +311,7 @@ export function bumpDataVersion(db: Database.Database = getDb()) {
 /** Restore the database from the pristine seed snapshot (used by /demo/reset and tests). */
 export function resetFromSeed(db: Database.Database = getDb()) {
   if (!fs.existsSync(SEED_DB_PATH)) throw new Error('Seed snapshot missing. Run `npm run seed` first.');
-  const tables = ['content_report', 'event_rsvp', 'community_event', 'group_member', 'community_group', 'saved_opportunity', 'opportunity', 'mentorship', 'mentor_profile', 'verification_request', 'membership', 'requests', 'connections', 'milestones', 'problems', 'person_skill', 'project_skill', 'person_project', 'skills', 'projects', 'people', 'cache', 'meta'];
+  const tables = ['contact_pref', 'content_report', 'event_rsvp', 'community_event', 'group_member', 'community_group', 'saved_opportunity', 'opportunity', 'mentorship', 'mentor_profile', 'verification_request', 'membership', 'requests', 'connections', 'milestones', 'problems', 'person_skill', 'project_skill', 'person_project', 'skills', 'projects', 'people', 'cache', 'meta'];
   db.exec(`ATTACH DATABASE '${SEED_DB_PATH.replace(/'/g, "''")}' AS seed`);
   try {
     db.pragma('foreign_keys = OFF');
