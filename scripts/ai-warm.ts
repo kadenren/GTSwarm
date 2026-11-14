@@ -59,5 +59,16 @@ const DEMO: { viewer: string; kind: 'expertise' | 'problem'; q: string; role?: s
     const m = await recommendBuilds({ viewerId: id, personId: id, requireRoles: true, limit: 9 });
     console.log(`  [startups] ${id} -> ${m.slice(0, 3).map((x) => x.build.name).join(', ')}`);
   }
+  // persona dashboards and mentor recommendations embed each persona's profile text as the query: warm those too
+  const { VIEWERS } = await import('../lib/viewer');
+  const { recommendMentors, memberProfileText } = await import('../lib/community');
+  const { membershipOf, isVerifiedAlum } = await import('../lib/access');
+  for (const v of VIEWERS) {
+    const alum = isVerifiedAlum(membershipOf(v.id).status);
+    const text = memberProfileText(v.id).text.slice(0, 1200);
+    await rankForExpertise(text, (alum ? 'Cofounder' : 'Advisor') as never, v.id, 'alumni', { ai: false });
+    if (!alum) await recommendMentors(v.id, 3);
+    console.log(`  [dashboard] ${v.label}`);
+  }
   console.log('Done. Restart the dev server if it was running before you added the key.');
 })().catch((e) => { console.error(e); process.exit(1); });

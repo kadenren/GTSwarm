@@ -47,10 +47,10 @@ const RESTWELL_ACCEPTED = `[data-testid="request-received"][data-status="accepte
  * The tour opens pages and switches personas itself; the judge does the actions.
  */
 const STEPS: Step[] = [
-  { as: ELENA, url: '/', target: '[data-tour="problem"]', who: 'The problem',
+  { as: ELENA, url: '/startups', target: '[data-testid="home-example"]', who: 'Startups',
     title: 'Georgia Tech has the talent. GT Swarm makes the connections.',
-    body: 'Founders can’t find the people who can help, and builders can’t find the startups that need them. Here is the whole loop in about a minute.' },
-  { as: ELENA, url: '/', target: RESTWELL_CARD, who: 'Discover',
+    body: 'Founders can’t find the people who can help, and builders can’t find the startups that need them. Here is the startup loop in about a minute.' },
+  { as: ELENA, url: '/startups', target: RESTWELL_CARD, who: 'Discover',
     title: 'Anyone can browse what GT is building',
     body: 'No sign-up needed. This is Restwell Patch, a medical wearable startup. You are now its founder, Elena Brooks, an alum who needs a hardware cofounder.' },
 
@@ -107,12 +107,66 @@ const STEPS: Step[] = [
     body: 'SGA runs a one-semester, opt-in pilot. CREATE-X, Startup Exchange and the Alumni Association bring the people (proposed). No university records needed. Explore Get Unstuck, the network map and Impact for GT on your own.' },
 ];
 
+const SOFIA = 'person:p012';
+const STUCK_SECURITY_Q = '/stuck?q=Hospital+IT+security+review+stalled+our+pilot';
+/**
+ * The lifelong-network tour (about 90 to 120 seconds): a student's dashboard, a mentor request and an internship,
+ * then an alum's view with alumni discovery, an alumni-only event and Get Unstuck, then a simulated graduation.
+ */
+const NETWORK_STEPS: Step[] = [
+  { as: MAYA, url: '/', target: '[data-tour="lifecycle"]', who: 'GT Swarm',
+    title: 'Your Georgia Tech network. For life.',
+    body: 'One profile from first year to decades after graduation: mentors, internships, jobs, groups, events, startups and expertise, matched on what people have actually done.' },
+  { as: MAYA, url: '/home', target: '[data-tour="dashboard"]', who: 'Student · Home',
+    title: 'Maya, an upper-year student, opens her home', body: 'Mentors, internships, alumni, events, groups and startups, each picked from her skills and projects, each with a reason.' },
+  { as: MAYA, url: '/mentorship', target: '[data-testid="my-mentorship"] || [data-tour="mentor-recs"] [data-testid="mentor-card"]', who: 'Student · Mentorship',
+    title: 'A mentor matched on real experience', body: 'Marcus solved BLE problems like the ones Maya works on, and he opted in to mentor students.',
+    action: 'Click “Request mentorship” on the first mentor, then “Send request”.',
+    done: '[data-testid="my-mentorship"][data-status="requested"]', skipClick: '[data-tour="mentor-recs"] [data-testid="mentor-request-button"] && [data-tour="mentor-recs"] [data-testid="mentor-request-send"]',
+    doneBody: 'Sent with her note. The mentor accepts or declines in their inbox; nothing starts without a yes.' },
+  { as: MAYA, url: '/opportunities', target: '[data-testid="opportunity-card"][data-id="opp:o001"]', who: 'Student · Internships',
+    title: 'An internship that fits what she has built', body: 'Recommended because her firmware, BLE and nRF52 experience matches the posting. Expired and ineligible postings are never recommended.',
+    action: 'Click “Save” on the Embedded Firmware Intern posting.',
+    done: '[data-id="opp:o001"] [data-testid="save-opportunity"][aria-pressed="true"]', skipClick: '[data-id="opp:o001"] [data-testid="save-opportunity"]',
+    doneBody: 'Saved. Postings are synthetic in this demo and clearly labeled.' },
+
+  { as: ELENA, url: '/home', target: '[data-tour="dashboard"]', who: 'Alum · Home',
+    title: 'Now Elena, a verified alum', body: 'Her home is different: alumni with complementary experience, roles, alumni events, professional groups, and startups seeking advisors.' },
+  { as: ELENA, url: '/match', target: '[data-testid="people-results"] > li:first-child || [data-tour="match-form"]', who: 'Alum → alum',
+    title: 'Alumni build companies together too', body: 'Elena needs an alumni cofounder with wearable hardware experience.',
+    action: 'Click “Alumni cofounder for a medical wearable”, then “Find people”.',
+    done: '[data-testid="people-results"]', skipUrl: "/match?mode=people&q=I%27m+building+a+wearable+medical+device+startup+and+need+an+alumni+cofounder+with+embedded+hardware+or+medical-device+expertise.&role=Cofounder&aud=alumni",
+    doneBody: 'Dana Whitfield, class of ’18, built a shipped wearable and is open to cofounding. A 2015 alum and a 2018 alum, matched on experience.' },
+  { as: ELENA, url: '/events', target: '[data-testid="event-card"][data-id="event:e03"]', who: 'Alum · Events',
+    title: 'Alumni-only events', body: 'Students see only a teaser for this dinner: no location, no description. Verified alumni can register, and capacity is enforced.',
+    action: 'Click “RSVP” on the Alumni Founders Dinner.',
+    done: '[data-id="event:e03"] [data-testid="rsvp-going"]', skipClick: '[data-id="event:e03"] [data-testid="rsvp"]',
+    doneBody: 'Registered, and that was the last seat.' },
+  { as: ELENA, url: '/stuck', target: '[data-testid="best-match"] || form[aria-label="Describe your problem"]', who: 'Get Unstuck',
+    title: 'Stuck? Find who already solved it', body: 'Her hospital pilot is stuck in a security review.',
+    action: 'Click “Hospital security review stalled our pilot”.',
+    done: '[data-testid="best-match"]', skipUrl: STUCK_SECURITY_Q,
+    doneBody: 'Tara, an alum founder, solved the same problem, and her fix is on record. Matched on the problem, with keyword and semantic relevance.' },
+
+  { as: SOFIA, url: '/profile', target: '[data-testid="lifecycle-panel"]', who: 'Graduation',
+    title: 'Sofia graduates in December', body: 'Her projects, connections, mentorship and groups are all here. Graduation is verified by an authorized source; here it is simulated and labeled.',
+    action: 'Click “Simulate verified graduation”.',
+    done: '[data-testid="lifecycle-panel"][data-status="VERIFIED_ALUMNI"]', skipClick: '[data-testid="simulate-graduation"]',
+    doneBody: 'Verified alum. Same profile, same projects, same connections. Alumni groups and events are now open to her.' },
+  { as: SOFIA, url: '/home', target: '[data-tour="dashboard"]', who: 'GT Swarm',
+    title: 'Your Georgia Tech network shouldn’t end at graduation.', body: 'It should grow with you. Sofia’s recommendations now lean toward professional peers, roles and alumni events.' },
+];
+
+const TOURS = { network: NETWORK_STEPS, startups: STEPS } as const;
+export type TourId = keyof typeof TOURS;
+
+
 const KEY = 'gtswarm-tour';
 const START_EVENT = 'gtswarm:tour-start';
 const CARD_W = 340;
 
 /** Start the guided demo from anywhere (starts a fresh demo session first). */
-export function startTour() { window.dispatchEvent(new Event(START_EVENT)); }
+export function startTour(tour: TourId = 'network') { window.dispatchEvent(new CustomEvent(START_EVENT, { detail: tour })); }
 
 type Rect = { top: number; left: number; width: number; height: number };
 const pick = (sel: string) => sel.split(' || ').map((q) => document.querySelector(q)).find(Boolean) ?? null;
@@ -123,6 +177,9 @@ export default function DemoTour({ current }: { current: string }) {
   const router = useRouter();
   const path = usePathname();
   const [step, setStep] = useState<number | null>(null);
+  const [tour, setTour] = useState<TourId>('network');
+  const tourRef = useRef<TourId>('network');
+  const STEPS = TOURS[tour];
   const [busy, setBusy] = useState(false);
   const [rect, setRect] = useState<Rect | null>(null);
   const [missing, setMissing] = useState(false);
@@ -133,11 +190,19 @@ export default function DemoTour({ current }: { current: string }) {
   const currentRef = useRef(current);
   currentRef.current = current;
 
-  const save = (s: number | null) => { try { if (s === null) localStorage.removeItem(KEY); else localStorage.setItem(KEY, String(s)); } catch { /* storage unavailable */ } };
-  useEffect(() => { try { const v = localStorage.getItem(KEY); if (v !== null) setStep(Number(v)); } catch { /* ignore */ } }, []);
+  const save = (s: number | null) => { try { if (s === null) localStorage.removeItem(KEY); else localStorage.setItem(KEY, `${tourRef.current}:${s}`); } catch { /* storage unavailable */ } };
+  useEffect(() => {
+    try {
+      const v = localStorage.getItem(KEY);
+      if (v === null) return;
+      const [t, n] = v.includes(':') ? v.split(':') : ['startups', v];
+      const id: TourId = t === 'startups' ? 'startups' : 'network';
+      tourRef.current = id; setTour(id); setStep(Number(n));
+    } catch { /* ignore */ }
+  }, []);
 
   const go = useCallback(async (i: number, viewer: string) => {
-    const s = STEPS[i];
+    const s = TOURS[tourRef.current][i];
     setBusy(true); setRect(null); setDone(false); setStep(i); save(i);
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })); // close any dialog or menu a previous step opened
     if (s.as !== viewer) {
@@ -152,7 +217,9 @@ export default function DemoTour({ current }: { current: string }) {
   }, [router]);
 
   useEffect(() => {
-    const onStart = async () => {
+    const onStart = async (e: Event) => {
+      const id: TourId = (e as CustomEvent).detail === 'startups' ? 'startups' : 'network';
+      tourRef.current = id; setTour(id);
       setBusy(true);
       await fetch('/api/demo/reset', { method: 'POST' });
       await go(0, '');

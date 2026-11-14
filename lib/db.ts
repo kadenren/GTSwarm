@@ -125,6 +125,121 @@ CREATE TABLE IF NOT EXISTS gemini_vec (
   text_hash TEXT NOT NULL,
   vec BLOB NOT NULL
 );
+-- GT Swarm 2.0: lifelong membership, mentorship, opportunities, groups and events (all opt-in; demo rows are fictional)
+CREATE TABLE IF NOT EXISTS membership (
+  person_id TEXT PRIMARY KEY REFERENCES people(id),
+  status TEXT NOT NULL CHECK (status IN ('CURRENT_STUDENT','ALUMNI_PENDING_VERIFICATION','VERIFIED_ALUMNI','ADMIN')),
+  verified_source TEXT,
+  verified_at TEXT,
+  expected_graduation TEXT
+);
+CREATE TABLE IF NOT EXISTS verification_request (
+  id TEXT PRIMARY KEY,
+  person_id TEXT NOT NULL REFERENCES people(id),
+  kind TEXT NOT NULL DEFAULT 'graduation',
+  evidence TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','approved','denied')),
+  decided_by TEXT,
+  decided_source TEXT,
+  created_at TEXT NOT NULL,
+  decided_at TEXT
+);
+CREATE TABLE IF NOT EXISTS mentor_profile (
+  person_id TEXT PRIMARY KEY REFERENCES people(id),
+  accepting INTEGER NOT NULL DEFAULT 1,
+  topics TEXT NOT NULL DEFAULT '[]',
+  mentees TEXT NOT NULL DEFAULT '["students"]',
+  capacity INTEGER NOT NULL DEFAULT 2,
+  contact TEXT NOT NULL DEFAULT 'In-app messages',
+  note TEXT NOT NULL DEFAULT ''
+);
+CREATE TABLE IF NOT EXISTS mentorship (
+  id TEXT PRIMARY KEY,
+  mentor_id TEXT NOT NULL REFERENCES people(id),
+  mentee_id TEXT NOT NULL REFERENCES people(id),
+  topic TEXT NOT NULL DEFAULT '',
+  message TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'requested' CHECK (status IN ('requested','active','declined','ended')),
+  created_at TEXT NOT NULL,
+  decided_at TEXT
+);
+CREATE TABLE IF NOT EXISTS opportunity (
+  id TEXT PRIMARY KEY,
+  kind TEXT NOT NULL CHECK (kind IN ('internship','full-time','part-time','startup')),
+  title TEXT NOT NULL,
+  org TEXT NOT NULL,
+  description TEXT NOT NULL,
+  location TEXT NOT NULL,
+  mode TEXT NOT NULL,
+  skills TEXT NOT NULL DEFAULT '[]',
+  majors TEXT NOT NULL DEFAULT '[]',
+  audience TEXT NOT NULL DEFAULT 'both',
+  class_years TEXT NOT NULL DEFAULT '',
+  deadline TEXT,
+  apply TEXT NOT NULL,
+  posted_by TEXT REFERENCES people(id),
+  project_id TEXT REFERENCES projects(id),
+  status TEXT NOT NULL DEFAULT 'published' CHECK (status IN ('published','pending','rejected')),
+  published_at TEXT NOT NULL,
+  expires_at TEXT NOT NULL,
+  synthetic INTEGER NOT NULL DEFAULT 1
+);
+CREATE TABLE IF NOT EXISTS saved_opportunity (
+  person_id TEXT NOT NULL REFERENCES people(id),
+  opportunity_id TEXT NOT NULL REFERENCES opportunity(id),
+  created_at TEXT NOT NULL,
+  PRIMARY KEY (person_id, opportunity_id)
+);
+CREATE TABLE IF NOT EXISTS community_group (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL,
+  category TEXT NOT NULL,
+  access TEXT NOT NULL CHECK (access IN ('open','request')),
+  eligibility TEXT NOT NULL CHECK (eligibility IN ('all','students','verified_alumni')),
+  admin_id TEXT REFERENCES people(id),
+  interests TEXT NOT NULL DEFAULT '[]'
+);
+CREATE TABLE IF NOT EXISTS group_member (
+  group_id TEXT NOT NULL REFERENCES community_group(id),
+  person_id TEXT NOT NULL REFERENCES people(id),
+  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('member','admin')),
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','pending')),
+  created_at TEXT NOT NULL,
+  PRIMARY KEY (group_id, person_id)
+);
+CREATE TABLE IF NOT EXISTS community_event (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  organizer TEXT NOT NULL,
+  group_id TEXT REFERENCES community_group(id),
+  category TEXT NOT NULL,
+  starts_at TEXT NOT NULL,
+  ends_at TEXT NOT NULL,
+  timezone TEXT NOT NULL DEFAULT 'America/New_York',
+  location TEXT NOT NULL,
+  virtual INTEGER NOT NULL DEFAULT 0,
+  audience TEXT NOT NULL CHECK (audience IN ('all','students','verified_alumni','group')),
+  capacity INTEGER,
+  reg_deadline TEXT,
+  interests TEXT NOT NULL DEFAULT '[]'
+);
+CREATE TABLE IF NOT EXISTS event_rsvp (
+  event_id TEXT NOT NULL REFERENCES community_event(id),
+  person_id TEXT NOT NULL REFERENCES people(id),
+  status TEXT NOT NULL DEFAULT 'going' CHECK (status IN ('going','cancelled')),
+  created_at TEXT NOT NULL,
+  PRIMARY KEY (event_id, person_id)
+);
+CREATE TABLE IF NOT EXISTS content_report (
+  id TEXT PRIMARY KEY,
+  reporter_id TEXT NOT NULL REFERENCES people(id),
+  target TEXT NOT NULL,
+  reason TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'open',
+  created_at TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 CREATE INDEX IF NOT EXISTS idx_pp_project ON person_project(project_id);
@@ -184,7 +299,7 @@ export function bumpDataVersion(db: Database.Database = getDb()) {
 /** Restore the database from the pristine seed snapshot (used by /demo/reset and tests). */
 export function resetFromSeed(db: Database.Database = getDb()) {
   if (!fs.existsSync(SEED_DB_PATH)) throw new Error('Seed snapshot missing. Run `npm run seed` first.');
-  const tables = ['requests', 'connections', 'milestones', 'problems', 'person_skill', 'project_skill', 'person_project', 'skills', 'projects', 'people', 'cache', 'meta'];
+  const tables = ['content_report', 'event_rsvp', 'community_event', 'group_member', 'community_group', 'saved_opportunity', 'opportunity', 'mentorship', 'mentor_profile', 'verification_request', 'membership', 'requests', 'connections', 'milestones', 'problems', 'person_skill', 'project_skill', 'person_project', 'skills', 'projects', 'people', 'cache', 'meta'];
   db.exec(`ATTACH DATABASE '${SEED_DB_PATH.replace(/'/g, "''")}' AS seed`);
   try {
     db.pragma('foreign_keys = OFF');

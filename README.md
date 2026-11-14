@@ -1,5 +1,24 @@
 # GT Swarm
 
+**Your Georgia Tech network, for life.** GT Swarm connects Georgia Tech students and alumni with the people, opportunities and expertise that matter, from first year to decades after graduation: mentorship, internships and jobs, groups, events, startups and Get Unstuck, all matched on demonstrated experience and explained. All demo data is fictional.
+
+## GT Swarm 2.0: membership and community
+
+| Piece | Where | Notes |
+|---|---|---|
+| Membership states | `lib/access.ts` | CURRENT_STUDENT, ALUMNI_PENDING_VERIFICATION, VERIFIED_ALUMNI, ADMIN. Capabilities are separate from status; every protected read and write checks them on the server. No record means unverified. |
+| Graduation lifecycle | `lib/lifecycle.ts` | A member can only move themselves to pending. Verification needs an ADMIN (a stand-in for an authorized source). The demo persona Sofia Alvarez can run a labeled simulated verification (disable with `GTSWARM_DEMO_DATA=false`). The person record is updated in place, so projects, connections, mentorships and groups carry over. |
+| Mentorship | `lib/community.ts`, `/mentorship` | Opt-in mentor profiles (topics, mentees, capacity, contact), hybrid-ranked recommendations with grounded reasons, request → accept/decline in Inbox → active → ended. |
+| Opportunities | `/opportunities` | Internships, full-time, part-time and startup roles; audience and class-year eligibility; expiry; saving; alumni proposals wait for a moderator. Demo postings are synthetic. |
+| Groups | `/groups` | Explicit per-group policy: eligibility (all, students, verified alumni) and access (open, request). Admin approval for requests; member lists hidden from ineligible viewers. |
+| Events | `/events` | Audiences (all, students, verified alumni, group members), capacity, deadlines, duplicate prevention, RSVP and cancel; restricted details hidden. |
+| Dashboards | `/home` | Different for students and verified alumni; all recommendations come from stored records. |
+| Data | `lib/db.ts`, `lib/community-data.ts` | New tables: membership, verification_request, mentor_profile, mentorship, opportunity, saved_opportunity, community_group, group_member, community_event, event_rsvp, content_report. Mirrored to the hosted Postgres like every other table; no new provider. |
+
+**Simulated in the demo:** Georgia Tech sign-in (the "Viewing as" switcher), alumni verification (seeded as "Demo seed (simulated verification)"), email delivery, every person, posting, group and event.
+**Needs institutional approval before real data:** Georgia Tech identity provider (OIT), alumni verification source (Alumni Association), any use of real student or alumni records, data governance and retention. GT Swarm does not claim FERPA certification or university endorsement.
+
+
 **An intelligent startup matchmaking exchange for Georgia Tech students and alumni.** A demo for the Georgia Tech SGA Campus Solutions Hackathon.
 
 - **Discover** what Yellow Jackets are building: a feed of student- and alumni-founded startups you can browse without committing to anything.

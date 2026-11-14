@@ -18,6 +18,8 @@ export const PG_SCHEMA = 'gts';
 export const DATA_TABLES = [
   'people', 'projects', 'skills', 'person_project', 'person_skill', 'project_skill', 'problems', 'milestones',
   'connections', 'requests', 'project_link', 'person_link', 'project_status', 'person_pref', 'gemini_vec', 'cache', 'meta',
+  'membership', 'verification_request', 'mentor_profile', 'mentorship', 'opportunity', 'saved_opportunity',
+  'community_group', 'group_member', 'community_event', 'event_rsvp', 'content_report',
 ] as const;
 
 export interface Op { id?: number; sql: string; params: unknown[] | null } // params null = a multi-statement exec

@@ -11,6 +11,7 @@ import { INTERESTS, prefsOf } from '@/lib/prefs';
 import { roleLabel } from '@/lib/roles';
 import PrefsEditor from '@/components/PrefsEditor';
 import { STAGE_STYLE } from '@/components/stage';
+import LifecyclePanel from '@/components/LifecyclePanel';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,8 +30,9 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
   const myStartups = listBuilds().filter((b) => (s.membersOf.get(b.id) ?? []).some((m) => m.person_id === id));
   return (
     <>
-      <PageHero eyebrow="My profile" title={`${me.name.split(' ')[0]}'s builder profile`}
-        subtitle="What you have built, what you know, and what you are looking for. Founders find you by this record, and it decides which startups are recommended to you." />
+      <PageHero eyebrow="My profile" title={`${me.name.split(' ')[0]}'s profile`}
+        subtitle="What you have built, what you know and what you are looking for. It powers your recommendations for people, mentors, opportunities, groups, events and startups, and it stays with you after graduation." />
+      <div className="mx-auto max-w-7xl px-4 pt-8"><LifecyclePanel personId={id} /></div>
       {sp.joined && (
         <div className="mx-auto max-w-7xl px-4 pt-6">
           <div className="rounded-xl border border-gold/50 bg-gold/15 px-5 py-3 text-sm text-navy" role="status"><strong>Welcome to GT Swarm, {me.name.split(' ')[0]}.</strong> Your profile is live and you are now viewing as yourself. Below are startups and projects that could use your expertise; their teams will see you as a match.</div>

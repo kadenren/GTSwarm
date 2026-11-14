@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
-type L = { href: string; label: string; badge?: number };
+type L = { href: string; label: string; badge?: number; also?: string[] };
 
 /** Main navigation: a row of links on wider screens, a menu button on phones so the header stays one line. */
 export default function NavLinks({ links }: { links: L[] }) {
@@ -19,20 +19,23 @@ export default function NavLinks({ links }: { links: L[] }) {
     document.addEventListener('keydown', esc);
     return () => { document.removeEventListener('click', close); document.removeEventListener('keydown', esc); };
   }, [open]);
-  const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+  const isActive = (href: string) => {
+    const l = links.find((x) => x.href === href);
+    return [href, ...(l?.also ?? [])].some((h) => (h === '/' ? path === '/' : path.startsWith(h)));
+  };
   const badge = (n?: number) => (n ? <span className="ml-1.5 rounded-full bg-gold px-1.5 py-0.5 text-[10px] font-bold text-navy-900">{n}</span> : null);
   const pending = links.reduce((n, l) => n + (l.badge ?? 0), 0);
 
   return (
     <>
-      <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
+      <nav aria-label="Main" className="hidden items-center gap-0.5 xl:flex">
         {links.map((l) => (
-          <Link key={l.href} href={l.href} className={`relative rounded-md px-2.5 py-1.5 text-sm font-medium transition ${isActive(l.href) ? 'bg-white/10 text-gold' : 'text-white/80 hover:text-white'}`}>
+          <Link key={l.href} href={l.href} className={`relative rounded-md px-2 py-1.5 text-sm font-medium transition ${isActive(l.href) ? 'bg-white/10 text-gold' : 'text-white/80 hover:text-white'}`}>
             {l.label}{badge(l.badge)}
           </Link>
         ))}
       </nav>
-      <div className="order-last md:hidden" ref={ref}>
+      <div className="order-last xl:hidden" ref={ref}>
         <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-haspopup="menu" aria-label="Menu"
           className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 text-white" data-testid="nav-menu">
           <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">

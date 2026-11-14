@@ -6,6 +6,23 @@
 
 **The point to land:** Georgia Tech already has the people and the answers startups need, but founders, alumni and students can't see each other, so connections happen by luck. GT Swarm learns what each person has built and solved, matches them in both directions with reasons, and turns matches into real, consented connections. Connection is not only hiring: when a founder hits a wall (a bug, a hospital security review, a fundraising question), GT Swarm finds the student or alum who already solved it, and the ask is just 15 minutes.
 
+## Main guided demo: the lifelong network (Try Guided Demo, about 90 to 120 seconds)
+
+| # | Scene | The judge does | What they see |
+|---|---|---|---|
+| 1 | GT Swarm | Next | "Your Georgia Tech network. For life." and the student-to-alum lifecycle |
+| 2 | Student home (Maya) | Next | Mentors, internships, alumni, events, groups and startups, each with a reason |
+| 3 | Mentorship | **Request mentorship → Send request** | A mentor matched on real BLE experience; request waits for the mentor's yes |
+| 4 | Internships | **Save** the Embedded Firmware Intern posting | Recommended because her firmware, BLE and nRF52 skills match (synthetic posting) |
+| 5 | Alum home (Elena) | Next | A different dashboard: complementary alumni, roles, alumni events, professional groups |
+| 6 | Alum → alum | Example, **Find people** | Dana ('18) for Elena ('15): alumni cofounders matched on experience |
+| 7 | Alumni-only event | **RSVP** to the Alumni Founders Dinner | Students only see a teaser; capacity enforced (last seat) |
+| 8 | Get Unstuck | Example problem | Tara solved the same hospital security review |
+| 9 | Graduation (Sofia) | **Simulate verified graduation** | Status becomes Verified alum; projects, connections, mentorship and groups unchanged; labeled simulated |
+| 10 | Close | Finish | Sofia's dashboard now leans toward alumni and professional recommendations |
+
+## Startup demo (Startups page → Watch the startup demo)
+
 | # | Chapter | The judge does | What they see |
 |---|---|---|---|
 | 1 | The problem | Reads, **Next** | Founders can't find help; builders can't find startups |

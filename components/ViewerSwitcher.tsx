@@ -6,7 +6,7 @@ type V = { id: string; label: string; sub: string };
 
 const initials = (name: string) => name.split(' ').map((w) => w[0]).join('').slice(0, 2);
 const role = (sub: string) => sub.replace(/\s*\(demo\)\s*$/i, '');
-const tone = (sub: string) => (sub.toLowerCase().includes('student') ? 'bg-plum' : 'bg-teal');
+const tone = (sub: string) => (/^(upper-year |first-year )?student/i.test(sub) ? 'bg-plum' : 'bg-teal');
 
 /** Demo identity switcher: who is acting right now (no logins). A styled menu, not a native select, so it reads well on the dark header. */
 export default function ViewerSwitcher({ viewers, current }: { viewers: readonly V[]; current: string }) {
@@ -48,7 +48,7 @@ export default function ViewerSwitcher({ viewers, current }: { viewers: readonly
       </button>
 
       {open && (
-        <div role="menu" aria-label="Demo personas" className="absolute right-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-xl border border-navy/10 bg-white py-1.5 shadow-2xl" data-testid="persona-menu">
+        <div role="menu" aria-label="Demo personas" className="absolute right-0 top-full z-50 mt-2 max-h-[70vh] w-80 overflow-y-auto rounded-xl border border-navy/10 bg-white py-1.5 shadow-2xl" data-testid="persona-menu">
           <div className="px-3.5 pb-1.5 pt-1 text-[10px] font-semibold uppercase tracking-wider text-ink/45">Switch demo persona (fictional)</div>
           {viewers.map((v) => {
             const active = v.id === value;

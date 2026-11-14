@@ -6,6 +6,8 @@ import { isOwner } from '@/lib/actions';
 import { AcceptDecline, AddToProject } from '@/components/RequestActions';
 import PageHero from '@/components/PageHero';
 import { roleLabel } from '@/lib/roles';
+import ActionButton from '@/components/ActionButton';
+import { mentorshipsOf } from '@/lib/community';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +22,9 @@ export default async function InboxPage() {
   const db = getDb();
   const received = db.prepare('SELECT * FROM requests WHERE to_person = ? ORDER BY created_at DESC').all(viewerId) as Req[];
   const sent = db.prepare('SELECT * FROM requests WHERE from_person = ? ORDER BY created_at DESC').all(viewerId) as Req[];
+  const mentorship = mentorshipsOf(viewerId).filter((x) => x.status === 'requested' || x.status === 'active');
+  // join requests waiting for this member as a group admin
+  const groupRequests = db.prepare("SELECT g.id, g.name, gm.person_id FROM group_member gm JOIN community_group g ON g.id = gm.group_id WHERE gm.status = 'pending' AND g.id IN (SELECT group_id FROM group_member WHERE person_id = ? AND role = 'admin' AND status = 'active')").all(viewerId) as { id: string; name: string; person_id: string }[];
   const me = s.person.get(viewerId)!;
   // consented connections (accepted requests); both people see them
   const connections = (db.prepare("SELECT from_person, to_person, created_at FROM connections WHERE source = 'request' AND status = 'active' AND (from_person = ? OR to_person = ?) ORDER BY created_at DESC").all(viewerId, viewerId) as { from_person: string; to_person: string; created_at: string }[])
@@ -78,7 +83,7 @@ export default async function InboxPage() {
 
   return (
     <>
-      <PageHero eyebrow="Inbox" title="Invites, requests and connections" subtitle={`For ${me.name}. Accepting creates a consented connection, nothing more. Joining a project is a separate step.`} />
+      <PageHero eyebrow="Inbox" title="Requests, mentorship and connections" subtitle={`For ${me.name}. Each request type is separate: accepting a connection creates a connection, accepting mentorship creates a mentorship, and neither grants a role, job or group membership.`} />
     <div className="mx-auto max-w-4xl px-4 py-8">
       <section aria-label="Your connections" data-testid="connections">
         <h2 className="label">Your connections ({connections.length})</h2>
@@ -93,8 +98,48 @@ export default async function InboxPage() {
           </ul>
         ) : <p className="text-sm text-ink/60">No connections yet. When someone accepts your request, or you accept theirs, they show up here.</p>}
       </section>
+      {mentorship.length > 0 && (
+        <section className="mt-8" aria-label="Mentorship" data-testid="inbox-mentorship">
+          <h2 className="label">Mentorship ({mentorship.length})</h2>
+          <ul className="space-y-3">
+            {mentorship.map((x) => (
+              <li key={x.id} className="card p-4" data-testid="mentorship-request" data-status={x.status}>
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <p className="font-semibold text-navy">{x.iAmMentor ? `${x.menteeName} asked you for mentorship` : `You asked ${x.mentorName} for mentorship`}</p>
+                    <p className="text-xs text-ink/60">{x.topic} · {x.status === 'requested' ? 'waiting for the mentor' : 'active mentorship'} · {fmt(x.created_at)}</p>
+                  </div>
+                  {x.iAmMentor && x.status === 'requested' && (
+                    <span className="flex gap-2">
+                      <ActionButton endpoint={`/api/mentorship/${encodeURIComponent(x.id)}`} body={{ action: 'accept' }} label="Accept" className="btn-primary px-3 py-1 text-xs" testId="mentorship-accept" />
+                      <ActionButton endpoint={`/api/mentorship/${encodeURIComponent(x.id)}`} body={{ action: 'decline' }} label="Decline" className="btn-ghost px-3 py-1 text-xs" />
+                    </span>
+                  )}
+                </div>
+                <p className="mt-2 rounded-lg bg-paper p-3 text-sm text-ink/80">{x.message}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {groupRequests.length > 0 && (
+        <section className="mt-8" aria-label="Group requests" data-testid="inbox-groups">
+          <h2 className="label">Group join requests ({groupRequests.length})</h2>
+          <ul className="space-y-2">
+            {groupRequests.map((g) => (
+              <li key={g.id + g.person_id} className="card flex flex-wrap items-center justify-between gap-2 p-4">
+                <span className="text-sm"><strong className="text-navy">{s.person.get(g.person_id)?.name ?? 'A member'}</strong> wants to join <Link href={`/groups/${encodeURIComponent(g.id)}`} className="font-semibold text-navy underline decoration-gold underline-offset-2">{g.name}</Link></span>
+                <span className="flex gap-2">
+                  <ActionButton endpoint={`/api/groups/${encodeURIComponent(g.id)}`} body={{ action: 'approve', personId: g.person_id }} label="Approve" className="btn-primary px-3 py-1 text-xs" />
+                  <ActionButton endpoint={`/api/groups/${encodeURIComponent(g.id)}`} body={{ action: 'deny', personId: g.person_id }} label="Decline" className="btn-ghost px-3 py-1 text-xs" />
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       <section className="mt-8">
-        <h2 className="label">Received ({received.length})</h2>
+        <h2 className="label">Connection and startup requests ({received.length})</h2>
         {received.length ? <ul className="space-y-3">{received.map((r) => card(r, 'received'))}</ul> : <p className="card p-6 text-sm text-ink/60">No requests yet.</p>}
       </section>
       <section className="mt-8">
