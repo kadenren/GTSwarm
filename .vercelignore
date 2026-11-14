@@ -1,0 +1,9 @@
+node_modules
+.next
+.next-*
+data/*.db
+data/*.db-*
+data/models
+.env
+.env.*
+*.tsbuildinfo
