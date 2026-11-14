@@ -1,40 +1,23 @@
 # GT Swarm demo script (about 2 minutes)
 
-GT Swarm is a startup matchmaking exchange for Georgia Tech students and alumni. Discovery brings people in, matching creates value, and connections turn matches into opportunities. Every person, startup, request and outcome in the demo is **fictional**.
+**Live site:** https://gtswarm.vercel.app. Click **Try Demo** and the guided tour walks through these ten steps, switching demo accounts for you. Every person, startup and request is **fictional**.
 
-## Before you present
+**The point to land:** Georgia Tech builders can't find each other. GT Swarm matches a startup with exactly the people it needs, and people with exactly the startups that need them, and shows why.
 
-1. In the **GT Swarm** folder, run `npm run dev` and open http://localhost:3000 full screen.
-2. Click the gold **Demo** button (top right). It resets the data and starts a guided tour: each step dims the page, highlights what to click, and points an arrow at it, switching demo accounts for you. Run it once to warm up the searches, then click **Demo** again to reset before judges arrive.
-3. Present with the tour on, or close it (X) and follow this script by hand. The matching that drives the story is deterministic and works offline.
+| # | Screen | Do | Say (one line) |
+|---|---|---|---|
+| 1 | Discover | Point at the startup grid | "Every student and alumni startup at GT, in one place, with who they need." |
+| 2 | Join (alumni invite) | Click **Use a sample resume** | "A resume becomes a profile. Skills and projects fill in, the person reviews them." |
+| 3 | Find People, as Elena (alum founder) | Search: alumni cofounder for a medical wearable | "She describes exactly who she needs. Dana fits, and the card says why, from Dana's own record." |
+| 4 | Same results, **View network** | Look at the map | "Closer to the center is a better fit. Lines link people who built together." |
+| 5 | Same results | **Invite to connect → Send invite** | "One click to reach the right alum." |
+| 6 | Find Startups, as Maya (student) | Look at Restwell's card | "It works both ways: Restwell needs Maya's BLE firmware experience." |
+| 7 | Same | **Request to join → Send request** | |
+| 8 | Inbox, as Elena | **Accept** | "The founder decides. Accepting connects them; joining the team is a separate choice." |
+| 9 | My Swarm, as Elena | Look at the map | "Her whole network, mapped: people and startups linked by real work together." |
+| 10 | Discover | | "Alum to alum, alum to student, student to student. The right people for every GT startup." |
 
-## Scene 1: Discover (15 s)
-- **Discover** is the homepage: student- and alumni-founded startups, each with stage, industry, founder, technologies and open roles.
-- Point at the filters (industry, skills needed, stage, founder, actively recruiting) and at **Restwell Patch**, Elena Brooks's medical wearable startup.
-- **Say:** "Anyone can browse what Yellow Jackets are building, without committing to anything."
-
-## Scene 2: Alum finds an alum cofounder (35 s), the main wow moment
-- **Viewing as → Elena Brooks** (alum founder). **Find Matches → Find People.**
-- Type: `I'm building a wearable medical device startup and need an alumni cofounder with embedded hardware or medical-device expertise.` Role **Cofounder**, from **Alumni**. **Find people.**
-- **Dana Whitfield** leads, with a reason built from her record (she solved battery drain on a wearable sensor board, has embedded hardware experience, and is open to cofounding). Only alumni open to cofounding are ranked.
-- Click **View connections**: her real network and the warm path, with documented ties kept separate from inferred similarity. Close it.
-- **Invite to connect → Send invite.**
-
-## Scene 3: Alum finds a student engineer (15 s)
-- Change the text to `wearable firmware engineer`, role **Engineer**, from **Students**. Maya Okafor, Jordan Kim and Sofia Alvarez lead, each with firmware work on record. Optionally invite one.
-
-## Scene 4: Student finds the startup (20 s)
-- **Viewing as → Maya Okafor** (student). **Find Matches → Find Startups.**
-- Type: `I'm a computer engineering student interested in embedded systems, wearable devices, and early-stage hardware startups.` (or leave it empty to use her saved profile). **Find startups.**
-- Restwell Patch is a top match: "Strong match because you have Wearables, BLE, nRF52 experience and Restwell Patch is seeking an engineer." **Request to join → Engineer → Send request.**
-
-## Scene 5: Connection, then collaboration (20 s)
-- **Viewing as → Elena** → **Inbox**. Maya's request to join. **Accept.**
-- Maya appears under **Your connections**. **Say:** "Accepting creates a connection, not a title." Optionally click **Add to Restwell Patch as…**, the separate step only the founder can take.
-
-## Scene 6: Close (10 s)
-- Back to **Discover**. "This works alumni to alumni, alumni to students, students to alumni, and students to students."
-> "GT Swarm helps Yellow Jackets find the people they need to build what's next."
+**Before presenting:** click **Try Demo** once to warm the site up, then click it again. Each click starts a fresh private session, so a judge clicking along never sees your changes and you never see theirs.
 
 ## Optional extras
 - **View network** on Find People results opens the radial relevance web.

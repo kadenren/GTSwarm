@@ -42,11 +42,11 @@ export default function ProfileClaim({ aiEnabled, mode = 'update', current }: {
   const join = mode === 'join';
   const canRead = files.length > 0 || !!links.github?.trim() || !!links.website?.trim();
 
-  async function read() {
-    if (join && name.trim().split(/\s+/).length < 2) { setMsg({ ok: false, text: 'Enter your first and last name first.' }); return; }
+  async function read(useFiles: File[] = files, useName: string = name) {
+    if (join && useName.trim().split(/\s+/).length < 2) { setMsg({ ok: false, text: 'Enter your first and last name first.' }); return; }
     setBusy(true); setMsg(null);
     const form = new FormData();
-    files.forEach((f) => form.append('files', f));
+    useFiles.forEach((f) => form.append('files', f));
     for (const { k } of LINKS) form.set(k, links[k] ?? '');
     const res = await fetch('/api/profile/draft', { method: 'POST', body: form });
     const d = await res.json();
@@ -55,6 +55,14 @@ export default function ProfileClaim({ aiEnabled, mode = 'update', current }: {
     setDraft(d.draft); setSource(d.source); setSources(d.sources ?? []);
     setSkillsText(d.draft.skills.join(', '));
     setAddProjects(d.draft.projects.map((p: DraftProject) => p.from !== 'github')); // GitHub repos are opt-in
+  }
+  /** No resume handy (judges, for example)? Read a fictional sample alum's resume in one click. */
+  async function useSample() {
+    setBusy(true); setMsg(null);
+    const blob = await (await fetch('/samples/resume-rachel-bianchi-demo.pdf')).blob();
+    const file = new File([blob], 'resume-rachel-bianchi-demo.pdf', { type: 'application/pdf' });
+    setName('Rachel Bianchi'); setType('alum'); setFiles([file]);
+    await read([file], 'Rachel Bianchi');
   }
   async function save() {
     if (!draft) return;
@@ -115,12 +123,16 @@ export default function ProfileClaim({ aiEnabled, mode = 'update', current }: {
             ))}
           </div>
           <p className="text-[11px] text-ink/50">GitHub and your website are read to suggest projects and skills. LinkedIn and Google Scholar links are shown on your profile but never read automatically.</p>
-          <button className="btn-primary" disabled={busy || !canRead} onClick={read}>{busy ? 'Reading…' : join ? 'Read and draft my profile' : 'Read my resume and links'}</button>
+          <div className="flex flex-wrap items-center gap-3">
+            <button className="btn-primary" disabled={busy || !canRead} onClick={() => read()}>{busy ? 'Reading…' : join ? 'Read and draft my profile' : 'Read my resume and links'}</button>
+            {join && <button type="button" className="btn-gold" disabled={busy} onClick={useSample} data-testid="sample-resume">{busy ? 'Reading…' : 'Use a sample resume'}</button>}
+          </div>
+          {join && <p className="text-[11px] text-ink/50">The sample is a fictional alum, Rachel Bianchi, so you can watch a profile build itself without uploading anything.</p>}
         </div>
       )}
 
       {draft && (
-        <div className="mt-4 space-y-3">
+        <div className="mt-4 space-y-3" data-testid="profile-draft">
           <div className="rounded-lg bg-paper px-3 py-2 text-xs">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-ink/60">{source === 'gemini' ? 'Drafted by Gemini' : 'Drafted by GT Swarm keyword rules'}{join && name ? ` for ${name}` : ''}. Check every field.</span>

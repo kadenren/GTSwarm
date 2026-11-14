@@ -14,59 +14,50 @@ interface Step {
   target?: string;
   /** clicked automatically if the target has not appeared (for example, to open a panel) */
   prepare?: string;
+  /** big visuals (the maps): keep the card in the corner so it never covers them */
+  corner?: boolean;
   who: string; title: string; body: string; action?: string;
 }
 
-const SCENE2 = "/match?mode=people&q=I%27m+building+a+wearable+medical+device+startup+and+need+an+alumni+cofounder+with+embedded+hardware+or+medical-device+expertise.&role=Cofounder&aud=alumni";
-const SCENE3 = '/match?mode=people&q=wearable+firmware+engineer&role=Early+engineer&aud=students';
-const SCENE4 = '/match?mode=startups&q=I%27m+a+computer+engineering+student+interested+in+embedded+systems%2C+wearable+devices%2C+and+early-stage+hardware+startups.';
+const FIND_COFOUNDER = "/match?mode=people&q=I%27m+building+a+wearable+medical+device+startup+and+need+an+alumni+cofounder+with+embedded+hardware+or+medical-device+expertise.&role=Cofounder&aud=alumni";
+const FIND_STARTUPS = '/match?mode=startups&q=I%27m+a+computer+engineering+student+interested+in+embedded+systems%2C+wearable+devices%2C+and+early-stage+hardware+startups.';
 const FIRST_PERSON = '[data-testid="people-results"] > li:first-child';
 const RESTWELL_MATCH = '[data-testid="startup-results"] li[data-build="project:pr009"]';
-const RESTWELL_DISCOVER = '[data-testid="discover-grid"] li:has(a[href="/projects/project%3Apr009"])';
 
+/** Ten short steps: one startup finding exactly the people it needs, in both directions. */
 const STEPS: Step[] = [
-  { as: ELENA, url: '/', target: '[data-tour="discover-filters"]', who: 'Anyone',
-    title: 'Discover what Yellow Jackets are building',
-    body: 'Startups and projects from students and alumni, each with its stage, industry, founder and open roles. You can browse without committing to anything.',
-    action: 'Filter by industry, skills needed, stage, founder, and whether they are recruiting.' },
-  { as: ELENA, url: '/', target: RESTWELL_DISCOVER, who: 'Anyone',
-    title: 'An alumni-founded startup',
-    body: 'Restwell Patch is a medical wearable startup founded by Elena Brooks (alum, 2015). It is at pilot stage and recruiting an engineer and an advisor.' },
-  { as: ELENA, url: SCENE2, target: FIRST_PERSON, who: 'Elena, alum founder',
-    title: 'Alum to alum: finding a cofounder',
-    body: 'Elena asks for an alumni cofounder with embedded hardware or medical-device experience. Only alumni who said they are open to cofounding are ranked. The reason on each card comes from that person’s own record.',
-    action: 'Read why the top match fits. "Why this match?" shows how the score adds up.' },
-  { as: ELENA, url: SCENE2, target: '[data-testid="connections-dialog"]', prepare: `${FIRST_PERSON} [data-testid="view-connections"]`, who: 'Elena, alum founder',
-    title: 'Why the match is meaningful',
-    body: 'View connections shows the real network around this person, and separates documented ties (shared projects, accepted connections) from inferred similarity.',
-    action: 'Close it with the X when you are done.' },
-  { as: ELENA, url: SCENE2, target: `${FIRST_PERSON} [data-testid="invite-button"] || ${FIRST_PERSON}`, who: 'Elena, alum founder',
-    title: 'Invite to connect',
-    body: 'Elena invites her top match to talk about a cofounder role at Restwell.',
-    action: 'Click "Invite to connect", then "Send invite".' },
-  { as: ELENA, url: SCENE3, target: FIRST_PERSON, who: 'Elena, alum founder',
-    title: 'Alum to student: an engineer',
-    body: 'The same search for a firmware engineer, filtered to current students. These are students whose firmware work is on record, not just listed as a skill.',
-    action: 'Optionally invite one of them.' },
-  { as: MAYA, url: SCENE4, target: RESTWELL_MATCH, who: 'Maya, student',
-    title: 'The reverse: a student finds the startup',
-    body: 'Maya, a computer engineering student, uses Find Startups. Restwell is one of her top matches because it is seeking an engineer with the wearable and BLE firmware experience on her record.',
-    action: 'Read why it fits.' },
-  { as: MAYA, url: SCENE4, target: `${RESTWELL_MATCH} [data-testid="collab-button"] || ${RESTWELL_MATCH}`, who: 'Maya, student',
+  { as: ELENA, url: '/', target: '[data-tour="discover-filters"]', who: 'The problem',
+    title: 'GT builders can’t find each other',
+    body: 'GT Swarm puts every student and alumni startup in one place, with who they need.' },
+  { as: ELENA, url: '/join?invite=alumni', target: '[data-testid="sample-resume"] || [data-testid="profile-draft"]', who: 'Joining',
+    title: 'A resume becomes a profile',
+    body: 'Alumni join from an invite. Upload a resume and the skills and projects fill in.',
+    action: 'Click “Use a sample resume”.' },
+  { as: ELENA, url: FIND_COFOUNDER, target: FIRST_PERSON, who: 'Founder: Elena, alum',
+    title: 'Describe exactly who you need',
+    body: 'Elena needs an alumni cofounder for her medical wearable. Dana fits, and the card says why.' },
+  { as: ELENA, url: FIND_COFOUNDER, target: '[data-testid="relevance-web"]', prepare: '[data-testid="view-network"]', corner: true, who: 'Founder: Elena, alum',
+    title: 'The match map',
+    body: 'Closer to the center means a better fit. Lines link people who built together.' },
+  { as: ELENA, url: FIND_COFOUNDER, target: `${FIRST_PERSON} [data-testid="invite-button"] || ${FIRST_PERSON}`, prepare: '[data-testid="view-cards"]', who: 'Founder: Elena, alum',
+    title: 'Reach out in one click',
+    action: 'Click “Invite to connect”, then “Send invite”.', body: '' },
+  { as: MAYA, url: FIND_STARTUPS, target: RESTWELL_MATCH, who: 'Student: Maya',
+    title: 'It works both ways',
+    body: 'Maya gets startups that need her skills. Restwell is looking for her BLE firmware experience.' },
+  { as: MAYA, url: FIND_STARTUPS, target: `${RESTWELL_MATCH} [data-testid="collab-button"] || ${RESTWELL_MATCH}`, who: 'Student: Maya',
     title: 'Request to join',
-    body: 'Maya asks to join Restwell as an engineer.',
-    action: 'Click "Request to join", choose Engineer, then "Send request".' },
-  { as: ELENA, url: '/inbox', target: '[data-testid="request-received"]', who: 'Elena, alum founder',
-    title: 'Nothing happens without a yes',
-    body: "Elena sees Maya's request to join Restwell.",
+    action: 'Click “Request to join”, then “Send request”.', body: '' },
+  { as: ELENA, url: '/inbox', target: '[data-testid="request-received"]', who: 'Founder: Elena, alum',
+    title: 'The founder decides',
+    body: 'Accepting connects them. Adding Maya to the team is a separate choice.',
     action: 'Click Accept.' },
-  { as: ELENA, url: '/inbox', target: '[data-testid="connections"]', who: 'Elena, alum founder',
-    title: 'A connection, not a title',
-    body: 'Maya now appears under Your connections. Accepting did not make her a team member or cofounder. Adding her to Restwell is a separate step only Elena can take.',
-    action: 'Optionally click "Add to Restwell Patch as…" on the request.' },
+  { as: ELENA, url: '/swarm', target: '[data-testid="relevance-web"]', corner: true, who: 'Founder: Elena, alum',
+    title: 'Her network, mapped',
+    body: 'Every person and startup around Elena, linked by real work together.' },
   { as: ELENA, url: '/', target: '[data-testid="find-match-cta"]', who: 'GT Swarm',
     title: 'Every direction',
-    body: 'Alumni to alumni, alumni to students, students to alumni, and students to students. GT Swarm helps Yellow Jackets find the people they need to build what’s next.' },
+    body: 'Alum to alum, alum to student, student to student: the right people for every GT startup.' },
 ];
 
 const KEY = 'gtswarm-tour';
@@ -163,7 +154,7 @@ export default function DemoTour({ current }: { current: string }) {
   const pad = 10, gap = 18;
   let card = { top: vp.h - cardH - 24, left: vp.w - CARD_W - 24 };
   let arrow: { side: 'top' | 'bottom' | 'left' | 'right'; at: number } | null = null;
-  if (rect && onPage) {
+  if (rect && onPage && !s.corner) {
     const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
     const clampX = (x: number) => Math.max(16, Math.min(vp.w - CARD_W - 16, x));
     const clampY = (y: number) => Math.max(76, Math.min(vp.h - cardH - 16, y));
@@ -204,7 +195,7 @@ export default function DemoTour({ current }: { current: string }) {
             </button>
           </div>
           <h3 className="mt-1 font-display text-lg font-bold leading-snug text-navy">{s.title}</h3>
-          <p className="mt-1 text-sm leading-relaxed text-ink/75">{s.body}</p>
+          {s.body && <p className="mt-1 text-sm leading-relaxed text-ink/75">{s.body}</p>}
           {onPage && s.action && (
             <p className="mt-2 flex gap-2 rounded-lg bg-gold/15 px-3 py-2 text-sm font-medium text-navy">
               <svg className="mt-0.5 shrink-0" width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2l10 5.5-4.2 1.3L11 14l-2 1-2.2-5.2L3 13z" fill="#B3A369" /></svg>
