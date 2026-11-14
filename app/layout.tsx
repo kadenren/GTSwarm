@@ -42,7 +42,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <ViewerSwitcher viewers={viewerOptions(viewerId)} current={viewerId} />
             </div>
           </div>
-          <div className="border-t border-white/10 bg-gold/15 py-1 text-center text-[11px] font-medium tracking-wide text-gold-light" data-testid="demo-banner">Demo for the GT SGA Campus Solutions Hackathon · all people, startups and requests shown are fictional</div>
         </header>
         <main className="flex-1">{children}</main>
         <footer className="border-t border-navy/10 bg-white">
