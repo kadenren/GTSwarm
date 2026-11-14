@@ -5,7 +5,6 @@
  */
 import fs from 'node:fs';
 import { openDb, SEED_DB_PATH, DB_PATH, resetFromSeed } from '../lib/db';
-import { seedCommunity } from '../lib/community-data';
 import { loadEmbedder, embedTexts, toBlob, MODEL_ID } from '../lib/embed';
 import { FIELDS, FIRST_NAMES, LAST_NAMES, CITIES, OUTCOMES, MAJOR_LABEL, type Field, type TeamType, type Role } from './seed-data';
 
@@ -666,9 +665,6 @@ async function main() {
     meta.run('pulseband_id', pulseband);
     for (const [k, v] of Object.entries(seedCache())) db.prepare('INSERT INTO cache VALUES (?,?)').run(k, v);
   })();
-
-  // GT Swarm 2.0 community: memberships, mentors, opportunities, groups and events (fictional, deterministic)
-  db.transaction(() => seedCommunity(db))();
 
   // reachability: every person and project within 6 hops of PulseBand
   const adj = new Map<string, Set<string>>();

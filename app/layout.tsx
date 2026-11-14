@@ -5,24 +5,26 @@ import Wordmark from '@/components/Wordmark';
 import ViewerSwitcher from '@/components/ViewerSwitcher';
 import NavLinks from '@/components/NavLinks';
 import DemoTour from '@/components/DemoTour';
+import DemoButton from '@/components/DemoButton';
 import { getViewerId, viewerOptions } from '@/lib/viewer';
 import { getDb } from '@/lib/db';
 
 export const metadata: Metadata = {
-  title: 'GT Swarm: your Georgia Tech community, for life',
-  description: 'Help Yellow Jackets find their people, become part of a community, and stay connected for life.',
+  title: 'GT Swarm: Where Yellow Jackets build together',
+  description: 'Find the Georgia Tech student or alum who has built what you need, at every step of building.',
 };
 export const dynamic = 'force-dynamic';
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const viewerId = await getViewerId();
   const pending = (getDb().prepare("SELECT COUNT(*) n FROM requests WHERE to_person = ? AND status = 'sent'").get(viewerId) as { n: number }).n;
-  const mentorWaiting = (getDb().prepare("SELECT COUNT(*) n FROM mentorship WHERE mentor_id = ? AND status = 'requested'").get(viewerId) as { n: number }).n;
-  // Three destinations, plus My Network as a utility. Older pages stay reachable and highlight their parent.
+  // Five main sections. Posting a startup, joining and Impact for GT are linked from the footer.
   const links = [
-    { href: '/people', label: 'Find People', also: ['/match', '/stuck', '/mentorship'] },
-    { href: '/communities', label: 'Communities', also: ['/groups', '/events'] },
-    { href: '/opportunities', label: 'Opportunities', also: ['/startups', '/projects', '/add'] },
+    { href: '/', label: 'Discover' },
+    { href: '/match', label: 'Find Matches' },
+    { href: '/stuck', label: 'Get Unstuck' },
+    { href: '/profile', label: 'My Profile' },
+    { href: '/inbox', label: 'Inbox', badge: pending },
   ];
   return (
     <html lang="en">
@@ -31,10 +33,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <div className="relative mx-auto flex max-w-[1400px] items-center gap-x-3 px-4 py-2.5 md:gap-x-4">
             <Link href="/" className="flex flex-col leading-tight" aria-label="GT Swarm home">
               <Wordmark />
-              <span className="hidden text-[11px] tracking-wide text-gold-light/90 sm:block">Your Georgia Tech community, for life</span>
+              <span className="hidden text-[11px] tracking-wide text-gold-light/90 sm:block">Where Yellow Jackets build together</span>
             </Link>
-            <NavLinks links={links} network={{ href: '/network', label: 'My Network', badge: pending + mentorWaiting, also: ['/inbox', '/profile', '/home'] }} />
-            <div className="ml-auto flex items-center gap-2 md:ml-0 md:gap-3">
+            <NavLinks links={links} />
+            <div className="ml-auto flex items-center gap-2 md:gap-3">
+              <DemoButton />
               <ViewerSwitcher viewers={viewerOptions(viewerId)} current={viewerId} />
             </div>
           </div>
@@ -48,7 +51,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <span>Independent student project for the GT Campus Solutions Challenge. Not affiliated with or endorsed by Georgia Tech. All demo data is fictional.</span>
             </span>
             <nav aria-label="More" className="flex flex-wrap items-center gap-x-4 gap-y-1">
-              {[["/stuck", "Get Unstuck"], ["/pilot", "SGA pilot plan"], ["/add", "Post a startup"], ["/join", "Join GT Swarm"], ["/impact", "Impact for GT"]].map(([h, l]) => (
+              {[["/pilot", "SGA pilot plan"], ["/add", "Post a startup"], ["/join", "Join GT Swarm"], ["/impact", "Impact for GT"]].map(([h, l]) => (
                 <Link key={h} href={h} className="hover:text-navy hover:underline">{l}</Link>
               ))}
             </nav>

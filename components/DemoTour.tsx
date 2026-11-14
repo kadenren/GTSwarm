@@ -47,10 +47,10 @@ const RESTWELL_ACCEPTED = `[data-testid="request-received"][data-status="accepte
  * The tour opens pages and switches personas itself; the judge does the actions.
  */
 const STEPS: Step[] = [
-  { as: ELENA, url: '/startups', target: '[data-testid="home-example"]', who: 'Startups',
+  { as: ELENA, url: '/', target: '[data-tour="problem"]', who: 'The problem',
     title: 'Georgia Tech has the talent. GT Swarm makes the connections.',
-    body: 'Founders can’t find the people who can help, and builders can’t find the startups that need them. Here is the startup loop in about a minute.' },
-  { as: ELENA, url: '/startups', target: RESTWELL_CARD, who: 'Discover',
+    body: 'Founders can’t find the people who can help, and builders can’t find the startups that need them. Here is the whole loop in about a minute.' },
+  { as: ELENA, url: '/', target: RESTWELL_CARD, who: 'Discover',
     title: 'Anyone can browse what GT is building',
     body: 'No sign-up needed. This is Restwell Patch, a medical wearable startup. You are now its founder, Elena Brooks, an alum who needs a hardware cofounder.' },
 
@@ -107,115 +107,12 @@ const STEPS: Step[] = [
     body: 'SGA runs a one-semester, opt-in pilot. CREATE-X, Startup Exchange and the Alumni Association bring the people (proposed). No university records needed. Explore Get Unstuck, the network map and Impact for GT on your own.' },
 ];
 
-const SOFIA = 'person:p012', NOAH = 'person:p039', KENJI = 'person:p227', JAMIE = 'person:p097';
-const SEATTLE = '/communities/group%3Ag04';
-const JAMIE_CARD = '[data-testid="circle-member"][data-id="person:p097"]';
-const NOAH_REQUEST = '[data-testid="request-received"]:has([data-testid="request-purpose"]):has(a[href="/people/person%3Ap039"])';
-const KENJI_SEARCH = '/people?q=robotics+career+advice&purpose=mentorship';
-const MENTOR_RESULTS = '[data-testid="people-results"][data-purpose="mentorship"]';
-const WEB_PANEL = '[data-testid="web-panel"]';
-const STUCK_SECURITY_Q = '/stuck?q=Hospital+IT+security+review+stalled+our+pilot';
-/**
- * The main tour (about three minutes): one Georgia Tech community, four moments in a Yellow Jacket's life.
- * 1. A student needs career advice: Find People, why this person, the connection web, a mentorship request, internships.
- * 2. An alum founder builds: Get Unstuck finds who solved her problem, matchmaking finds a cofounder (why this match, the web, a warm path), and a student is matched to her startup.
- * 3. An alum moves to a new city: Communities, a hello, a yes.
- * 4. Graduation: same account, alumni spaces open. Then how GT could run it.
- */
-const NETWORK_STEPS: Step[] = [
-  { as: KENJI, url: '/', target: '[data-testid="hero-preview"] || h1', who: 'Why GT Swarm',
-    title: 'Georgia Tech already has the people. They’re hard to find.',
-    body: 'Generations of Yellow Jackets could help each other, but those connections live in group chats, LinkedIn and luck. GT Swarm matches people on what they have actually built and solved, shows how they are connected, and only introduces people who said yes. Four moments show how.' },
-
-  { as: KENJI, url: '/people', target: `${MENTOR_RESULTS} > li:first-child || [data-tour="people-search"]`, who: '1 · A student needs advice',
-    title: 'Kenji wants a career in robotics', body: 'He’s a student with no industry contacts. He searches for advice and picks the purpose “Career advice or mentorship”.',
-    action: 'Type “robotics career advice”, choose “Career advice or mentorship”, then Search.',
-    done: MENTOR_RESULTS, skipUrl: KENJI_SEARCH,
-    doneBody: 'Only alumni who chose to mentor students appear, each with a plain reason: their work, what they offer, interests they share with Kenji. No scores, and no cold messages to people who opted out.' },
-  { as: KENJI, url: '/people', target: '[data-testid="people-web"] || [data-testid="see-connections"]', corner: true, who: '1 · The web of connections',
-    title: 'See how he’s connected', body: 'Behind the list is a web of real Georgia Tech ties.',
-    action: 'Click “See connections”.',
-    done: '[data-testid="people-web"]', skipClick: '[data-testid="see-connections"]',
-    doneBody: 'Closer to the center means more relevant. Lines are only confirmed ties: people who built a project together or accepted a connection. Kenji reaches Quinn through teammates, a warm introduction instead of a cold one.' },
-  { as: KENJI, url: '/people', target: `${WEB_PANEL} [data-testid="connect-sent"] || ${WEB_PANEL} [data-testid="connect-form"] || ${WEB_PANEL}`, who: '1 · Ask for mentorship',
-    title: 'Quinn: relevant and willing', body: 'Robotics engineer, opted in to mentor students, and the path shows who they both know.',
-    action: 'Click “Ask to connect”, then “Send request”.',
-    done: `${WEB_PANEL} [data-testid="connect-sent"]`, skipClick: `${WEB_PANEL} [data-testid="ask-to-connect"] && ${WEB_PANEL} [data-testid="connect-send"]`,
-    doneBody: 'A mentorship request with an editable note. Quinn accepts or declines; nothing starts without a yes.' },
-  { as: KENJI, url: '/opportunities?tab=internships', target: '[data-testid="opportunity-card"][data-id="opp:o002"] || [data-testid="opportunity-list"]', who: '1 · Opportunities',
-    title: 'Internships posted by alumni', body: 'Matched to what Kenji has built, eligible ones first. Official listings stay on CareerBuzz through the Career Center: GT Swarm links to existing programs instead of replacing them.' },
-
-  { as: ELENA, url: '/stuck', target: '[data-testid="best-match"] || form[aria-label="Describe your problem"]', who: '2 · An alum founder is stuck',
-    title: 'Elena’s startup hits a wall', body: 'Her hospital pilot is stuck in a security review. Somewhere at GT, someone has solved this before.',
-    action: 'Click “Hospital security review stalled our pilot”.',
-    done: '[data-testid="best-match"]', skipUrl: STUCK_SECURITY_Q,
-    doneBody: 'Tara, an alum founder, solved the same problem and her fix is on record. Matched on the problem itself, not on job titles.' },
-  { as: ELENA, url: '/match', target: `${FIRST_PERSON} || [data-tour="match-form"]`, who: '2 · Matchmaking',
-    title: 'Elena needs a hardware cofounder', body: 'GT Swarm’s matchmaking reads what people have actually built and solved, not just their titles. She describes the need in plain words.',
-    action: 'Click “Alumni cofounder for a medical wearable”, then “Find people”.',
-    done: '[data-testid="people-results"]', skipUrl: FIND_COFOUNDER,
-    doneBody: 'Dana Whitfield, an alum, ranks first. Only people open to cofounding are shown.' },
-  { as: ELENA, url: '/match', target: `${FIRST_PERSON}:has([data-testid="why-breakdown"]) || ${FIRST_PERSON} button[aria-expanded]`, prepare: '[data-testid="view-cards"]', who: '2 · Matchmaking',
-    title: 'Why Dana?', body: '',
-    action: 'Click “Why this match?” on her card.',
-    done: `${FIRST_PERSON} [data-testid="why-breakdown"]`, skipClick: `${FIRST_PERSON} button[aria-expanded]`,
-    doneBody: 'Every factor is shown: how closely her work matches (keyword and meaning-based search), the wearable she shipped, shared GT ties, and that she is open to cofounding. Each line comes from her record.' },
-  { as: ELENA, url: '/match', target: '[data-testid="person-panel"] || [data-testid="relevance-web"] || [data-testid="view-network"]', corner: true, who: '2 · The web behind the match',
-    title: 'How Elena actually reaches Dana', body: '',
-    action: 'Click “View network”, then click Dana (the gold-ringed node nearest the center).',
-    done: '[data-testid="person-panel"]', skipClick: '[data-testid="view-network"] && [data-testid="relevance-web"] g.node[data-id="person:p005"]',
-    doneBody: 'Elena → Diego Park → Dana: teammates on real projects. A warm introduction built only from confirmed ties.' },
-  { as: ELENA, url: '/match', target: `${FIRST_PERSON} [role="status"] || ${FIRST_PERSON} [data-testid="invite-form"] || ${FIRST_PERSON} [data-testid="invite-button"]`, prepare: '[data-testid="view-cards"]', who: '2 · Matchmaking',
-    title: 'Invite Dana', body: '',
-    action: 'Click “Invite to connect”, then “Send invite”.',
-    done: `${FIRST_PERSON} [role="status"]`, skipClick: `${FIRST_PERSON} [data-testid="invite-button"] && ${FIRST_PERSON} [data-testid="invite-send"]`,
-    doneBody: 'Sent, with the reason attached. Dana can accept or decline.' },
-  { as: MAYA, url: '/match', target: `${RESTWELL_MATCH} || [data-testid="mode-startups"]`, who: '2 · Matching both ways',
-    title: 'And it works the other way', body: 'Maya, a student engineer, doesn’t type anything. Find Your Startup reads her profile and recommends startups that need what she has built.',
-    action: 'Click the “Find Your Startup” tab.',
-    done: RESTWELL_MATCH, skipClick: '[data-testid="mode-startups"]',
-    doneBody: 'Elena’s startup, Restwell, is recommended because it needs the Bluetooth firmware experience Maya already has. Founders find talent, and students find startups.' },
-
-  { as: NOAH, url: '/communities', target: '[data-testid="circle-card"][data-id="group:g04"]', who: '3 · An alum moves',
-    title: 'Noah just moved to Seattle', body: 'He knows no one there. Communities suggests GT in Seattle because he chose to share his city.',
-    action: 'Click “Explore community” on GT in Seattle.',
-    done: '[data-tour="circle-members"]', autoNext: true, skipUrl: SEATTLE },
-  { as: NOAH, url: SEATTLE, target: `${JAMIE_CARD} [data-testid="connect-sent"] || ${JAMIE_CARD} [data-testid="connect-form"] || ${JAMIE_CARD}`, who: '3 · An alum moves',
-    title: 'Yellow Jackets nearby who welcome a hello', body: 'Only members open to requests are shown, each with why they fit.',
-    action: 'On Jamie’s card, click “Ask to connect”, then “Send request”.',
-    done: `${JAMIE_CARD} [data-testid="connect-sent"]`, skipClick: `${JAMIE_CARD} [data-testid="ask-to-connect"] && ${JAMIE_CARD} [data-testid="connect-send"]`,
-    doneBody: 'Sent with the purpose “Meet fellow Yellow Jackets” and a note Noah could edit.' },
-  { as: JAMIE, url: '/inbox', target: NOAH_REQUEST, who: '3 · Consent',
-    title: 'Jamie decides', body: 'The request shows who Noah is and why he reached out.',
-    action: 'Click Accept.',
-    done: `${NOAH_REQUEST}[data-status="accepted"]`, skipClick: `${NOAH_REQUEST} button`,
-    doneBody: 'Connected. That new tie joins the web, so future introductions get warmer for everyone.' },
-
-  { as: SOFIA, url: '/network', target: '[data-testid="lifecycle-panel"]', who: '4 · Graduation',
-    title: 'Sofia graduates in December', body: 'One account from student to alum. Graduation is verified by an authorized source; here it’s simulated and labeled.',
-    action: 'Click “Simulate verified graduation”.',
-    done: '[data-testid="lifecycle-panel"][data-status="VERIFIED_ALUMNI"]', skipClick: '[data-testid="simulate-graduation"]',
-    doneBody: 'Verified alum, with the same profile, connections and mentorships.' },
-  { as: SOFIA, url: '/communities/group%3Ag02', target: 'main header', who: '4 · Graduation',
-    title: 'Alumni spaces open up', body: 'Before graduating, this professional community said “for verified alumni.” Now Sofia can join. The rule is enforced on the server, not just hidden in the page.' },
-
-  { as: SOFIA, url: '/pilot', target: '[data-tour="pilot-timeline"]', who: 'Why it works for GT',
-    title: 'Small enough to pilot next semester', body: 'Student government could run an opt-in pilot, with the Career Center, CREATE-X and the Alumni Association bringing people in (proposed). One app, no university records needed.' },
-  { as: SOFIA, url: '/', target: '[data-tour="how"]', who: 'GT Swarm',
-    title: 'A Yellow Jacket for life',
-    body: 'Georgia Tech gives us a community. GT Swarm makes it easier to find our place in it—and stay part of it for life.' },
-];
-
-const TOURS = { network: NETWORK_STEPS, startups: STEPS } as const;
-export type TourId = keyof typeof TOURS;
-
-
 const KEY = 'gtswarm-tour';
 const START_EVENT = 'gtswarm:tour-start';
 const CARD_W = 340;
 
 /** Start the guided demo from anywhere (starts a fresh demo session first). */
-export function startTour(tour: TourId = 'network') { window.dispatchEvent(new CustomEvent(START_EVENT, { detail: tour })); }
+export function startTour() { window.dispatchEvent(new Event(START_EVENT)); }
 
 type Rect = { top: number; left: number; width: number; height: number };
 const pick = (sel: string) => sel.split(' || ').map((q) => document.querySelector(q)).find(Boolean) ?? null;
@@ -226,9 +123,6 @@ export default function DemoTour({ current }: { current: string }) {
   const router = useRouter();
   const path = usePathname();
   const [step, setStep] = useState<number | null>(null);
-  const [tour, setTour] = useState<TourId>('network');
-  const tourRef = useRef<TourId>('network');
-  const STEPS = TOURS[tour];
   const [busy, setBusy] = useState(false);
   const [rect, setRect] = useState<Rect | null>(null);
   const [missing, setMissing] = useState(false);
@@ -239,19 +133,11 @@ export default function DemoTour({ current }: { current: string }) {
   const currentRef = useRef(current);
   currentRef.current = current;
 
-  const save = (s: number | null) => { try { if (s === null) localStorage.removeItem(KEY); else localStorage.setItem(KEY, `${tourRef.current}:${s}`); } catch { /* storage unavailable */ } };
-  useEffect(() => {
-    try {
-      const v = localStorage.getItem(KEY);
-      if (v === null) return;
-      const [t, n] = v.includes(':') ? v.split(':') : ['startups', v];
-      const id: TourId = t === 'startups' ? 'startups' : 'network';
-      tourRef.current = id; setTour(id); setStep(Number(n));
-    } catch { /* ignore */ }
-  }, []);
+  const save = (s: number | null) => { try { if (s === null) localStorage.removeItem(KEY); else localStorage.setItem(KEY, String(s)); } catch { /* storage unavailable */ } };
+  useEffect(() => { try { const v = localStorage.getItem(KEY); if (v !== null) setStep(Number(v)); } catch { /* ignore */ } }, []);
 
   const go = useCallback(async (i: number, viewer: string) => {
-    const s = TOURS[tourRef.current][i];
+    const s = STEPS[i];
     setBusy(true); setRect(null); setDone(false); setStep(i); save(i);
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })); // close any dialog or menu a previous step opened
     if (s.as !== viewer) {
@@ -266,9 +152,7 @@ export default function DemoTour({ current }: { current: string }) {
   }, [router]);
 
   useEffect(() => {
-    const onStart = async (e: Event) => {
-      const id: TourId = (e as CustomEvent).detail === 'startups' ? 'startups' : 'network';
-      tourRef.current = id; setTour(id);
+    const onStart = async () => {
       setBusy(true);
       await fetch('/api/demo/reset', { method: 'POST' });
       await go(0, '');

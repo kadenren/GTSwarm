@@ -2,21 +2,16 @@ import { cookies } from 'next/headers';
 import { getDb } from './db';
 import { ready } from './session';
 
-/** Fictional demo personas across career stages. The first is the default. */
+/** The three fictional demo personas a visitor can switch between. */
 export const VIEWERS = [
-  { id: 'person:p039', label: 'Noah Bennett', sub: 'Alum who just moved to Seattle (demo)' },
-  { id: 'person:p227', label: 'Kenji Watanabe', sub: 'Robotics student looking for career advice (demo)' },
-  { id: 'person:p012', label: 'Sofia Alvarez', sub: 'Student graduating in December (demo)' },
-  { id: 'person:p097', label: 'Jamie Keller', sub: 'Alum in Seattle who welcomes requests (demo)' },
-  { id: 'person:p008', label: 'Elena Brooks', sub: 'Alum founder looking for a cofounder (demo)' },
-  { id: 'person:p010', label: 'Maya Okafor', sub: 'Student engineer looking for an internship (demo)' },
-  { id: 'person:p005', label: 'Dana Whitfield', sub: 'Alum open to cofounding (demo)' },
-  { id: 'person:p028', label: 'Amelia Diallo', sub: 'Recent alum, verification pending (demo)' },
+  { id: 'person:p008', label: 'Elena Brooks', sub: 'Alumni founder (demo)' },
+  { id: 'person:p010', label: 'Maya Okafor', sub: 'Student looking for startups (demo)' },
+  { id: 'person:p005', label: 'Dana Whitfield', sub: 'Alumni cofounder candidate (demo)' },
 ] as const;
 export const DEFAULT_VIEWER = VIEWERS[0].id;
 export const VIEWER_COOKIE = 'gtswarm_viewer';
 
-/** The demo identity: a persona, or someone who joined during this visitor's session. Unknown ids fall back to the first persona. */
+/** The demo identity: a persona, or someone who joined during this visitor's session. Unknown ids fall back to Elena. */
 export async function getViewerId(): Promise<string> {
   await ready();
   const c = (await cookies()).get(VIEWER_COOKIE)?.value;
@@ -26,7 +21,7 @@ export async function getViewerId(): Promise<string> {
   return row ? row.id : DEFAULT_VIEWER;
 }
 
-/** Switcher options: the demo personas plus the current viewer if they joined during the demo. */
+/** Switcher options: the three demo personas plus the current viewer if they joined during the demo. */
 export function viewerOptions(currentId: string): { id: string; label: string; sub: string }[] {
   const base = VIEWERS.map((v) => ({ ...v }));
   if (base.some((v) => v.id === currentId)) return base;

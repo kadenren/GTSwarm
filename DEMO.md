@@ -1,35 +1,10 @@
-# GT Swarm demo script (about 3 minutes)
+# GT Swarm demo script (about 2 minutes)
 
-**Live site:** https://gtswarm.vercel.app. Click **Start guided demo** on the homepage (or in the Demo persona menu, top right). Each step explains what's on screen or asks the judge to click the real site; every step has **Skip, do it for me**. Every person, community, event and posting is **fictional**.
+**Live site:** https://gtswarm.vercel.app. Click **Try Demo** for a hands-on tour: the judge clicks the real site (navigation, example buttons, Find People, Find Startups, invites, the persona menu, Accept) and the tour moves on when they do. Every step also has **Skip, do it for me**. Every person, startup and request is **fictional**.
 
-**The point to land:** Georgia Tech already has the people who could help each other, but those connections live in group chats, LinkedIn and luck. GT Swarm matches people on what they've actually built and solved, shows how they're connected through confirmed ties, and only introduces people who said yes. It stays with you from student to alum.
+**Who runs it:** the Student Government Association, as a one-semester opt-in pilot, with CREATE-X, Startup Exchange, the Alumni Association and project courses bringing people in (proposed; no existing partnership). Details at `/pilot`.
 
-**What's unique:** matching on demonstrated work (projects built, problems solved), not job titles; explained matches ("Why this match?"); the connection web with warm introduction paths built only from confirmed ties; matching in both directions (founders find people, students find startups); consent before ranking.
-
-## Main guided demo: four moments in a Yellow Jacket's life
-
-| # | Moment | The judge does | What they see |
-|---|---|---|---|
-| 1 | Why GT Swarm | Next | The problem: the people exist, finding them is luck |
-| 2 | Kenji, robotics student | Search "robotics career advice", purpose **Career advice or mentorship** | Only alumni who chose to mentor students, each with a plain reason |
-| 3 | The web of connections | **See connections** | Relevance web; lines are only confirmed ties; Kenji's warm path to Quinn |
-| 4 | Ask for mentorship | **Ask to connect → Send request** in the side panel | A mentorship request with an editable note |
-| 5 | Opportunities | Next | Alumni-posted internships; official listings stay on CareerBuzz |
-| 6 | Elena, alum founder, is stuck | Example problem in Get Unstuck | Tara already solved the hospital security review |
-| 7 | Matchmaking | Example, **Find people** | Dana ranks first for an alumni hardware cofounder |
-| 8 | Why Dana? | **Why this match?** | Every factor from her record: work match (keyword + meaning), shipped wearable, GT ties, open to cofounding |
-| 9 | The web behind the match | **View network**, click Dana | Elena → Diego Park → Dana: a warm introduction through teammates |
-| 10 | Invite | **Invite to connect → Send invite** | Sent with the reason; Dana decides |
-| 11 | Matching both ways | **Find Your Startup** as Maya | Restwell is recommended from her profile, no typing |
-| 12 | Noah moves to Seattle | **Explore community** on GT in Seattle | Suggested because he shared his city |
-| 13 | A hello | **Ask to connect → Send** on Jamie | Only members who welcome requests |
-| 14 | Consent | **Accept** as Jamie | Connected; the new tie joins the web |
-| 15 | Sofia graduates | **Simulate verified graduation** | Same account becomes Verified alum (labeled simulated) |
-| 16 | Alumni spaces open | Next | The alumni-only community now lets her join; enforced on the server |
-| 17 | Why it works for GT | Next | One-semester opt-in pilot with existing programs (proposed) |
-| 18 | Close | Finish | "Georgia Tech gives us a community. GT Swarm makes it easier to find our place in it—and stay part of it for life." |
-
-## Startup demo (Startups page → Watch the startup demo)
+**The point to land:** Georgia Tech already has the people and the answers startups need, but founders, alumni and students can't see each other, so connections happen by luck. GT Swarm learns what each person has built and solved, matches them in both directions with reasons, and turns matches into real, consented connections. Connection is not only hiring: when a founder hits a wall (a bug, a hospital security review, a fundraising question), GT Swarm finds the student or alum who already solved it, and the ask is just 15 minutes.
 
 | # | Chapter | The judge does | What they see |
 |---|---|---|---|
@@ -48,7 +23,7 @@
 
 The tour opens pages and switches personas itself; the judge only does the actions above (about 60 to 90 seconds). Every action has **Skip, do it for me**. Get Unstuck, profile building from a resume, the network map and Impact for GT are left for the judge to explore.
 
-**Before presenting:** click **Start guided demo** once to warm the site up, then click it again. Each click starts a fresh private session, so a judge clicking along never sees your changes and you never see theirs.
+**Before presenting:** click **Try Demo** once to warm the site up, then click it again. Each click starts a fresh private session, so a judge clicking along never sees your changes and you never see theirs.
 
 ## Optional extras
 - **Why this match?** on a person card shows how the score adds up.
@@ -65,7 +40,7 @@ The tour opens pages and switches personas itself; the judge only does the actio
 ## Assumptions
 - **Data comes from people opting in.** Alumni and students create their own profiles (resume, GitHub, website; LinkedIn and Scholar are links only). Nothing is scraped. In the demo, every profile is fictional.
 - **Campus partners help with reach, not engineering.** We assume the Alumni Association emails invite links (`/join?invite=alumni`) and that CREATE-X, VIP and SGA share links with students. No access to private alumni databases is assumed.
-- **Sign-in would use GT single sign-on** for students and email invites for alumni. Not built; the "Demo persona" switcher stands in for it.
+- **Sign-in would use GT single sign-on** for students and email invites for alumni. Not built; the "Viewing as" switcher stands in for it.
 - **Founders keep their startup pages current** (stage, open roles, needs). Stale pages make matches worse; owners can edit status in one click.
 - **People are honest about roles and availability.** Willingness to cofound or advise is self-reported, and it gates who appears for that role.
 - **One office could run it.** It is one web app and one database, with an optional Gemini key for meaning-based search and document reading. Matching works without it.

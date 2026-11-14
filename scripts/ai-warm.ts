@@ -53,28 +53,11 @@ const DEMO: { viewer: string; kind: 'expertise' | 'problem'; q: string; role?: s
     const top = out.results.slice(0, 3).map((r) => r.name).join(', ');
     console.log(`  [${out.mode}/${out.matcher}] "${d.q}" -> ${top}`);
   }
-  // Find People searches from the community demo (Kenji asks for robotics career advice)
-  const { findPeople } = await import('../lib/people');
-  for (const [viewer, q, purpose] of [['person:p227', 'robotics career advice', 'mentorship'], ['person:p039', 'Seattle', 'meet'], ['person:p039', 'product management', 'networking']] as const) {
-    const r = await findPeople(viewer, { q, purpose });
-    console.log(`  [people] "${q}" -> ${r.slice(0, 3).map((x) => x.name).join(', ')}`);
-  }
   // Find Your Startup embeds each builder's profile as the query: warm the demo personas
   const { recommendBuilds } = await import('../lib/matching');
   for (const id of ['person:p010', 'person:p008', 'person:p005']) {
     const m = await recommendBuilds({ viewerId: id, personId: id, requireRoles: true, limit: 9 });
     console.log(`  [startups] ${id} -> ${m.slice(0, 3).map((x) => x.build.name).join(', ')}`);
-  }
-  // persona dashboards and mentor recommendations embed each persona's profile text as the query: warm those too
-  const { VIEWERS } = await import('../lib/viewer');
-  const { recommendMentors, memberProfileText } = await import('../lib/community');
-  const { membershipOf, isVerifiedAlum } = await import('../lib/access');
-  for (const v of VIEWERS) {
-    const alum = isVerifiedAlum(membershipOf(v.id).status);
-    const text = memberProfileText(v.id).text.slice(0, 1200);
-    await rankForExpertise(text, (alum ? 'Cofounder' : 'Advisor') as never, v.id, 'alumni', { ai: false });
-    if (!alum) await recommendMentors(v.id, 3);
-    console.log(`  [dashboard] ${v.label}`);
   }
   console.log('Done. Restart the dev server if it was running before you added the key.');
 })().catch((e) => { console.error(e); process.exit(1); });
