@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
  * Guided demo: dims the page, highlights the element to look at or click, and points an arrow at it.
  * Steps switch the "viewing as" account and open the right page. State lives in localStorage so it survives navigation.
  */
-const ELENA = 'person:p008', MAYA = 'person:p010';
+const ELENA = 'person:p008', MAYA = 'person:p010', DANA = 'person:p005';
 
 interface Step {
   as: string; url: string;
@@ -20,47 +20,62 @@ interface Step {
 }
 
 const FIND_COFOUNDER = "/match?mode=people&q=I%27m+building+a+wearable+medical+device+startup+and+need+an+alumni+cofounder+with+embedded+hardware+or+medical-device+expertise.&role=Cofounder&aud=alumni";
+const FIND_ENGINEER = '/match?mode=people&q=wearable+firmware+engineer&role=Early+engineer&aud=students';
 const FOR_MAYA = '/match?mode=startups'; // no text: matched from her saved profile
 const FIRST_PERSON = '[data-testid="people-results"] > li:first-child';
 const RESTWELL_MATCH = '[data-testid="startup-results"] li[data-build="project:pr009"]';
+const RESTWELL_REQUEST = '[data-testid="request-received"]:has(a[href="/projects/project%3Apr009"])';
 
-/** One story in five chapters: why, profile, personalized matching, real connection, the network. */
+/**
+ * One story, told in the order judges need it: why it matters, the builder profile it runs on,
+ * Find People (alum to alum, alum to student), Find Startups (student to alum), consented connections, the network.
+ */
 const STEPS: Step[] = [
   { as: ELENA, url: '/', target: '[data-tour="stats"]', who: 'Why GT Swarm',
     title: 'The talent is here. The connections aren’t.',
-    body: 'GT startups have dozens of open roles, and the alumni and students who could fill them never see them. Today it happens by luck.' },
-  { as: ELENA, url: '/join?invite=alumni', target: '[data-testid="sample-resume"] || [data-testid="profile-draft"]', who: '1 · Your profile',
-    title: 'A resume becomes a profile',
-    body: 'GT Swarm reads what you have built, and you say what you are open to. That is what matching runs on.',
+    body: 'GT startups have dozens of open roles, and the alumni and students who could fill them never see them.' },
+  { as: ELENA, url: '/join?invite=alumni', target: '[data-testid="sample-resume"] || [data-testid="profile-draft"]', who: 'Builder profile',
+    title: 'Join with a resume',
+    body: 'Alumni join from an invite. GT Swarm reads the resume and fills in skills and projects.',
     action: 'Click “Use a sample resume”.' },
-  { as: ELENA, url: FIND_COFOUNDER, target: FIRST_PERSON, who: '2 · Personalized matching',
-    title: 'A founder describes exactly who she needs',
-    body: 'Elena wants an alumni cofounder for her medical wearable. Only alumni open to cofounding are ranked.' },
-  { as: ELENA, url: FIND_COFOUNDER, target: `${FIRST_PERSON}:has([data-testid="why-breakdown"])`, prepare: `[data-testid="view-cards"] && ${FIRST_PERSON} button[aria-expanded]`, who: '2 · Personalized matching',
-    title: 'Matched on real work, not keywords',
-    body: 'Dana solved a battery problem on a wearable board and wants to cofound. The score adds up from her actual record.' },
-  { as: ELENA, url: FIND_COFOUNDER, target: '[data-testid="relevance-web"]', prepare: '[data-testid="view-network"]', corner: true, who: '2 · Personalized matching',
+  { as: MAYA, url: '/profile', target: 'section[aria-label="Current profile"]', who: 'Builder profile',
+    title: 'What matching runs on',
+    body: 'Maya’s profile: what she has built, her skills, and the roles she is open to. Founders find her by this.' },
+  { as: ELENA, url: FIND_COFOUNDER, target: FIRST_PERSON, who: 'Find People · Alum → Alum',
+    title: 'An alum founder needs a cofounder',
+    body: 'Elena describes her need. Only alumni open to cofounding are ranked, and Dana comes out on top.' },
+  { as: ELENA, url: FIND_COFOUNDER, target: `${FIRST_PERSON}:has([data-testid="why-breakdown"])`, prepare: `[data-testid="view-cards"] && ${FIRST_PERSON} button[aria-expanded]`, who: 'Find People · Alum → Alum',
+    title: 'Why Dana: real work, not keywords',
+    body: 'She solved a battery problem on a wearable board and wants to cofound. The score adds up from her record.' },
+  { as: ELENA, url: FIND_COFOUNDER, target: '[data-testid="relevance-web"]', prepare: '[data-testid="view-network"]', corner: true, who: 'Find People · Alum → Alum',
     title: 'The match map',
     body: 'Best fits sit closest to the center. Lines link people who have built together.' },
-  { as: ELENA, url: FIND_COFOUNDER, target: `${FIRST_PERSON} [data-testid="invite-button"] || ${FIRST_PERSON}`, prepare: '[data-testid="view-cards"]', who: '3 · Real connection',
-    title: 'One click to reach the right person',
+  { as: ELENA, url: FIND_COFOUNDER, target: `${FIRST_PERSON} [data-testid="invite-button"] || ${FIRST_PERSON}`, prepare: '[data-testid="view-cards"]', who: 'Find People · Alum → Alum',
+    title: 'Invite her to connect',
     action: 'Click “Invite to connect”, then “Send invite”.', body: '' },
-  { as: MAYA, url: FOR_MAYA, target: RESTWELL_MATCH, who: '3 · Real connection',
-    title: 'Students get matched without searching',
-    body: 'From Maya’s profile alone: Restwell needs the BLE firmware experience she already has.' },
-  { as: MAYA, url: FOR_MAYA, target: `${RESTWELL_MATCH} [data-testid="collab-button"] || ${RESTWELL_MATCH}`, who: '3 · Real connection',
+  { as: ELENA, url: FIND_ENGINEER, target: FIRST_PERSON, who: 'Find People · Alum → Student',
+    title: 'The same search finds students',
+    body: 'Elena also needs an engineer. Filtered to students, the ones with real firmware work lead.' },
+  { as: MAYA, url: FOR_MAYA, target: RESTWELL_MATCH, who: 'Find Startups · Student → Alum',
+    title: 'Students find startups that need them',
+    body: 'Find Startups uses Maya’s profile, no typing needed. Restwell needs the BLE firmware skills she has.' },
+  { as: MAYA, url: FOR_MAYA, target: `${RESTWELL_MATCH} [data-testid="collab-button"] || ${RESTWELL_MATCH}`, who: 'Find Startups · Student → Alum',
     title: 'Request to join',
     action: 'Click “Request to join”, then “Send request”.', body: '' },
-  { as: ELENA, url: '/inbox', target: '[data-testid="request-received"]', who: '3 · Real connection',
-    title: 'Nothing happens without a yes',
-    body: 'Elena accepts, and they are connected. Adding Maya to the team stays Elena’s choice.',
+  { as: DANA, url: '/inbox', target: RESTWELL_REQUEST, who: 'Connect · Alum ↔ Alum',
+    title: 'Dana says yes',
+    body: 'Elena’s invite reaches Dana with the reason attached. Nothing happens without a yes.',
     action: 'Click Accept.' },
-  { as: ELENA, url: '/swarm', target: '[data-testid="relevance-web"]', corner: true, who: '4 · The network',
-    title: 'The network grows',
-    body: 'Elena’s map now includes Maya. Every connection and every solved problem improves the next match.' },
+  { as: ELENA, url: '/inbox', target: RESTWELL_REQUEST, who: 'Connect · Student ↔ Alum',
+    title: 'Elena says yes to Maya',
+    body: 'They are connected. Adding Maya to the team stays Elena’s choice.',
+    action: 'Click Accept.' },
+  { as: ELENA, url: '/swarm', target: '[data-testid="relevance-web"]', corner: true, who: 'The network',
+    title: 'Two new connections, mapped',
+    body: 'Dana and Maya now sit on Elena’s map. Every connection improves the next match.' },
   { as: ELENA, url: '/', target: '[data-testid="find-match-cta"]', who: 'GT Swarm',
     title: 'The right people for every GT startup',
-    body: 'Alum to alum, alum to student, student to student: matched on what they have built and what they want.' },
+    body: 'Alum to alum, alum to student, student to alum: matched on what they have built and what they want.' },
 ];
 
 const KEY = 'gtswarm-tour';

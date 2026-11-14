@@ -6,17 +6,20 @@
 
 | # | Chapter | Screen | Do | Say (one line) |
 |---|---|---|---|---|
-| 1 | Why | Discover (hero numbers) | Point at 47 startups, 72 open roles | "The talent is here. The connections aren't. Today it happens by luck." |
-| 2 | Profile | Join (alumni invite) | **Use a sample resume** | "A resume becomes a profile: what you've built, plus what you're open to. That's what matching runs on." |
-| 3 | Matching | Find People, as Elena (alum founder) | Alumni cofounder for a medical wearable | "She describes exactly who she needs. Only alumni open to cofounding are ranked." |
-| 4 | Matching | Dana's card, **Why this match?** | Read the reason and score | "Matched on real work, not keywords: Dana solved a battery problem on a wearable board and wants to cofound." |
-| 5 | Matching | **View network** | Look at the map | "Best fits sit at the center; lines link people who built together." |
-| 6 | Connection | Dana's card | **Invite to connect → Send invite** | "One click to reach the right alum." |
-| 7 | Connection | Find Startups, as Maya (student), no search typed | Restwell's card | "Students are matched from their profile alone: Restwell needs Maya's firmware experience." |
-| 8 | Connection | Same | **Request to join → Send request** | |
-| 9 | Connection | Inbox, as Elena | **Accept** | "Nothing happens without a yes. Joining the team stays the founder's choice." |
-| 10 | Network | My Swarm, as Elena | Look at the map | "Maya is now on Elena's map. Every connection improves the next match." |
-| 11 | Close | Discover | | "The right people for every GT startup: alum to alum, alum to student, student to student." |
+| 1 | Why | Discover (hero numbers) | Point at the startups and open roles | "The talent is here. The connections aren't." |
+| 2 | Builder profile | Join (alumni invite) | **Use a sample resume** | "Alumni join from an invite. A resume becomes a profile." |
+| 3 | Builder profile | My Profile, as Maya (student) | Point at skills, projects, roles open to | "This is what matching runs on: what you've built and what you want." |
+| 4 | Find People · alum → alum | As Elena (alum founder) | Alumni cofounder for a medical wearable | "Only alumni open to cofounding are ranked. Dana comes out on top." |
+| 5 | Find People · alum → alum | Dana's card, **Why this match?** | Read the reason and score | "Real work, not keywords: she solved a battery problem on a wearable board." |
+| 6 | Find People · alum → alum | **View network** | Look at the map | "Best fits at the center; lines link people who built together." |
+| 7 | Find People · alum → alum | Dana's card | **Invite to connect → Send invite** | |
+| 8 | Find People · alum → student | Same search, Engineer, Students | Look at the top three | "The same search finds students with real firmware work." |
+| 9 | Find Startups · student → alum | As Maya, nothing typed | Restwell's card | "From her profile alone: Restwell needs her BLE firmware skills." |
+| 10 | Find Startups · student → alum | Same | **Request to join → Send request** | |
+| 11 | Connect · alum ↔ alum | Inbox, as Dana | **Accept** Elena's invite | "Nothing happens without a yes." |
+| 12 | Connect · student ↔ alum | Inbox, as Elena | **Accept** Maya's request | "Joining the team stays the founder's choice." |
+| 13 | Network | My Swarm, as Elena | Look at the map | "Two new connections, mapped. Every connection improves the next match." |
+| 14 | Close | Discover | | "The right people for every GT startup: alum to alum, alum to student, student to alum." |
 
 **Before presenting:** click **Try Demo** once to warm the site up, then click it again. Each click starts a fresh private session, so a judge clicking along never sees your changes and you never see theirs.
 
