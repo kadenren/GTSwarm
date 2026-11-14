@@ -6,6 +6,7 @@ import { isOwner } from '@/lib/actions';
 import { AcceptDecline, AddToProject } from '@/components/RequestActions';
 import PageHero from '@/components/PageHero';
 import { roleLabel } from '@/lib/roles';
+import { contactFor } from '@/lib/profile';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,7 +40,7 @@ export default async function InboxPage() {
     const statusClass = r.status === 'accepted' ? 'bg-teal-light text-teal' : r.status === 'declined' ? 'bg-navy/5 text-ink/50' : 'bg-gold/20 text-gold-dark';
     const who = other.type === 'alum' ? `Alum, class of ${other.grad_year}` : 'Student';
     return (
-      <li key={r.id} className="card p-5" data-testid={`request-${mode}`} data-status={r.status}>
+      <li key={r.id} className="card p-5" data-testid={`request-${mode}`} data-status={r.status} data-from={r.from_person} data-to={r.to_person}>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             <span className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white ${other.type === 'alum' ? 'bg-teal' : 'bg-plum'}`}>{initials(other.name)}</span>
@@ -64,6 +65,16 @@ export default async function InboxPage() {
           </div>
         </div>
         <p className="mt-3 rounded-lg bg-paper p-3 text-sm leading-relaxed text-ink/85">{r.message}</p>
+        {r.status === 'accepted' && (() => {
+          const c = contactFor(other.id);
+          return c ? (
+            <div className="mt-3 rounded-lg border border-teal/30 bg-teal-light/40 p-3 text-sm" data-testid="contact-shared">
+              <p className="font-semibold text-navy">You're connected. Reach {other.name.split(' ')[0]} directly:</p>
+              <p className="mt-1"><a className="font-medium text-navy underline decoration-gold underline-offset-2" href={`mailto:${c.email}`}>{c.email}</a>{c.links.map((l) => <a key={l.kind} className="ml-3 font-medium text-navy underline decoration-gold underline-offset-2" href={l.url} target="_blank" rel="noreferrer">{l.kind}</a>)}</p>
+              {c.fictional && <p className="mt-1 text-[11px] text-ink/50">Contact details are shared only after a request is accepted. Demo addresses are fictional.</p>}
+            </div>
+          ) : null;
+        })()}
         <div className="mt-3 space-y-2">
           {mode === 'received' && r.status === 'sent' && <AcceptDecline id={r.id} name={other.name} />}
           {canAdd && <AddToProject id={r.id} name={other.name} projectName={proj!.name} suggested={r.role} />}
@@ -78,7 +89,7 @@ export default async function InboxPage() {
 
   return (
     <>
-      <PageHero eyebrow="Inbox" title="Invites, requests and connections" subtitle={`For ${me.name}. Accepting creates a consented connection, nothing more. Joining a project is a separate step.`} />
+      <PageHero eyebrow="Inbox" title="Invites, requests and connections" subtitle={`For ${me.name}. Accepting creates a connection and shares contact details with each other. Joining a project is a separate step.`} />
     <div className="mx-auto max-w-4xl px-4 py-8">
       <section aria-label="Your connections" data-testid="connections">
         <h2 className="label">Your connections ({connections.length})</h2>
@@ -87,7 +98,7 @@ export default async function InboxPage() {
             {connections.map((c) => (
               <li key={c.person.id} className="flex items-center gap-2 rounded-full border border-navy/10 bg-white py-1 pl-1 pr-3 text-sm">
                 <span className={`flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold text-white ${c.person.type === 'alum' ? 'bg-teal' : 'bg-plum'}`}>{initials(c.person.name)}</span>
-                <span className="font-semibold text-navy">{c.person.name}</span><span className="text-xs text-ink/50">{c.person.type === 'alum' ? 'Alum' : 'Student'} · since {fmt(c.at)}</span>
+                <span className="font-semibold text-navy">{c.person.name}</span><span className="text-xs text-ink/50">{c.person.type === 'alum' ? 'Alum' : 'Student'} · since {fmt(c.at)}</span>{(() => { const ct = contactFor(c.person.id); return ct ? <a className="text-xs font-medium text-navy underline decoration-gold underline-offset-2" href={`mailto:${ct.email}`}>{ct.email}</a> : null; })()}
               </li>
             ))}
           </ul>

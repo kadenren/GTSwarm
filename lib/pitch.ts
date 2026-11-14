@@ -22,7 +22,7 @@ export const PROGRAMS = [
   { name: 'Startup Exchange', today: 'Events and meetups bring founders and builders together.',
     adds: 'Attendees keep a profile, so a good conversation at an event turns into a match afterward.' },
   { name: 'Alumni Association', today: 'Alumni volunteer through mentoring programs.',
-    adds: 'Alumni choose the roles and hours they can give; founders send specific 15-minute asks.' },
+    adds: 'Alumni choose the roles and hours they can give, and founders find the alumni who already solved their problem.' },
   { name: 'Capstone, VIP and Invention Studio', today: 'Project know-how leaves when each team graduates.',
     adds: 'Teams log the problems they solved, so the next team can find who solved them.' },
 ] as const;

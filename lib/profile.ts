@@ -205,3 +205,14 @@ export function createPerson(input: { name: string; type: 'student' | 'alum'; ma
 export function linksOf(personId: string): { kind: string; url: string }[] {
   return getDb().prepare('SELECT kind, url FROM person_link WHERE person_id = ? ORDER BY kind').all(personId) as { kind: string; url: string }[];
 }
+
+/**
+ * How to reach someone, shown only after they accept a request (both people see each other's).
+ * Members' own links come from their profile; demo personas get a fictional address on the reserved example.com domain.
+ */
+export function contactFor(personId: string): { email: string; links: { kind: string; url: string }[]; fictional: boolean } | null {
+  const p = getDb().prepare('SELECT name FROM people WHERE id = ?').get(personId) as { name: string } | undefined;
+  if (!p) return null;
+  const handle = p.name.toLowerCase().normalize('NFD').replace(/[^a-z ]/g, '').trim().replace(/\s+/g, '.');
+  return { email: `${handle}@example.com`, links: linksOf(personId), fictional: true };
+}

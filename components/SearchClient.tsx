@@ -136,7 +136,7 @@ export default function SearchClient({
           {[
             ['1', 'Describe the problem', 'Plain words are fine: a bug, a security review, a fundraising question.'],
             ['2', 'See who solved it, and how', 'Students and alumni are ranked on problems they actually solved on GT projects, with the fix on record.'],
-            ['3', 'Ask for 15 minutes', 'Your question goes to their inbox with the problem attached. They can say yes or no; nothing else is shared.'],
+            ['3', 'Connect with them', 'Your request goes to their inbox with the problem attached. If they accept, you are connected and can contact each other directly.'],
           ].map(([n, t, d]) => (
             <div key={n} className="card flex gap-4 p-5">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold font-display font-bold text-navy-900">{n}</span>

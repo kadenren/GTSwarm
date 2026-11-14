@@ -4,26 +4,26 @@
 
 **Who runs it:** the Student Government Association, as a one-semester opt-in pilot, with CREATE-X, Startup Exchange, the Alumni Association and project courses bringing people in (proposed; no existing partnership). Details at `/pilot`.
 
-**The point to land:** Georgia Tech already has the people and the answers startups need, but founders, alumni and students can't see each other, so connections happen by luck. GT Swarm learns what each person has built and solved, matches them in both directions with reasons, and turns matches into real, consented connections. Connection is not only hiring: when a founder hits a wall (a bug, a hospital security review, a fundraising question), GT Swarm finds the student or alum who already solved it, and the ask is just 15 minutes.
+**The point to land:** Georgia Tech already has the people and the answers startups need, but founders, alumni and students can't see each other, so connections happen by luck. GT Swarm learns what each person has built and solved, matches them in both directions with reasons, and turns matches into real, consented connections. Connection is not only hiring: when a founder hits a wall (a bug, a hospital security review, a fundraising question), GT Swarm finds the alum or student who already solved it, so they can connect and share contact details once both say yes.
 
 The demo shows instead of explains: every step is a moment that can't happen at Georgia Tech today. The case for adopting it comes only at the end.
 
-| # | Moment | The judge does | What they feel |
+| # | Moment | The judge does | What they see |
 |---|---|---|---|
-| 1 | Meet Elena | **Next** | An alum founder with a startup (Restwell Patch) and no cofounder |
-| 2 | Smart match | Example, **Find people** | Seconds later: Dana, an alum who shipped a wearable and is open to cofounding. Elena had never heard of her |
-| 3 | Why Dana? | **Why this match?** | Not a keyword hit: every line is something Dana actually built |
-| 4 | The web | **View network** | Every dot a Yellow Jacket, closer = more relevant, every line two people who built together |
-| 5 | Is there a way in? | Click Dana on the map | Elena → Diego Park → Dana: a warm introduction no one could see before |
-| 6 | Reach out | **Invite to connect → Send invite** | One click, reason attached; Dana decides |
-| 7 | Get Unstuck | Example problem | Her hospital pilot is frozen in a security review; Tara, an alum founder, got through the exact same one |
-| 8 | How did she do it? | **See how Tara solved it** | The fix is on record, with the project it happened on |
-| 9 | Ask for 15 minutes | **Ask Tara for 15 minutes → Send request** | Sent to Tara's inbox. Alumni who'd never join a startup will give 15 minutes on something they already solved |
-| 10 | Meanwhile, Maya | As Maya: **Find Your Startup** | A student matched to Restwell from what she's built, without typing |
-| 11 | Maya asks to join | **Request to join → Send request** | Sent to Elena |
-| 12 | Connected | As Elena: **Accept** | A student and an alum founder who'd never have met are connected; the web grows |
-| 13 | For SGA | **Next** | Impact for GT: every introduction counted, live from the demo |
-| 14 | Next semester | **Finish** | "These connections happen at GT today, by luck. GT Swarm makes them happen on purpose." One opt-in semester; it already runs |
+| 1 | Meet Elena | **Next** | A GT alum building a startup who needs other alumni's experience |
+| 2 | Alum finds alum | Example, **Find people** | Dana ('18), who shipped a wearable and is open to cofounding. Two alumni who had never met |
+| 3 | Why Dana? | **Why this match?** | Every reason is something Dana actually built |
+| 4 | The alumni web | **View network** | Closer = more relevant; lines = people who built together |
+| 5 | Is there a way in? | Click Dana on the map | Elena → Diego Park → Dana: a warm introduction |
+| 6 | Reach out | **Invite to connect → Send invite** | Sent with the reason; Dana decides |
+| 7 | Get Unstuck | Example problem | Tara ('17), the alum who already got a hospital pilot through the same security review |
+| 8 | How did she solve it? | **See how Tara solved it** | Her fix, on record, with the project it happened on |
+| 9 | Connect with Tara | **Connect with Tara → Send request** | Request goes to Tara with the problem attached |
+| 10 | Tara's inbox | As Tara: **Accept** | Nothing is shared until she says yes |
+| 11 | Connected | **Next** | Elena now sees Tara's contact details (and Tara sees Elena's): they can talk directly |
+| 12 | Students too | As Maya: **Find Your Startup** | Elena's startup, matched to a student from what she has built |
+| 13 | For SGA | **Next** | Impact for GT: alum-to-alum and student-to-alum connections counted live |
+| 14 | Next semester | **Finish** | "These connections happen at GT today, by luck. GT Swarm makes them happen on purpose." |
 
 The tour opens pages and switches personas itself (about two minutes). Every action has **Skip, do it for me**.
 
@@ -49,7 +49,7 @@ The tour opens pages and switches personas itself (about two minutes). Every act
 - **People are honest about roles and availability.** Willingness to cofound or advise is self-reported, and it gates who appears for that role.
 - **One office could run it.** It is one web app and one database, with an optional Gemini key for meaning-based search and document reading. Matching works without it.
 - **Students use it at specific moments:** looking for a team or startup, needing an advisor or engineer, or stuck on a problem, not as a daily feed.
-- **Alumni give small amounts of time.** Most alumni will not join a startup, but many will answer a specific 15-minute question about something they already solved. The product is built around that small ask.
+- **Alumni help alumni with what they've already solved.** Get Unstuck finds the alumni who have been through a specific problem; once they accept a request, both people see each other's contact details and can work through it directly.
 - **Demo-only tools are off in production.** The data reset works in development, or only when `GTSWARM_DEMO=1` is set.
 
 ## If something goes wrong

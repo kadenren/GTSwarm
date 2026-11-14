@@ -41,77 +41,78 @@ const RESTWELL_REQUEST = `[data-testid="request-received"]:has(a[href="${RESTWEL
 const RESTWELL_ACCEPTED = `[data-testid="request-received"][data-status="accepted"]:has(a[href="${RESTWELL_PAGE}"])`;
 
 const STUCK_SECURITY_Q = '/stuck?q=Hospital+IT+security+review+stalled+our+pilot';
+const TARA = 'person:p223';
+const ELENA_TO_TARA = `[data-testid="request-received"][data-from="${ELENA}"]`;
+const TARA_CONNECTED = `[data-testid="request-sent"][data-to="${TARA}"][data-status="accepted"]`;
 
 /**
- * The judge story (about two minutes). Show, don't tell: each step is a moment that can't happen at GT today.
- * Elena finds a cofounder she'd never heard of, sees the warm path to her, gets unstuck by an alum who already
- * solved her problem (who, how, and a 15-minute ask); Maya is matched to a startup she didn't know existed; they connect; SGA sees it counted.
+ * The judge story (about two minutes): Georgia Tech alumni finding other alumni, then students.
+ * Elena (alum founder) finds an alumni cofounder she'd never heard of and the warm path to her; then finds the alum who
+ * already solved her stalled hospital review, connects, and gets her contact once Tara says yes. Maya (student) is
+ * matched to Elena's startup. Impact for GT counts it; the pilot shows how GT runs it.
  */
 const STEPS: Step[] = [
   { as: ELENA, url: '/', target: RESTWELL_CARD, who: 'Meet Elena',
-    title: 'Elena has a startup and no cofounder.',
-    body: 'She’s a GT alum building Restwell Patch, a medical wearable. Somewhere among thousands of Yellow Jackets is the hardware engineer she needs. Let’s see how long it takes to find them.' },
+    title: 'Elena is a GT alum building a startup.',
+    body: 'Restwell Patch, a medical wearable. She needs an alum with hardware experience, and later, an alum who has been through a hospital security review. Thousands of Yellow Jackets could help. She knows almost none of them.' },
 
-  { as: ELENA, url: '/match', target: `${FIRST_PERSON} || [data-tour="match-form"]`, who: 'Smart match',
+  { as: ELENA, url: '/match', target: `${FIRST_PERSON} || [data-tour="match-form"]`, who: 'Alum finds alum',
     title: 'She describes who she needs', body: 'Plain words, no keywords to guess.',
     action: 'Click “Alumni cofounder for a medical wearable”, then “Find people”.',
     done: '[data-testid="people-results"]', skipUrl: FIND_COFOUNDER,
-    doneBody: 'Seconds. Dana Whitfield, an alum who shipped a wearable and is open to cofounding. Elena had never heard of her.' },
-  { as: ELENA, url: '/match', target: `${FIRST_PERSON}:has([data-testid="why-breakdown"]) || ${FIRST_PERSON} button[aria-expanded]`, prepare: '[data-testid="view-cards"]', who: 'Smart match',
+    doneBody: 'Dana Whitfield, class of ’18, shipped a wearable and is open to cofounding. Two alumni, three years apart, who had never met.' },
+  { as: ELENA, url: '/match', target: `${FIRST_PERSON}:has([data-testid="why-breakdown"]) || ${FIRST_PERSON} button[aria-expanded]`, prepare: '[data-testid="view-cards"]', who: 'Alum finds alum',
     title: 'Why Dana?', body: '',
     action: 'Click “Why this match?”.',
     done: `${FIRST_PERSON} [data-testid="why-breakdown"]`, skipClick: `${FIRST_PERSON} button[aria-expanded]`,
     doneBody: 'Not a keyword hit. Every line is something Dana actually built or said she wants to do.' },
-  { as: ELENA, url: '/match', target: '[data-testid="relevance-web"] || [data-testid="view-network"]', corner: true, who: 'The web',
+  { as: ELENA, url: '/match', target: '[data-testid="relevance-web"] || [data-testid="view-network"]', corner: true, who: 'The alumni web',
     title: 'Now look behind the list', body: '',
     action: 'Click “View network”.',
     done: '[data-testid="relevance-web"]', skipClick: '[data-testid="view-network"]',
     doneBody: 'Every dot is a Yellow Jacket; closer to the center means more relevant. Every line is two people who actually built something together.' },
-  { as: ELENA, url: '/match', target: '[data-testid="person-panel"] || [data-testid="relevance-web"]', corner: true, who: 'The web',
+  { as: ELENA, url: '/match', target: '[data-testid="person-panel"] || [data-testid="relevance-web"]', corner: true, who: 'The alumni web',
     title: 'Is there a way in?', body: '',
     action: 'Click Dana, the gold-ringed node nearest the center.',
     done: '[data-testid="person-panel"]', skipClick: '[data-testid="relevance-web"] g.node[data-id="person:p005"]',
     doneBody: 'Elena → Diego Park → Dana. Elena already knows someone who worked beside Dana. A warm introduction no one could see before.' },
-  { as: ELENA, url: '/match', target: `${FIRST_PERSON} [role="status"] || ${FIRST_PERSON} [data-testid="invite-form"] || ${FIRST_PERSON} [data-testid="invite-button"]`, prepare: '[data-testid="view-cards"]', who: 'Smart match',
+  { as: ELENA, url: '/match', target: `${FIRST_PERSON} [role="status"] || ${FIRST_PERSON} [data-testid="invite-form"] || ${FIRST_PERSON} [data-testid="invite-button"]`, prepare: '[data-testid="view-cards"]', who: 'Alum finds alum',
     title: 'Reach out', body: '',
     action: 'Click “Invite to connect”, then “Send invite”.',
     done: `${FIRST_PERSON} [role="status"]`, skipClick: `${FIRST_PERSON} [data-testid="invite-button"] && ${FIRST_PERSON} [data-testid="invite-send"]`,
-    doneBody: 'Sent, with the reason attached. Dana can say yes or no.' },
+    doneBody: 'Sent, with the reason attached. Dana decides.' },
 
   { as: ELENA, url: '/stuck', target: '[data-testid="best-match"] || form', who: 'Get Unstuck',
-    title: 'Then her hospital pilot stalls', body: 'A hospital security review has frozen it for weeks. Nobody on her team has done one. She doesn’t need a hire, just someone who has been through it.',
+    title: 'Then her hospital pilot stalls', body: 'A hospital security review has frozen it for weeks, and no one on her team has done one. Someone in the GT network has.',
     action: 'Click “Hospital security review stalled our pilot”.',
     done: '[data-testid="best-match"]', skipUrl: STUCK_SECURITY_Q,
-    doneBody: 'Tara Holloway, an alum founder. Not because “security” is in her title: she got a hospital pilot through this exact review.' },
+    doneBody: 'Tara Holloway, class of ’17, an alum founder who got a hospital pilot through this exact review. Found by the problem she solved, not by her job title.' },
   { as: ELENA, url: '/stuck', target: '[data-testid="matched-problem"] || [data-testid="best-match"]', corner: true, who: 'Get Unstuck',
-    title: 'How did she do it?', body: '',
+    title: 'How did she solve it?', body: '',
     action: 'Click “See how Tara solved it”.',
     done: '[data-testid="matched-problem"]', skipClick: '[data-testid="best-match-why"]',
-    doneBody: 'The fix is on record, with the project it happened on. Elena already knows what worked before she sends a single message.' },
+    doneBody: 'Her fix is on record, with the project it happened on. Elena knows Tara is the right person before she reaches out.' },
   { as: ELENA, url: '/stuck', target: '[data-testid="request-status"] || [data-testid="request-send"] || [data-testid="person-panel"] [data-testid="request-button"]', corner: true, who: 'Get Unstuck',
-    title: 'Ask for 15 minutes', body: '',
-    action: 'Click “Ask Tara for 15 minutes”, then “Send request”.',
+    title: 'Connect with Tara', body: '',
+    action: 'Click “Connect with Tara”, then “Send request”.',
     done: '[data-testid="request-status"]', skipClick: '[data-testid="person-panel"] [data-testid="request-button"] && [data-testid="request-send"]',
-    doneBody: 'Most alumni will never join a startup. Almost all will give 15 minutes on something they already solved. That’s months saved for Elena, and an easy way for alumni to give back.' },
+    doneBody: 'The request goes to Tara with the problem attached.' },
+  { as: TARA, url: '/inbox', target: ELENA_TO_TARA, who: 'Tara’s inbox',
+    title: 'Tara sees a fellow alum stuck where she once was', body: 'She can accept or decline. Nothing is shared until she says yes.',
+    action: 'Click Accept.',
+    done: `${ELENA_TO_TARA}[data-status="accepted"]`, skipClick: `${ELENA_TO_TARA} button`,
+    doneBody: 'Accepted.' },
+  { as: ELENA, url: '/inbox', target: `${TARA_CONNECTED} [data-testid="contact-shared"] || [data-testid="connections"]`, who: 'Connected',
+    title: 'Now they can talk directly', body: 'Because Tara said yes, Elena gets her contact details, and Tara gets Elena’s. Two alumni who had never met are now working the problem together, and that new tie joins the web for the next match.' },
 
-  { as: MAYA, url: '/match', target: `${RESTWELL_MATCH} || [data-testid="mode-startups"]`, who: 'Matching both ways',
-    title: 'Meanwhile, Maya', body: 'A student who built Bluetooth firmware in class. She has never heard of Restwell.',
+  { as: MAYA, url: '/match', target: `${RESTWELL_MATCH} || [data-testid="mode-startups"]`, who: 'Students too',
+    title: 'Meanwhile, Maya, a student', body: 'She built Bluetooth firmware in class and has never heard of Restwell.',
     action: 'Click “Find Your Startup”.',
     done: RESTWELL_MATCH, skipClick: '[data-testid="mode-startups"]',
-    doneBody: 'Restwell, found for her from what she has already built. She didn’t type a word.' },
-  { as: MAYA, url: '/match', target: RESTWELL_MATCH, who: 'Matching both ways',
-    title: 'Maya asks to join', body: '',
-    action: 'Click “Request to join”, then “Send request”.',
-    done: `${RESTWELL_MATCH} [role="status"]`, skipClick: `${RESTWELL_MATCH} [data-testid="collab-button"] && ${RESTWELL_MATCH} .btn-primary`,
-    doneBody: 'Sent to Elena.' },
-  { as: ELENA, url: '/inbox', target: RESTWELL_REQUEST, who: 'Connected',
-    title: 'Elena decides', body: 'The request arrives with the reason attached.',
-    action: 'Click Accept.',
-    done: RESTWELL_ACCEPTED, skipClick: `${RESTWELL_REQUEST} button`,
-    doneBody: 'A student and an alum founder who would never have met are now connected. That tie joins the web, so the next match is smarter.' },
+    doneBody: 'Elena’s startup, found for her from what she has already built. Alumni find each other, and students find the alumni building things they can join.' },
 
   { as: ELENA, url: '/impact', target: '[data-tour="impact"]', who: 'For SGA',
-    title: 'Every connection counts, literally', body: 'Questions answered by alumni, student-to-alum introductions, startups that found help. Live numbers from this demo, ready for an SGA report.' },
+    title: 'Every connection is counted', body: 'Alum-to-alum, student-to-alum, problems solved through the network. Live numbers from this demo, ready for an SGA report.' },
   { as: ELENA, url: '/pilot', target: '[data-tour="pilot-timeline"]', who: 'Next semester',
     title: 'These connections happen at GT today, by luck.',
     body: 'GT Swarm makes them happen on purpose. One opt-in semester with CREATE-X and the Alumni Association (proposed), no university records, and it already runs: you just used it.' },

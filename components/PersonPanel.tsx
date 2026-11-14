@@ -26,7 +26,7 @@ export default function PersonPanel({
   const defaultMsg = () => {
     const proj = viewerProjects.find((p) => p.id === projectId);
     return kind === 'stuck'
-      ? `Hi ${first}, I'm ${viewerName.split(' ')[0]}${proj ? ` from ${proj.name}` : ''}. I'm stuck on "${query}". I saw you solved "${result.matchedProblem?.description ?? 'something similar'}". Could you spare 15 minutes?`
+      ? `Hi ${first}, I'm ${viewerName.split(' ')[0]}${proj ? ` from ${proj.name}` : ''}. I'm working through "${query}" and saw you solved "${result.matchedProblem?.description ?? 'something similar'}". I'd love to connect and hear how you approached it.`
       : `Hi ${first}, I'm ${viewerName.split(' ')[0]}${proj ? ` from ${proj.name}` : ''}. We're looking for ${role === 'Advisor' || role === 'Early engineer' ? 'an' : 'a'} ${role?.toLowerCase()} ("${query}") and your work stood out. Would you be open to a short conversation?`;
   };
   const [message, setMessage] = useState('');
@@ -52,7 +52,7 @@ export default function PersonPanel({
     }
   }
 
-  const ctaLabel = kind === 'stuck' ? `Ask ${first} for 15 minutes` : `Request ${role} conversation`;
+  const ctaLabel = kind === 'stuck' ? `Connect with ${first}` : `Request ${role} conversation`;
   const isAlum = result.type === 'alum';
 
   return (
