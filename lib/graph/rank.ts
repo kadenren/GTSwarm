@@ -41,6 +41,8 @@ export interface RankedPerson {
   aiReason: string | null;
   path: WarmPath | null;
   openTo: Role[];
+  /** The two parts of the work match, each 0..1 for this person's closest record. semantic is null when Gemini is off. */
+  signals: { keyword: number; semantic: number | null };
 }
 export interface RankOutput { query: string; role: Role | null; audience: Audience; mode: SearchMode; matcher: 'gemini' | 'graph'; results: RankedPerson[] }
 
@@ -58,6 +60,8 @@ function candidateSummary(s: Snapshot, p: Person): string {
 }
 
 interface Ctx { s: Snapshot; sims: Map<string, number>; viewerId: string; topDocs: Set<string> }
+/** LLM re-ranking is off unless explicitly enabled: matches and reasons stay deterministic and grounded in records. */
+const llmRerank = () => process.env.GTSWARM_LLM_RERANK === 'true';
 
 function eligible(s: Snapshot, viewerId: string, audience: Audience): Person[] {
   return s.people.filter((p) => p.claimed && p.id !== viewerId && (audience === 'both' || (audience === 'students' ? p.type === 'student' : p.type === 'alum')));
@@ -123,7 +127,7 @@ async function rank(kind: 'expertise' | 'problem', query: string, role: Role | n
   const s = snapshot();
   const q = query.trim();
   if (!q) return { query: q, role, audience, mode: s.searchMode, matcher: 'graph', results: [] };
-  const { sims, mode } = await similarity(q);
+  const { sims, mode, keyword, semantic } = await similarity(q);
   const docs = [...s.projects.map((p) => p.id), ...s.problems.map((p) => p.id)]
     .map((id) => [id, sims.get(id) ?? 0] as const)
     .filter(([, v]) => v > 0)
@@ -167,7 +171,7 @@ async function rank(kind: 'expertise' | 'problem', query: string, role: Role | n
   // Gemini matchmaker: rescore the graph's shortlist by reading each candidate's record against the request
   let matcher: 'gemini' | 'graph' = 'graph';
   const aiReasons = new Map<string, string>();
-  if (geminiEnabled() && opts.ai !== false) {
+  if (geminiEnabled() && llmRerank() && opts.ai !== false) {
     const pool = scored.slice(0, MATCH_POOL).filter((r) => r.eRaw > 0);
     const verdicts = await geminiMatch({ request: q, role: kind === 'problem' ? null : role, kind, candidates: pool.map((r) => ({ id: r.p.id, name: r.p.name, summary: candidateSummary(s, r.p) })) });
     if (verdicts) {
@@ -206,12 +210,15 @@ async function rank(kind: 'expertise' | 'problem', query: string, role: Role | n
       matchedProblem = { id: pb.id, description: pb.description, solution: pb.solution, projectId: pr.id, projectName: pr.name, year: pr.year, credit: problemEv.role === 'helped' ? 'helped' : 'solved' };
     }
     const path = warmPath(viewerId, r.p.id);
+    const docIds = [r.p.id, ...(s.projectsOf.get(r.p.id) ?? []).map((m) => m.project_id), ...(s.problemsBy.get(r.p.id) ?? []).map((pb) => pb.id)];
+    const bestOf = (m: Map<string, number>) => Math.max(0, ...docIds.map((id) => m.get(id) ?? 0));
+    const signals = { keyword: Math.round(bestOf(keyword) * 100) / 100, semantic: semantic ? Math.round(bestOf(semantic) * 100) / 100 : null };
     const description = describeFromEvidence({ s, person: r.p, viewerId, query: q, role: kind === 'problem' ? null : role, lead: leadEv, evidence: r.evidence, ties: r.ties, path, openToRole: r.R === 1 });
     return {
       personId: r.p.id, name: r.p.name, type: r.p.type, label: personLabel(r.p), major: r.p.major, gradYear: r.p.grad_year, currentRole: r.p.current_role,
       score: Math.round(r.score * 1000) / 1000, rank: i + 1, ring: i < 3 ? 1 : i < 7 ? 2 : 3,
       components: r.c, reasons, evidence: r.evidence.slice(0, 5), matchedProblem: kind === 'problem' ? matchedProblem : matchedProblem && problemEv!.sim > 0.4 ? matchedProblem : null,
-      description, path, openTo: r.p.open_to, aiReason: aiReasons.get(r.p.id) ?? null,
+      description, path, openTo: r.p.open_to, aiReason: aiReasons.get(r.p.id) ?? null, signals,
     };
   });
   return { query: q, role, audience, mode, matcher, results };

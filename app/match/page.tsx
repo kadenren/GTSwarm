@@ -18,7 +18,7 @@ export default async function MatchPage({ searchParams }: { searchParams: Promis
   return (
     <>
       <PageHero eyebrow="Find matches" title="Find your people, or find your startup."
-        subtitle="Founders: describe who you need. Students and alumni: see the startups that need what you've built. Every match shows why." />
+        subtitle="Go beyond keywords. GT Swarm connects startup needs with relevant projects, skills and engineering experience across Georgia Tech. Matches combine technical experience, semantic relevance, collaboration preferences and documented Georgia Tech connections." />
       <MatchFinder initialMode={mode} initialQuery={sp.q ?? ''} initialRole={sp.role ?? 'any'} initialAudience={sp.aud ?? 'both'}
         viewer={{ name: me.name, type: me.type, openTo: me.open_to }} viewerProjects={projects} ownedBuilds={ownedBuilds} />
       <HowMatchingWorks />

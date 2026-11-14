@@ -1,14 +1,17 @@
 import { perDb } from './db';
 import { snapshot, type Snapshot } from './data';
 import { embedText, cosine, loadEmbedder } from './embed';
-import { geminiEnabled } from './gemini';
-import { geminiVectors, geminiQueryVector } from './geminiVec';
+import { geminiVectors, geminiQueryVector, semanticEnabled } from './geminiVec';
 
 /**
  * Text similarity over three document kinds: people (bio + skills), projects and solved problems.
- * - semantic mode: cosine similarity of MiniLM embeddings, blended with BM25 so exact technical terms still count
- * - keyword mode (fallback): BM25 alone
- * Similarities are scaled to 0..1 per query.
+ * Hybrid matching:
+ * - Layer A, keyword: BM25 with an engineering thesaurus (always on, works offline)
+ * - Layer B, semantic: Gemini embeddings, used only when enabled, warmed and reachable
+ *   work relevance = (1 - w) * keyword + w * semantic, with w = GTSWARM_SEMANTIC_WEIGHT (default 0.7, chosen by
+ *   scripts/eval-matching.ts: see docs/EVAL.md; 0.3 was the starting point and helped paraphrased queries much less)
+ * - local fallback: MiniLM embeddings when the seed was built with them
+ * Each signal is scaled to 0..1 per query; both are returned so explanations can show them separately.
  */
 
 const STOP = new Set('a an and are as at be by for from has have i in into is it its me my of on or our that the their them this to was we when where which who will with you your need needs looking someone help how what can do does after before during get got too very keep keeps kept just only still even so than then there these those us any all some not no up out over again really'.split(' '));
@@ -105,34 +108,50 @@ function bm25(s: Snapshot, query: string): Map<string, number> {
 
 export type SearchMode = 'gemini' | 'semantic' | 'keyword';
 
+/** Weight of the semantic signal inside the work-match score (the remaining share is keyword relevance). */
+export const semanticWeight = () => {
+  const w = Number(process.env.GTSWARM_SEMANTIC_WEIGHT ?? 0.7);
+  return Number.isFinite(w) ? Math.min(1, Math.max(0, w)) : 0.7;
+};
+
+const median = (xs: number[]) => { const a = [...xs].sort((x, y) => x - y); return a.length ? a[Math.floor(a.length / 2)] : 0; };
+
+export interface Similarity { sims: Map<string, number>; keyword: Map<string, number>; semantic: Map<string, number> | null; mode: SearchMode }
+
 /** Gemini vectors are used once most of the swarm has been embedded (`npm run ai:warm`). */
 function geminiReady(s: Snapshot) {
-  if (!geminiEnabled()) return false;
+  if (!semanticEnabled()) return false;
   const total = s.people.filter((p) => p.claimed).length + s.projects.length + s.problems.length;
   return geminiVectors(s).size >= total * 0.8;
 }
 
-export async function similarity(query: string): Promise<{ sims: Map<string, number>; mode: SearchMode }> {
+export async function similarity(query: string, opts: { semanticWeight?: number } = {}): Promise<Similarity> {
   const s = snapshot();
   const kw = bm25(s, query);
-  if (geminiReady(s)) {
+  const w = opts.semanticWeight ?? semanticWeight();
+  // no query embedding at all when the semantic share is zero, the feature is off, or vectors are not warmed
+  if (w > 0 && geminiReady(s)) {
     const qv = await geminiQueryVector(query);
     if (qv) {
       const vecs = geminiVectors(s);
       const cos = new Map<string, number>();
-      let max = 0, min = 1;
+      let max = -1, min = 1;
       for (const [id, v] of vecs) { const c = cosine(qv, v); cos.set(id, c); if (c > max) max = c; if (c < min) min = c; }
-      // Gemini meaning-based similarity leads; exact terms (part numbers, acronyms) still count a little
+      // scale semantic similarity from the median record (0) to the best record (1): most records are loosely related,
+      // so anchoring at the median keeps "somewhat similar" from looking as strong as a real match
+      const floor = process.env.GTSWARM_SEMANTIC_NORM === 'minmax' ? min : median([...cos.values()]);
+      const sem = new Map<string, number>();
+      for (const [id, c] of cos) sem.set(id, max > floor ? Math.max(0, (c - floor) / (max - floor)) : 0);
       const sims = new Map<string, number>();
-      for (const [id, c] of cos) sims.set(id, 0.8 * (max > min ? (c - min) / (max - min) : 0) + 0.2 * (kw.get(id) ?? 0));
+      for (const [id, v] of sem) sims.set(id, (1 - w) * (kw.get(id) ?? 0) + w * v);
       // records added moments ago may not be embedded yet: score them by keywords so they are still found
       for (const [id, k] of kw) if (!vecs.has(id)) sims.set(id, k);
-      return { sims, mode: 'gemini' };
+      return { sims, keyword: kw, semantic: sem, mode: 'gemini' };
     }
   }
-  if (s.searchMode !== 'semantic') return { sims: kw, mode: 'keyword' };
+  if (s.searchMode !== 'semantic') return { sims: kw, keyword: kw, semantic: null, mode: 'keyword' };
   const qv = await embedText(query);
-  if (!qv) return { sims: kw, mode: 'keyword' };
+  if (!qv) return { sims: kw, keyword: kw, semantic: null, mode: 'keyword' };
   const cos = new Map<string, number>();
   let max = 0;
   const add = (id: string, v: Float32Array | null) => {
@@ -145,8 +164,9 @@ export async function similarity(query: string): Promise<{ sims: Map<string, num
   for (const p of s.projects) add(p.id, p.embedding);
   for (const p of s.problems) add(p.id, p.embedding);
   const sims = new Map<string, number>();
-  for (const [id, c] of cos) sims.set(id, 0.6 * (max > 0 ? c / max : 0) + 0.4 * (kw.get(id) ?? 0));
-  return { sims, mode: 'semantic' };
+  const sem = new Map<string, number>();
+  for (const [id, c] of cos) { sem.set(id, max > 0 ? c / max : 0); sims.set(id, 0.6 * (max > 0 ? c / max : 0) + 0.4 * (kw.get(id) ?? 0)); }
+  return { sims, keyword: kw, semantic: sem, mode: 'semantic' };
 }
 
 export async function currentSearchMode(): Promise<SearchMode> {

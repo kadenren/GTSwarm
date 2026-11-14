@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type { SearchResult } from '@/lib/searchApi';
+import SignalsLine from './SignalsLine';
 
 const COMPONENT_INFO: Record<string, { label: string; weight: number; help: string }> = {
   E: { label: 'Text match', weight: 0.55, help: 'Similarity of your search to their profile, projects and solved problems' },
@@ -98,11 +99,13 @@ export default function PersonPanel({
         <section>
           <h3 className="label">How {first} connects to your search</h3>
           <p className="text-sm leading-relaxed text-ink/90" data-testid="connection-description">{result.description.full}</p>
+          {result.signals && <div className="text-xs"><SignalsLine signals={result.signals} /></div>}
         </section>
 
         {result.path && result.path.hops > 0 && (
           <section>
-            <h3 className="label">Warm path from you ({result.path.hops} {result.path.hops === 1 ? 'hop' : 'hops'})</h3>
+            <h3 className="label">Documented warm path from you ({result.path.hops} {result.path.hops === 1 ? 'hop' : 'hops'})</h3>
+            <p className="mb-1.5 text-[11px] text-ink/55">Built only from shared projects and accepted connections on record.</p>
             <ol className="flex flex-wrap items-center gap-1.5 text-xs">
               {result.path.steps.map((st, i) => (
                 <li key={st.id + i} className="flex items-center gap-1.5">

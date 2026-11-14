@@ -41,7 +41,7 @@ const RESTWELL_REQUEST = `[data-testid="request-received"]:has(a[href="${RESTWEL
 const RESTWELL_ACCEPTED = `[data-testid="request-received"][data-status="accepted"]:has(a[href="${RESTWELL_PAGE}"])`;
 
 /**
- * The judge story in ten steps (about 60 to 90 seconds): discover a startup, Elena finds and invites a cofounder,
+ * The judge story in twelve steps (about 60 to 90 seconds): discover a startup, Elena finds and invites a cofounder,
  * Maya finds Restwell through reverse matching and asks to join, Elena accepts, the introduction is made,
  * and the SGA pilot plan shows how Georgia Tech could run it.
  * The tour opens pages and switches personas itself; the judge does the actions.
@@ -64,7 +64,17 @@ const STEPS: Step[] = [
     title: 'Why Dana?', body: '',
     action: 'Click “Why this match?” on her card.',
     done: `${FIRST_PERSON} [data-testid="why-breakdown"]`, skipClick: `${FIRST_PERSON} button[aria-expanded]`,
-    doneBody: 'Her work fully matches the request, she built the Lumen Band wearable, and she is open to cofounding. Each line comes from her record.' },
+    doneBody: 'Her work fully matches the request, she built the Lumen Band wearable, and she is open to cofounding. Keyword and Gemini semantic relevance are shown separately, and each line comes from her record.' },
+  { as: ELENA, url: '/match', target: '[data-testid="relevance-web"] || [data-testid="view-network"]', corner: true, who: '1 · The web behind the match',
+    title: 'See the network, not just a list', body: '',
+    action: 'Click “View network”.',
+    done: '[data-testid="relevance-web"]', skipClick: '[data-testid="view-network"]',
+    doneBody: 'Closer to the center means more relevant. Lines are documented ties only: people who built together or accepted a connection. Similarity never draws a line.' },
+  { as: ELENA, url: '/match', target: '[data-testid="person-panel"] || [data-testid="relevance-web"]', corner: true, who: '1 · The web behind the match',
+    title: 'How Elena actually reaches Dana', body: '',
+    action: 'Click Dana on the map (the gold-ringed node nearest the center).',
+    done: '[data-testid="person-panel"]', skipClick: '[data-testid="relevance-web"] g.node[data-id="person:p005"]',
+    doneBody: 'Elena → Diego Park → Dana: teammates on real projects. A warm introduction built only from documented ties, with semantic relevance kept separate.' },
   { as: ELENA, url: '/match', target: `${FIRST_PERSON} [role="status"] || ${FIRST_PERSON} [data-testid="invite-form"] || ${FIRST_PERSON} [data-testid="invite-button"]`, prepare: '[data-testid="view-cards"]', who: '1 · Founder → Expertise',
     title: 'Invite Dana', body: '',
     action: 'Click “Invite to connect”, then “Send invite”.',
@@ -90,7 +100,7 @@ const STEPS: Step[] = [
     doneBody: 'Accepted. Adding Maya to the team stays Elena’s choice.' },
   { as: ELENA, url: '/inbox', target: '[data-testid="connections"]', who: 'Introduction made',
     title: 'Elena and Maya are connected',
-    body: 'The introduction is made, and Dana has Elena’s invite waiting. In this demo introductions appear in each person’s inbox; a real deployment would also send an email.' },
+    body: 'The introduction is made, and it adds a new documented line to the knowledge graph for future matches. Dana has Elena’s invite waiting. In this demo introductions appear in each inbox; a real deployment would also send an email.' },
 
   { as: ELENA, url: '/pilot', target: '[data-tour="pilot-timeline"]', who: 'How GT gets this',
     title: 'SGA could pilot this next semester',
@@ -235,7 +245,8 @@ export default function DemoTour({ current }: { current: string }) {
     for (const sel of (s.skipClick ?? '').split(' && ').filter(Boolean)) {
       let el: HTMLElement | null = null;
       for (let i = 0; i < 40 && !(el = document.querySelector<HTMLElement>(sel)); i++) await new Promise((r) => setTimeout(r, 200));
-      el?.click();
+      if (el && typeof el.click === 'function') el.click();
+      else el?.dispatchEvent(new MouseEvent('click', { bubbles: true })); // SVG nodes on the network map
       await new Promise((r) => setTimeout(r, 500));
     }
   }

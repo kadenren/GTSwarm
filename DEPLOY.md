@@ -34,3 +34,25 @@ The public demo runs on **Vercel** (the Next.js app) with **Supabase Postgres** 
 ## Local development
 
 Without `DATABASE_URL` the app uses `data/gtswarm.db` exactly as before: `npm run dev`.
+
+## Gemini hybrid matching (optional)
+
+Matching works with no AI service. To turn on Gemini semantic relevance:
+
+| Variable | Value | Notes |
+|---|---|---|
+| `GEMINI_API_KEY` | your Google AI Studio key | Server-side only; never exposed to the browser |
+| `GTSWARM_SEMANTIC_MATCHING_ENABLED` | `true` | Feature flag. Without it (or without the key) the site is keyword-only, exactly as before |
+| `GTSWARM_SEMANTIC_WEIGHT` | `0.7` (default) | Share of the work-match score from semantic relevance; the rest is keyword relevance |
+| `GTSWARM_SEMANTIC_TIMEOUT_MS` | `3500` (default) | A slower query embedding falls back to keyword matching |
+| `GTSWARM_LLM_RERANK` | unset | Leave unset: the optional Flash re-ranker writes AI reasons, so it is off by default |
+
+Embeddings (`gemini-embedding-001`, 768 dimensions) are computed once, locally, then shipped with the data:
+
+```bash
+npm run ai:warm                     # embeds only new or changed records, caches demo query vectors
+npx tsx scripts/eval-matching.ts    # optional: regenerate docs/EVAL.md
+npx tsx --env-file=.env.deploy.local scripts/db-seed.ts -- --reset-sessions   # copies vectors to Postgres
+```
+
+Add the two variables in Vercel (Project → Settings → Environment Variables, Production), then redeploy.

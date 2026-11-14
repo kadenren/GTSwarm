@@ -12,7 +12,9 @@
 | 2 | Discover | Reads, **Next** | Restwell Patch in the startup feed (no sign-up); you are now Elena, its alum founder |
 | 3 | Founder → Expertise | Fills the example (or types), **Find people** | Dana Whitfield, an alum, ranks first |
 | 4 | Founder → Expertise | **Why this match?** | How her score adds up, from her record |
-| 5 | Founder → Expertise | **Invite to connect → Send invite** | "Sent", reason attached |
+| 5 | The web behind the match | **View network** | Distance = relevance; lines = documented ties only |
+| 6 | The web behind the match | Clicks Dana on the map | Documented warm path: Elena → Diego Park → Dana; keyword vs semantic relevance |
+| 7 | Founder → Expertise | **Invite to connect → Send invite** | "Sent", reason attached |
 | 6 | Builder → Opportunity | As Maya: **Find Your Startup** tab | Restwell recommended from her profile |
 | 7 | Builder → Opportunity | **Request to join → Send request** | "Sent to Elena" |
 | 8 | Consent | As Elena: **Accept** | Accepted; joining the team stays her choice |

@@ -16,21 +16,26 @@ if (fs.existsSync(envFile)) {
   }
 }
 
+const COFOUNDER = "I'm building a wearable medical device startup and need an alumni cofounder with embedded hardware or medical-device expertise.";
 const DEMO: { viewer: string; kind: 'expertise' | 'problem'; q: string; role?: string; audience?: 'students' | 'alumni' | 'both' }[] = [
-  { viewer: 'person:p001', kind: 'expertise', q: 'low-power embedded hardware, has shipped a product', role: 'Cofounder' },
-  { viewer: 'person:p001', kind: 'problem', q: 'Bluetooth drops when the sensor sleeps' },
-  { viewer: 'person:p001', kind: 'problem', q: 'BLE connection drops when the device enters sleep mode' },
-  { viewer: 'person:p001', kind: 'problem', q: 'BLE connection drops when the device enters sleep mode (nRF52 / Zephyr firmware)' },
-  { viewer: 'person:p001', kind: 'problem', q: 'We need an advisor who has been through FDA clearance for a wearable' },
-  { viewer: 'person:p001', kind: 'expertise', q: 'BLE firmware that stays connected through sleep, medical wearable', role: 'Advisor', audience: 'alumni' },
-  { viewer: 'person:p008', kind: 'expertise', q: 'FDA approval for a wearable medical device', role: 'Advisor' },
-  { viewer: 'person:p008', kind: 'expertise', q: 'wearable firmware', role: 'Early engineer', audience: 'students' },
+  // guided demo and Find Your People examples
+  { viewer: 'person:p008', kind: 'expertise', q: COFOUNDER, role: 'Cofounder', audience: 'alumni' },
+  { viewer: 'person:p008', kind: 'expertise', q: 'I need an engineer who has built a low-power wearable that transmits health data wirelessly.', role: 'Early engineer', audience: 'both' },
+  { viewer: 'person:p008', kind: 'expertise', q: 'wearable firmware engineer', role: 'Early engineer', audience: 'students' },
+  { viewer: 'person:p008', kind: 'expertise', q: 'robotics technical cofounder', role: 'Cofounder', audience: 'both' },
+  // Get Unstuck examples
+  { viewer: 'person:p008', kind: 'problem', q: 'Bluetooth disconnects when the microcontroller enters sleep mode' },
+  { viewer: 'person:p008', kind: 'problem', q: 'Our wearable loses Bluetooth connection whenever the microcontroller goes into sleep mode.' },
+  { viewer: 'person:p008', kind: 'problem', q: 'Hospital IT security review stalled our pilot' },
+  { viewer: 'person:p008', kind: 'problem', q: 'Investors want clinical evidence before our pre-seed round' },
+  { viewer: 'person:p008', kind: 'problem', q: 'Splitting equity with a cofounder who joined late' },
+  { viewer: 'person:p008', kind: 'problem', q: 'Preparing an FDA 510(k) submission for a wearable' },
 ];
 
 (async () => {
-  const { geminiEnabled } = await import('../lib/gemini');
-  if (!geminiEnabled()) {
-    console.log('GEMINI_API_KEY is not set in .env.local, so there is nothing to warm. Matching keeps using the built-in graph search.');
+  const { semanticEnabled } = await import('../lib/geminiVec');
+  if (!semanticEnabled()) {
+    console.log('Semantic matching is off (needs GEMINI_API_KEY and GTSWARM_SEMANTIC_MATCHING_ENABLED=true in .env.local). Matching keeps using keyword search.');
     return;
   }
   const { snapshot } = await import('../lib/data');
@@ -40,13 +45,19 @@ const DEMO: { viewer: string; kind: 'expertise' | 'problem'; q: string; role?: s
   console.log(n ? `\n  ${n} records embedded.` : '  Already up to date.');
 
   const { rankForExpertise, rankForProblem } = await import('../lib/graph/rank');
-  console.log('Pre-running demo searches (query vectors + Gemini matchmaker):');
+  console.log('Pre-running demo searches so their query vectors are cached:');
   for (const d of DEMO) {
     const out = d.kind === 'problem'
       ? await rankForProblem(d.q, d.viewer, d.audience ?? 'both')
       : await rankForExpertise(d.q, d.role as never, d.viewer, d.audience ?? 'both');
     const top = out.results.slice(0, 3).map((r) => r.name).join(', ');
     console.log(`  [${out.mode}/${out.matcher}] "${d.q}" -> ${top}`);
+  }
+  // Find Your Startup embeds each builder's profile as the query: warm the demo personas
+  const { recommendBuilds } = await import('../lib/matching');
+  for (const id of ['person:p010', 'person:p008', 'person:p005']) {
+    const m = await recommendBuilds({ viewerId: id, personId: id, requireRoles: true, limit: 9 });
+    console.log(`  [startups] ${id} -> ${m.slice(0, 3).map((x) => x.build.name).join(', ')}`);
   }
   console.log('Done. Restart the dev server if it was running before you added the key.');
 })().catch((e) => { console.error(e); process.exit(1); });

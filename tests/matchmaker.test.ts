@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeAll } from 'vitest';
+import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 
 // Stand in for the Gemini API: the matchmaker prefers Tom Brennan, to prove its verdicts drive the order.
 vi.mock('@/lib/gemini', async (orig) => {
@@ -13,14 +13,23 @@ vi.mock('@/lib/gemini', async (orig) => {
   };
 });
 // no embeddings in tests: keep the keyword similarity path
-vi.mock('@/lib/geminiVec', () => ({ geminiVectors: () => new Map(), geminiQueryVector: async () => null, embedNewInBackground: () => undefined }));
+vi.mock('@/lib/geminiVec', () => ({ semanticEnabled: () => false, geminiVectors: () => new Map(), geminiQueryVector: async () => null, embedNewInBackground: () => undefined }));
 
 import { resetFromSeed } from '@/lib/db';
 import { rankForExpertise } from '@/lib/graph/rank';
 import { byName } from './helpers';
 
 describe('Gemini matchmaker integration', () => {
-  beforeAll(() => resetFromSeed());
+  beforeAll(() => { resetFromSeed(); process.env.GTSWARM_LLM_RERANK = 'true'; });
+  afterAll(() => { delete process.env.GTSWARM_LLM_RERANK; });
+
+  it('is off by default: without GTSWARM_LLM_RERANK the ranking stays deterministic', async () => {
+    delete process.env.GTSWARM_LLM_RERANK;
+    const out = await rankForExpertise('low-power embedded hardware, has shipped a product', 'Cofounder', byName('Leo Martinez'));
+    expect(out.matcher).toBe('graph');
+    expect(out.results.every((r) => r.aiReason === null)).toBe(true);
+    process.env.GTSWARM_LLM_RERANK = 'true';
+  });
 
   it('reorders the shortlist by Gemini fit and attaches its reasons', async () => {
     const out = await rankForExpertise('low-power embedded hardware, has shipped a product', 'Cofounder', byName('Leo Martinez'));

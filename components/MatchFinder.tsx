@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import RelevanceWeb, { WebLegend, type WebNode } from './RelevanceWeb';
 import PersonPanel, { type ViewerProject } from './PersonPanel';
+import SignalsLine from './SignalsLine';
 import BuildCardView from './BuildCard';
 import { MATCH_ROLES, roleLabel } from '@/lib/roles';
 import type { SearchResponse, SearchResult } from '@/lib/searchApi';
@@ -14,12 +15,13 @@ interface Viewer { name: string; type: 'student' | 'alum'; openTo: string[] }
 interface OwnedBuild { id: string; name: string }
 
 const AUDIENCES = [{ v: 'both', l: 'Both' }, { v: 'students', l: 'Students' }, { v: 'alumni', l: 'Alumni' }] as const;
-const COMPONENTS: Record<string, string> = { E: 'Work matches your request', X: 'Documented experience', T: 'Shared GT ties', R: 'Open to the role', A: 'Availability' };
+const COMPONENTS: Record<string, string> = { E: 'Work match (keyword + semantic)', X: 'Documented experience', T: 'Shared GT ties', R: 'Open to the role', A: 'Availability' };
 const WEIGHT: Record<string, number> = { E: 0.55, X: 0.2, T: 0.1, R: 0.1, A: 0.05 };
 /** One-click examples: each fills the text and sets the role and audience it is about (nothing is searched until you click). */
 const PEOPLE_EXAMPLES = [
   { label: 'Alumni cofounder for a medical wearable', text: "I'm building a wearable medical device startup and need an alumni cofounder with embedded hardware or medical-device expertise.", role: 'Cofounder', aud: 'alumni' },
   { label: 'Student firmware engineer', text: 'wearable firmware engineer', role: 'Early engineer', aud: 'students' },
+  { label: 'Plain words: low-power wearable that sends health data', text: 'I need an engineer who has built a low-power wearable that transmits health data wirelessly.', role: 'Early engineer', aud: 'both' },
   { label: 'Robotics technical cofounder', text: "I'm building an autonomous robotics startup and need a technical cofounder experienced in ROS 2, embedded systems, and navigation.", role: 'Cofounder', aud: 'both' },
 ];
 const STARTUP_EXAMPLE = "I'm a computer engineering student interested in embedded systems, wearable devices, and early-stage hardware startups.";
@@ -140,6 +142,7 @@ function PeopleResults({ data, viewer, viewerProjects, ownedBuilds }: { data: Se
         <div>
           <h2 className="text-2xl font-bold text-navy">{relevant.length} {relevant.length === 1 ? 'person' : 'people'} who fit</h2>
           <p className="text-sm text-ink/60">Ranked by what they have actually built and solved{data.role ? `, among people open to ${roleLabel(data.role).toLowerCase()} roles` : ''}. Every reason comes from their record.</p>
+          <p className="mt-0.5 text-xs text-ink/50" data-testid="match-mode">{data.mode === 'gemini' ? 'Hybrid matching: keyword relevance plus Gemini semantic relevance, inside role and availability rules.' : 'Keyword matching (semantic matching is off or unavailable right now).'}</p>
         </div>
         <div className="flex rounded-lg border border-navy/15 bg-white p-0.5" role="tablist" aria-label="Result view">
           {([['cards', 'Matches'], ['network', 'View network']] as const).map(([v, l]) => (
@@ -215,6 +218,7 @@ function PersonMatchCard({ r, role, query, viewer, ownedBuilds }: { r: SearchRes
               </li>
             ))}
           </ul>
+          <SignalsLine signals={r.signals} />
           <ul className="mt-2 space-y-0.5 text-ink/70">{r.reasons.slice(0, 4).map((x) => <li key={x}>· {x}</li>)}</ul>
         </div>
       )}
@@ -287,3 +291,4 @@ function StartupResults({ data, viewer }: { data: { usedProfile: boolean; matche
     </section>
   );
 }
+

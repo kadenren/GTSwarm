@@ -58,6 +58,7 @@ export const PRIVACY = [
 
 export const REAL = [
   'Two-way matching engine with an explanation for every match',
+  'Hybrid matching: keyword relevance plus Gemini semantic embeddings, with keyword fallback',
   'Knowledge graph of people, projects, skills and solved problems',
   'Resume and document reading that drafts profiles and startups',
   'Consent-based invites, requests and inbox',
@@ -69,5 +70,4 @@ export const SIMULATED = [
   'Every person, startup and outcome is fictional',
   'The “Viewing as” switcher stands in for gatech.edu sign-in',
   'Requests appear in the in-app inbox; no email is sent',
-  'Gemini embeddings are optional and turned off on this site',
 ] as const;

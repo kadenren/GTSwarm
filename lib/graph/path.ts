@@ -30,13 +30,20 @@ function via(s: Snapshot, a: string, b: string): string | undefined {
   return undefined;
 }
 
+/** Shortest documented introduction path from the viewer to someone (null if there is none). */
 export function warmPath(viewerId: string, targetId: string): WarmPath | null {
   const s = snapshot();
   const graph = getGraph();
   if (!graph.hasNode(viewerId) || !graph.hasNode(targetId)) return null;
   if (viewerId === targetId) return { ids: [viewerId], steps: [stepLabel(s, viewerId, viewerId)], hops: 0, text: 'You' };
-  const ids = bidirectional(graph, viewerId, targetId, 'weight');
-  if (!ids) return null;
+  // an introduction path may only use documented ties (shared projects, solved problems, accepted connections);
+  // a shared skill is a similarity, not a relationship, so skill nodes are never part of a warm path
+  const isDocumented = (id: string) => /^(person|project|problem):/.test(id);
+  const ids = bidirectional(graph, viewerId, targetId, (edge, attr) => {
+    const [a, b] = graph.extremities(edge);
+    return isDocumented(a) && isDocumented(b) ? Number(attr.weight ?? 1) : Infinity;
+  });
+  if (!ids || !ids.every(isDocumented)) return null;
   const steps = ids.map((id, i) => ({ ...stepLabel(s, id, viewerId), via: i > 0 ? via(s, ids[i - 1], id) : undefined }));
   const text = steps
     .map((st, i) => (i === 0 ? st.label : st.via?.startsWith('continued') ? `${st.via} ${st.label}` : st.via ? `${st.label} (${st.via})` : st.label))

@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 /** The matching factors as they are actually scored (lib/graph/rank.ts and lib/matching.ts), in plain words. */
 const FACTORS = [
-  { t: 'Project and experience match', w: '55%', d: 'Your request is compared with each person’s projects, bio and the problems they solved.' },
+  { t: 'Project and experience match', w: '55%', d: 'Your request is compared with each person’s projects, bio and solved problems: 30% keyword relevance (exact terms like BLE or nRF52) and 70% Gemini semantic relevance (the same work described in different words). We picked the split by testing 15 queries with hand-written relevance judgments.' },
   { t: 'Documented experience', w: '20%', d: 'How much of their record sits among the closest projects and solved problems.' },
   { t: 'Skill relevance', w: 'shown', d: 'Skills you asked for that are on their record are highlighted on every card.' },
   { t: 'Role eligibility', w: 'filter + 10%', d: 'Pick a role and only people open to it are ranked. No one is shown for a role they did not choose.' },
@@ -60,7 +60,7 @@ export default function HowMatchingWorks() {
           </figure>
         </div>
         <p className="mt-6 text-xs text-ink/55">
-          Matching runs on the graph plus keyword search and works without any AI service. Gemini embeddings are an optional add-on and are turned off on the public demo. <Link href="/stuck" className="font-semibold text-navy underline decoration-gold underline-offset-4">Get Unstuck</Link> uses the same graph to find who solved a problem.
+          Gemini embeddings (gemini-embedding-001) are precomputed once per record and cached; a search embeds only the query. If Gemini is slow or unavailable, matching falls back to keyword search within a few seconds, and nothing else changes. Semantic similarity never draws a connection line and is never treated as proof of a skill. <Link href="/stuck" className="font-semibold text-navy underline decoration-gold underline-offset-4">Get Unstuck</Link> uses the same graph to find who solved a problem.
         </p>
       </div>
     </section>
