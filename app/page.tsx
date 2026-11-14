@@ -46,11 +46,7 @@ export default async function Home() {
       <section className="relative overflow-hidden bg-navy text-white">
         <HeroPattern opacity={0.1} />
         <div className="relative mx-auto max-w-7xl px-4 pb-12 pt-12 sm:pt-14">
-          <p className="inline-flex flex-wrap items-center gap-x-2 rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-xs font-semibold text-gold-light">
-            <span className="uppercase tracking-[0.16em] text-gold">Campus Solutions proposal</span>
-            <span className="text-white/70">Designed for SGA to run, alongside CREATE-X and other GT programs</span>
-          </p>
-          <h1 className="mt-3 max-w-4xl text-4xl font-bold leading-[1.06] tracking-tight sm:text-[3.4rem]">
+          <h1 className="max-w-4xl text-4xl font-bold leading-[1.06] tracking-tight sm:text-[3.4rem]">
             Georgia Tech has the talent. <span className="text-gold">GT Swarm makes the connections.</span>
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/80">
