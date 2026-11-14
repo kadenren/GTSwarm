@@ -39,11 +39,22 @@ export function pg(): postgres.Sql {
   return g.__gtPg;
 }
 
+/** Fail fast with a clear error instead of letting a stuck connection run into the platform timeout. */
+function withTimeout<T>(work: Promise<T>, ms: number, what: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout>;
+  return Promise.race([work, new Promise<T>((_, reject) => { timer = setTimeout(() => reject(new Error(`${what} took longer than ${ms / 1000}s`)), ms); })]).finally(() => clearTimeout(timer));
+}
+
 /** All rows of every dataset table. */
 export async function loadDataset(): Promise<Record<string, Record<string, unknown>[]>> {
   const sql = pg();
   const out: Record<string, Record<string, unknown>[]> = {};
-  await Promise.all(DATA_TABLES.map(async (t) => { out[t] = await sql.unsafe(`SELECT * FROM ${PG_SCHEMA}.${t}`); }));
+  // One query in flight per connection: Supabase's transaction pooler stalls when many queries are pipelined at once.
+  const queue: string[] = [...DATA_TABLES];
+  const work = Promise.all([0, 1, 2].map(async () => {
+    for (let t = queue.shift(); t; t = queue.shift()) out[t] = await sql.unsafe(`SELECT * FROM ${PG_SCHEMA}.${t}`);
+  }));
+  await withTimeout(work, 25000, 'Loading the demo dataset from Postgres');
   return out;
 }
 
@@ -52,7 +63,7 @@ const encode = (v: unknown): unknown => (Buffer.isBuffer(v) ? { $b64: v.toString
 const decode = (v: unknown): unknown => (v && typeof v === 'object' && !Array.isArray(v) && '$b64' in (v as object) ? Buffer.from((v as { $b64: string }).$b64, 'base64') : Array.isArray(v) ? v.map(decode) : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, decode(x)])) : v);
 
 export async function fetchOps(sessionId: string): Promise<Op[]> {
-  const rows = await pg()<{ id: string; sql: string; params: unknown[] }[]>`SELECT id, sql, params FROM gts.session_ops WHERE session_id = ${sessionId} ORDER BY id`;
+  const rows = await withTimeout(pg()<{ id: string; sql: string; params: unknown[] }[]>`SELECT id, sql, params FROM gts.session_ops WHERE session_id = ${sessionId} ORDER BY id`, 10000, 'Loading this demo session');
   return rows.map((r) => ({ id: Number(r.id), sql: r.sql, params: decode(r.params) as unknown[] }));
 }
 
