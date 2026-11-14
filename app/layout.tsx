@@ -25,6 +25,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     { href: '/circles', label: 'Circles' },
     { href: '/graph', label: 'Network' },
     { href: '/impact', label: 'Impact' },
+    { href: '/add', label: 'Add project' },
     { href: '/inbox', label: 'Inbox', badge: pending },
   ];
   return (

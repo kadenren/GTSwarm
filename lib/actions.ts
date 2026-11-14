@@ -144,3 +144,39 @@ export function confirmMilestone(milestoneId: string, viewerId: string) {
   db.prepare('UPDATE milestones SET confirmed_by = ? WHERE id = ?').run(viewerId, milestoneId);
   bumpDataVersion();
 }
+
+/** Save a confirmed project: the viewer becomes a builder (founder for startups); skills, problems and embeddings join the graph. */
+export async function createProject(viewerId: string, input: { name: string; year: number; team_type: string; team_name: string; summary: string; technologies: string[]; problems: { description: string; solution: string }[] }) {
+  const db = getDb();
+  const name = input.name.trim(), summary = input.summary.trim();
+  const TYPES = ['VIP', 'Capstone', 'CREATE-X', 'Lab', 'Club', 'Invention Studio', 'Startup'];
+  if (name.length < 2 || summary.length < 10) throw new ActionError('Add a name and a one-sentence summary.');
+  if (!TYPES.includes(input.team_type)) throw new ActionError('Pick a team type.');
+  const year = Math.min(2030, Math.max(2000, Math.round(input.year)));
+  const techs = [...new Set(input.technologies.map((t) => t.trim()).filter(Boolean))].slice(0, 12);
+  const problems = input.problems.filter((p) => p.description.trim().length > 4 && p.solution.trim().length > 4).slice(0, 6);
+  const isStartup = input.team_type === 'Startup' || input.team_type === 'CREATE-X';
+  const semantic = snapshot().searchMode === 'semantic';
+  const pVec = semantic ? await embedText(`${name}. ${summary} Technologies: ${techs.join(', ')}.`) : null;
+  const probVecs = semantic ? await Promise.all(problems.map((p) => embedText(`${p.description}. ${p.solution}`))) : [];
+  const id = nextId('projects', 'project:pr');
+  db.transaction(() => {
+    db.prepare('INSERT INTO projects (id, name, year, team_type, team_name, summary, technologies, outcome, is_startup, continued_from, embedding) VALUES (?,?,?,?,?,?,?,NULL,?,NULL,?)')
+      .run(id, name, year, input.team_type, input.team_name.trim() || input.team_type, summary, JSON.stringify(techs), isStartup ? 1 : 0, pVec ? toBlob(pVec) : null);
+    db.prepare('INSERT INTO person_project (person_id, project_id, role, title) VALUES (?,?,?,?)').run(viewerId, id, isStartup ? 'founder' : 'builder', isStartup ? 'Founder' : null);
+    for (const t of techs) {
+      let skill = db.prepare('SELECT id FROM skills WHERE lower(name) = lower(?)').get(t) as { id: string } | undefined;
+      if (!skill) { skill = { id: nextId('skills', 'skill:s') }; db.prepare('INSERT INTO skills (id, name) VALUES (?,?)').run(skill.id, t); }
+      db.prepare('INSERT OR IGNORE INTO project_skill VALUES (?,?)').run(id, skill.id);
+      db.prepare('INSERT OR IGNORE INTO person_skill VALUES (?,?)').run(viewerId, skill.id);
+    }
+    problems.forEach((p, i) => {
+      const pid = nextId('problems', 'problem:pb');
+      const v = probVecs[i];
+      db.prepare('INSERT INTO problems (id, project_id, description, solution, solved_by, helper_id, created_at, embedding) VALUES (?,?,?,?,?,NULL,?,?)')
+        .run(pid, id, p.description.trim(), p.solution.trim(), viewerId, now(), v ? toBlob(v) : null);
+    });
+  })();
+  bumpDataVersion();
+  return { id };
+}
