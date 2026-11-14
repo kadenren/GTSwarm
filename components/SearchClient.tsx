@@ -32,7 +32,7 @@ export default function SearchClient({
   const [data, setData] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<'web' | 'list'>('list');
+  const [view, setView] = useState<'web' | 'list'>(kind === 'stuck' ? 'web' : 'list'); // Get Unstuck opens on the connection map
   const [showAll, setShowAll] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -88,7 +88,7 @@ export default function SearchClient({
             <input id="q" className="input flex-1 text-base" value={q} onChange={(e) => setQ(e.target.value)} placeholder="A skill or experience, for example: low-power embedded hardware, has shipped a product" />
           )}
           <button type="submit" className="btn-primary px-6 text-base" disabled={loading || !q.trim()}>
-            {loading ? 'Searching…' : kind === 'stuck' ? 'Find who solved it' : 'Search'}
+            {loading ? 'Searching…' : kind === 'stuck' ? 'Find who can help' : 'Search'}
           </button>
         </div>
 
@@ -135,8 +135,8 @@ export default function SearchClient({
         <section className="mt-6 grid gap-4 md:grid-cols-3" aria-label="How Get Unstuck works" data-testid="stuck-how">
           {[
             ['1', 'Describe the problem', 'Plain words are fine: a bug, a security review, a fundraising question.'],
-            ['2', 'See who solved it, and how', 'Students and alumni are ranked on problems they actually solved on GT projects, with the fix on record.'],
-            ['3', 'Connect with them', 'Your request goes to their inbox with the problem attached. If they accept, you are connected and can contact each other directly.'],
+            ['2', 'See who can help, and why', 'Alumni and students are ranked on relevant experience from their record: projects, roles and problems they have worked through.'],
+            ['3', 'Use the map, then connect', 'See how you are connected to each person through people you already know, then reach out. If they accept, you can contact each other directly.'],
           ].map(([n, t, d]) => (
             <div key={n} className="card flex gap-4 p-5">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold font-display font-bold text-navy-900">{n}</span>
@@ -177,12 +177,12 @@ export default function SearchClient({
               {data.results[0].name.split(' ').map((w) => w[0]).join('')}
             </span>
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-gold-dark">{kind === 'stuck' ? 'Solved this before' : 'Best match'}</div>
+              <div className="text-[11px] font-semibold uppercase tracking-wide text-gold-dark">{kind === 'stuck' ? 'Best placed to help' : 'Best match'}</div>
               <div className="font-display text-lg font-bold text-navy">{data.results[0].name} <span className="text-sm font-medium text-ink/55">{data.results[0].label.replace(/^[^,]+,\s*/, '')}</span></div>
-              <div className="text-sm text-ink/70">{kind === 'stuck' && data.results[0].matchedProblem ? `“${data.results[0].matchedProblem.description}” on ${data.results[0].matchedProblem.projectName} (${data.results[0].matchedProblem.year})` : data.results[0].description.short.split(' · ')[0]}{data.results[0].path ? ` · ${data.results[0].path.hops} ${data.results[0].path.hops === 1 ? 'hop' : 'hops'} from you` : ''}</div>
+              <div className="text-sm text-ink/70">{kind === 'stuck' && data.results[0].matchedProblem ? `Worked through “${data.results[0].matchedProblem.description}” on ${data.results[0].matchedProblem.projectName} (${data.results[0].matchedProblem.year})` : data.results[0].description.short.split(' · ')[0]}{data.results[0].path ? ` · ${data.results[0].path.hops} ${data.results[0].path.hops === 1 ? 'hop' : 'hops'} from you` : ''}</div>
             </div>
           </div>
-          <button className="btn-gold" data-testid="best-match-why" onClick={() => setSelected(data.results[0].personId)}>{kind === 'stuck' ? `See how ${data.results[0].name.split(' ')[0]} solved it` : `See why ${data.results[0].name.split(' ')[0]} matched`}</button>
+          <button className="btn-gold" data-testid="best-match-why" onClick={() => setSelected(data.results[0].personId)}>{kind === 'stuck' ? `See why ${data.results[0].name.split(' ')[0]} can help` : `See why ${data.results[0].name.split(' ')[0]} matched`}</button>
         </div>
       )}
 
@@ -190,7 +190,7 @@ export default function SearchClient({
         <div className="card mt-6 p-10 text-center">
           <h2 className="text-xl font-bold text-navy">No matches yet</h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-ink/70">
-            Nobody on GT Swarm has solved something close to &ldquo;{data.query}&rdquo;{data.audience !== 'both' ? ` among ${data.audience}` : ''}. Try broader words, switch to Both, or log what you learn on your project page so the next builder can find it.
+            Nobody on GT Swarm has experience close to &ldquo;{data.query}&rdquo; yet{data.audience !== 'both' ? ` among ${data.audience}` : ''}. Try broader words, switch to Both, or log what you learn on your project page so the next builder can find it.
           </p>
         </div>
       )}
@@ -201,10 +201,10 @@ export default function SearchClient({
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h2 className="text-lg font-bold text-navy">
-                  {(() => { const n = data.results.filter((r) => r.relevant).length; return `${n} ${n === 1 ? 'person has' : 'people have'} solved something close to "${data.query}"`; })()}
+                  {(() => { const n = data.results.filter((r) => r.relevant).length; return kind === 'stuck' ? `People who can help with "${data.query}"` : `${n} ${n === 1 ? 'person has' : 'people have'} relevant experience for "${data.query}"`; })()}
                 </h2>
                 <p className="text-xs text-ink/60">
-                  {view === 'list' ? 'Ranked by the problems they solved and the work they did. Click a person to see how they solved it.' : 'Closer to the center means a closer match. Click a person to see how they solved it.'}
+                  {view === 'list' ? 'Ranked by relevant experience from their record. Click a person to see why they can help and how you are connected.' : 'Closer to the center means more relevant experience. Lines are people who built together. Click a person to see why they can help and how you are connected.'}
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -242,7 +242,7 @@ export default function SearchClient({
                           <div className="text-xs text-ink/60">{r.type === 'alum' ? `Alum '${String(r.gradYear).slice(2)}` : 'Student'}{r.currentRole && r.type === 'alum' ? ` · ${r.currentRole}` : ''}</div>
                         </div>
                       </div>
-                      <p className="mt-2 text-sm leading-snug text-ink/85">{r.matchedProblem ? `Solved “${r.matchedProblem.description}” on ${r.matchedProblem.projectName} (${r.matchedProblem.year})` : r.description.short.split(' · ')[0]}</p>
+                      <p className="mt-2 text-sm leading-snug text-ink/85">{r.matchedProblem ? `Worked through “${r.matchedProblem.description}” on ${r.matchedProblem.projectName} (${r.matchedProblem.year})` : r.description.short.split(' · ')[0]}</p>
                     </button>
                   </li>
                 ))}

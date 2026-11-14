@@ -7,7 +7,7 @@ export const VIEWERS = [
   { id: 'person:p008', label: 'Elena Brooks', sub: 'Alumni founder (demo)' },
   { id: 'person:p010', label: 'Maya Okafor', sub: 'Student looking for startups (demo)' },
   { id: 'person:p005', label: 'Dana Whitfield', sub: 'Alumni cofounder candidate (demo)' },
-  { id: 'person:p223', label: 'Tara Holloway', sub: 'Alumni founder who solved a hospital security review (demo)' },
+  { id: 'person:p007', label: 'Priya Natarajan', sub: 'Alum in medical device regulatory affairs (demo)' },
 ] as const;
 export const DEFAULT_VIEWER = VIEWERS[0].id;
 export const VIEWER_COOKIE = 'gtswarm_viewer';

@@ -36,8 +36,8 @@ export default async function ImpactPage() {
         </dl>
 
         <section aria-label="Alumni engagement">
-          <h2 className="text-2xl font-bold text-navy">Alumni who already solved it, found and connected</h2>
-          <p className="mt-1 max-w-2xl text-sm text-ink/70">Get Unstuck finds the alumni who have been through the exact problem a founder or student is facing, so they can connect and work through it together.</p>
+          <h2 className="text-2xl font-bold text-navy">Alumni who can help, found and connected</h2>
+          <p className="mt-1 max-w-2xl text-sm text-ink/70">Get Unstuck finds the alumni whose record and experience fit the problem a founder or student is facing, and maps how they are connected, so they can reach out and work through it together.</p>
           <dl className="mt-4 grid gap-4 sm:grid-cols-3" data-tour="impact">
             {engagement.map(([n, l]) => (
               <div key={l} className="card p-5" data-testid="engagement-tile">

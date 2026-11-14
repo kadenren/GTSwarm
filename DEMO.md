@@ -4,7 +4,7 @@
 
 **Who runs it:** the Student Government Association, as a one-semester opt-in pilot, with CREATE-X, Startup Exchange, the Alumni Association and project courses bringing people in (proposed; no existing partnership). Details at `/pilot`.
 
-**The point to land:** Georgia Tech already has the people and the answers startups need, but founders, alumni and students can't see each other, so connections happen by luck. GT Swarm learns what each person has built and solved, matches them in both directions with reasons, and turns matches into real, consented connections. Connection is not only hiring: when a founder hits a wall (a bug, a hospital security review, a fundraising question), GT Swarm finds the alum or student who already solved it, so they can connect and share contact details once both say yes.
+**The point to land:** Georgia Tech already has the people and the answers startups need, but founders, alumni and students can't see each other, so connections happen by luck. GT Swarm learns what each person has built and solved, matches them in both directions with reasons, and turns matches into real, consented connections. Connection is not only hiring: when a founder hits a wall (a bug, a hospital security review, a fundraising question), GT Swarm finds the alumni and students whose record and experience can help, maps how you're connected to them, and shares contact details once both say yes.
 
 The demo shows instead of explains: every step is a moment that can't happen at Georgia Tech today. The case for adopting it comes only at the end.
 
@@ -16,11 +16,11 @@ The demo shows instead of explains: every step is a moment that can't happen at 
 | 4 | The alumni web | **View network** | Closer = more relevant; lines = people who built together |
 | 5 | Is there a way in? | Click Dana on the map | Elena → Diego Park → Dana: a warm introduction |
 | 6 | Reach out | **Invite to connect → Send invite** | Sent with the reason; Dana decides |
-| 7 | Get Unstuck | Example problem | Tara ('17), the alum who already got a hospital pilot through the same security review |
-| 8 | How did she solve it? | **See how Tara solved it** | Her fix, on record, with the project it happened on |
-| 9 | Connect with Tara | **Connect with Tara → Send request** | Request goes to Tara with the problem attached |
-| 10 | Tara's inbox | As Tara: **Accept** | Nothing is shared until she says yes |
-| 11 | Connected | **Next** | Elena now sees Tara's contact details (and Tara sees Elena's): they can talk directly |
+| 7 | Get Unstuck | Example "FDA 510(k) for a wearable" | A connection map of who can help, ranked on their record and experience |
+| 8 | Who can help, and how is she connected? | Click Priya on the map | Priya ('11), VP of Regulatory Affairs, worked through a wearable 510(k); Elena reaches her through Diego Park |
+| 9 | Connect with Priya | **Connect with Priya → Send request** | Request goes to Priya with the problem attached |
+| 10 | Priya's inbox | As Priya: **Accept** | Nothing is shared until she says yes |
+| 11 | Connected | **Next** | Elena sees Priya's contact details (and Priya sees Elena's): they can talk directly |
 | 12 | Students too | As Maya: **Find Your Startup** | Elena's startup, matched to a student from what she has built |
 | 13 | For SGA | **Next** | Impact for GT: alum-to-alum and student-to-alum connections counted live |
 | 14 | Next semester | **Finish** | "These connections happen at GT today, by luck. GT Swarm makes them happen on purpose." |
@@ -32,7 +32,7 @@ The tour opens pages and switches personas itself (about two minutes). Every act
 ## Optional extras
 - **Why this match?** on a person card shows how the score adds up.
 - **My Profile**: interests (exploring, cofounders, joining, advising, collaborating, investing), roles open to, hours, and the startups you own.
-- **Get Unstuck** (top bar) has example problems across engineering, security, fundraising, equity and FDA. Each finds the person who solved it, with the fix.
+- **Get Unstuck** (top bar) has example problems across engineering, security, fundraising, equity and FDA. Each maps the people who can help, based on their record and experience, and how you are connected to them.
 - **Startup pages**: what the team needs, recommended people with Invite, solved problems, and **Add a solved problem**, which is how problems get into Get Unstuck.
 - Footer links: **Post a startup** and **Join GT Swarm** (fill a startup or profile from a resume, report or poster) and **Impact for GT**.
 
@@ -49,7 +49,7 @@ The tour opens pages and switches personas itself (about two minutes). Every act
 - **People are honest about roles and availability.** Willingness to cofound or advise is self-reported, and it gates who appears for that role.
 - **One office could run it.** It is one web app and one database, with an optional Gemini key for meaning-based search and document reading. Matching works without it.
 - **Students use it at specific moments:** looking for a team or startup, needing an advisor or engineer, or stuck on a problem, not as a daily feed.
-- **Alumni help alumni with what they've already solved.** Get Unstuck finds the alumni who have been through a specific problem; once they accept a request, both people see each other's contact details and can work through it directly.
+- **Alumni help alumni with what they've already solved.** Get Unstuck finds the alumni whose record and experience fit a specific problem and maps how you're connected to them; once they accept a request, both people see each other's contact details and can work through it directly.
 - **Demo-only tools are off in production.** The data reset works in development, or only when `GTSWARM_DEMO=1` is set.
 
 ## If something goes wrong

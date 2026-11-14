@@ -40,21 +40,21 @@ const RESTWELL_MATCH = '[data-testid="startup-results"] li[data-build="project:p
 const RESTWELL_REQUEST = `[data-testid="request-received"]:has(a[href="${RESTWELL_PAGE}"])`;
 const RESTWELL_ACCEPTED = `[data-testid="request-received"][data-status="accepted"]:has(a[href="${RESTWELL_PAGE}"])`;
 
-const STUCK_SECURITY_Q = '/stuck?q=Hospital+IT+security+review+stalled+our+pilot';
-const TARA = 'person:p223';
-const ELENA_TO_TARA = `[data-testid="request-received"][data-from="${ELENA}"]`;
-const TARA_CONNECTED = `[data-testid="request-sent"][data-to="${TARA}"][data-status="accepted"]`;
+const STUCK_FDA_Q = '/stuck?q=Preparing+an+FDA+510%28k%29+submission+for+a+wearable';
+const PRIYA = 'person:p007';
+const ELENA_TO_PRIYA = `[data-testid="request-received"][data-from="${ELENA}"]`;
+const PRIYA_CONNECTED = `[data-testid="request-sent"][data-to="${PRIYA}"][data-status="accepted"]`;
 
 /**
  * The judge story (about two minutes): Georgia Tech alumni finding other alumni, then students.
- * Elena (alum founder) finds an alumni cofounder she'd never heard of and the warm path to her; then finds the alum who
- * already solved her stalled hospital review, connects, and gets her contact once Tara says yes. Maya (student) is
+ * Elena (alum founder) finds an alumni cofounder she'd never heard of and the warm path to her; then Get Unstuck maps
+ * who can help with her FDA submission, she connects with Priya through a mutual teammate, and gets her contact once Priya says yes. Maya (student) is
  * matched to Elena's startup. Impact for GT counts it; the pilot shows how GT runs it.
  */
 const STEPS: Step[] = [
   { as: ELENA, url: '/', target: RESTWELL_CARD, who: 'Meet Elena',
     title: 'Elena is a GT alum building a startup.',
-    body: 'Restwell Patch, a medical wearable. She needs an alum with hardware experience, and later, an alum who has been through a hospital security review. Thousands of Yellow Jackets could help. She knows almost none of them.' },
+    body: 'Restwell Patch, a medical wearable. She needs an alum with hardware experience, and later, someone who can help with FDA clearance. Thousands of Yellow Jackets could help. She knows almost none of them.' },
 
   { as: ELENA, url: '/match', target: `${FIRST_PERSON} || [data-tour="match-form"]`, who: 'Alum finds alum',
     title: 'She describes who she needs', body: 'Plain words, no keywords to guess.',
@@ -82,28 +82,28 @@ const STEPS: Step[] = [
     done: `${FIRST_PERSON} [role="status"]`, skipClick: `${FIRST_PERSON} [data-testid="invite-button"] && ${FIRST_PERSON} [data-testid="invite-send"]`,
     doneBody: 'Sent, with the reason attached. Dana decides.' },
 
-  { as: ELENA, url: '/stuck', target: '[data-testid="best-match"] || form', who: 'Get Unstuck',
-    title: 'Then her hospital pilot stalls', body: 'A hospital security review has frozen it for weeks, and no one on her team has done one. Someone in the GT network has.',
-    action: 'Click “Hospital security review stalled our pilot”.',
-    done: '[data-testid="best-match"]', skipUrl: STUCK_SECURITY_Q,
-    doneBody: 'Tara Holloway, class of ’17, an alum founder who got a hospital pilot through this exact review. Found by the problem she solved, not by her job title.' },
-  { as: ELENA, url: '/stuck', target: '[data-testid="matched-problem"] || [data-testid="best-match"]', corner: true, who: 'Get Unstuck',
-    title: 'How did she solve it?', body: '',
-    action: 'Click “See how Tara solved it”.',
-    done: '[data-testid="matched-problem"]', skipClick: '[data-testid="best-match-why"]',
-    doneBody: 'Her fix is on record, with the project it happened on. Elena knows Tara is the right person before she reaches out.' },
+  { as: ELENA, url: '/stuck', target: '[data-testid="relevance-web"] || form', corner: true, who: 'Get Unstuck',
+    title: 'Next hurdle: FDA clearance', body: 'Restwell needs an FDA 510(k) submission, and no one on Elena’s team has done one. Who in the GT network could help?',
+    action: 'Click “FDA 510(k) for a wearable”.',
+    done: '[data-testid="relevance-web"]', skipUrl: STUCK_FDA_Q,
+    doneBody: 'GT Swarm reads everyone’s record (projects, roles, problems worked through) and maps the people who can help. Closer to the center means more relevant experience; lines are people who built together.' },
+  { as: ELENA, url: '/stuck', target: '[data-testid="person-panel"] || [data-testid="relevance-web"]', corner: true, who: 'Get Unstuck',
+    title: 'Who can help, and how is she connected?', body: '',
+    action: 'Click Priya Natarajan, the gold-ringed node nearest the center.',
+    done: '[data-testid="person-panel"]', skipClick: `[data-testid="relevance-web"] g.node[data-id="${PRIYA}"]`,
+    doneBody: 'Priya, class of ’11, leads regulatory affairs at a medical device company and has worked through a wearable 510(k) on a GT project. And Elena can reach her: Elena → Diego Park → Priya.' },
   { as: ELENA, url: '/stuck', target: '[data-testid="request-status"] || [data-testid="request-send"] || [data-testid="person-panel"] [data-testid="request-button"]', corner: true, who: 'Get Unstuck',
-    title: 'Connect with Tara', body: '',
-    action: 'Click “Connect with Tara”, then “Send request”.',
+    title: 'Connect with Priya', body: '',
+    action: 'Click “Connect with Priya”, then “Send request”.',
     done: '[data-testid="request-status"]', skipClick: '[data-testid="person-panel"] [data-testid="request-button"] && [data-testid="request-send"]',
-    doneBody: 'The request goes to Tara with the problem attached.' },
-  { as: TARA, url: '/inbox', target: ELENA_TO_TARA, who: 'Tara’s inbox',
-    title: 'Tara sees a fellow alum stuck where she once was', body: 'She can accept or decline. Nothing is shared until she says yes.',
+    doneBody: 'The request goes to Priya with the problem attached.' },
+  { as: PRIYA, url: '/inbox', target: ELENA_TO_PRIYA, who: 'Priya’s inbox',
+    title: 'Priya sees why a fellow alum reached out', body: 'She can accept or decline. Nothing is shared until she says yes.',
     action: 'Click Accept.',
-    done: `${ELENA_TO_TARA}[data-status="accepted"]`, skipClick: `${ELENA_TO_TARA} button`,
+    done: `${ELENA_TO_PRIYA}[data-status="accepted"]`, skipClick: `${ELENA_TO_PRIYA} button`,
     doneBody: 'Accepted.' },
-  { as: ELENA, url: '/inbox', target: `${TARA_CONNECTED} [data-testid="contact-shared"] || [data-testid="connections"]`, who: 'Connected',
-    title: 'Now they can talk directly', body: 'Because Tara said yes, Elena gets her contact details, and Tara gets Elena’s. Two alumni who had never met are now working the problem together, and that new tie joins the web for the next match.' },
+  { as: ELENA, url: '/inbox', target: `${PRIYA_CONNECTED} [data-testid="contact-shared"] || [data-testid="connections"]`, who: 'Connected',
+    title: 'Now they can talk directly', body: 'Because Priya said yes, Elena gets her contact details, and Priya gets Elena’s. Two alumni who graduated years apart are now working on the problem together, and their new tie joins the web for the next match.' },
 
   { as: MAYA, url: '/match', target: `${RESTWELL_MATCH} || [data-testid="mode-startups"]`, who: 'Students too',
     title: 'Meanwhile, Maya, a student', body: 'She built Bluetooth firmware in class and has never heard of Restwell.',

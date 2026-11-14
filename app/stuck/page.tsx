@@ -14,15 +14,15 @@ const STUCK_EXAMPLES = [
   { q: 'Preparing an FDA 510(k) submission for a wearable', label: 'FDA 510(k) for a wearable' },
 ];
 
-/** Get Unstuck: one search over problems the community has already solved, and the people who solved them. */
+/** Get Unstuck: describe a problem, find who can help based on their record and experience, and see how you are connected. */
 export default async function StuckPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
   const { me, projects } = await viewerContext();
   const s = snapshot();
   return (
     <>
-      <PageHero eyebrow="Get unstuck" title={<>Hit a wall? <span className="text-gold">Someone at GT already got past it.</span></>}
-        subtitle={`Not every connection is a hire. Describe the problem in plain words, a bug, a security review, a fundraising question, and GT Swarm finds the students and alumni who solved it, from ${s.problems.length} solved problems on record.`} />
+      <PageHero eyebrow="Get unstuck" title={<>Stuck? <span className="text-gold">Find who can help you solve it.</span></>}
+        subtitle={`Describe the problem in plain words. GT Swarm reads what alumni and students have actually done (projects, roles and ${s.problems.length} problems worked through on GT projects) to find who can help, then maps how you're connected to them.`} />
       <div className="pt-6">
         <SearchClient kind="stuck" viewerName={me.name} viewerProjects={projects}
           suggestions={STUCK_EXAMPLES}

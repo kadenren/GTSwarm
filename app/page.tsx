@@ -184,7 +184,7 @@ export default async function Home() {
             ]} />
         </div>
         <p className="mt-6 text-center text-sm text-ink/65">
-          Nothing happens until the other person says yes. Stuck on a specific problem instead? <Link href="/stuck" className="font-semibold text-navy underline decoration-gold underline-offset-4">Get Unstuck</Link> finds who already solved it.
+          Nothing happens until the other person says yes. Stuck on a specific problem instead? <Link href="/stuck" className="font-semibold text-navy underline decoration-gold underline-offset-4">Get Unstuck</Link> finds who can help, based on their record and experience, and how you're connected to them.
         </p>
       </section>
 

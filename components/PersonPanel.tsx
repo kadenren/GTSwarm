@@ -26,7 +26,7 @@ export default function PersonPanel({
   const defaultMsg = () => {
     const proj = viewerProjects.find((p) => p.id === projectId);
     return kind === 'stuck'
-      ? `Hi ${first}, I'm ${viewerName.split(' ')[0]}${proj ? ` from ${proj.name}` : ''}. I'm working through "${query}" and saw you solved "${result.matchedProblem?.description ?? 'something similar'}". I'd love to connect and hear how you approached it.`
+      ? `Hi ${first}, I'm ${viewerName.split(' ')[0]}${proj ? ` from ${proj.name}` : ''}. I'm working through "${query}", and your experience${result.matchedProblem ? ` with "${result.matchedProblem.description}"` : ''} looks really relevant. I'd love to connect.`
       : `Hi ${first}, I'm ${viewerName.split(' ')[0]}${proj ? ` from ${proj.name}` : ''}. We're looking for ${role === 'Advisor' || role === 'Early engineer' ? 'an' : 'a'} ${role?.toLowerCase()} ("${query}") and your work stood out. Would you be open to a short conversation?`;
   };
   const [message, setMessage] = useState('');
@@ -84,11 +84,11 @@ export default function PersonPanel({
       <div className="flex-1 space-y-5 overflow-y-auto p-5">
         {kind === 'stuck' && result.matchedProblem && (
           <section className="rounded-lg border border-gold/50 bg-gold/10 p-4" data-testid="matched-problem">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-gold-dark">Matching solved problem</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-gold-dark">Relevant experience</h3>
             <p className="mt-1 font-display font-bold text-navy">&ldquo;{result.matchedProblem.description}&rdquo;</p>
-            <p className="mt-2 text-sm leading-relaxed text-ink/80"><span className="font-semibold text-navy">Solution: </span>{result.matchedProblem.solution}</p>
+            <p className="mt-2 text-sm leading-relaxed text-ink/80"><span className="font-semibold text-navy">What they did: </span>{result.matchedProblem.solution}</p>
             <p className="mt-2 text-xs text-ink/60">
-              {result.matchedProblem.credit === 'helped' ? 'Helped solve on ' : 'Solved on '}
+              {result.matchedProblem.credit === 'helped' ? 'Helped on ' : 'On '}
               <Link className="font-medium text-navy underline decoration-gold underline-offset-2" href={`/projects/${encodeURIComponent(result.matchedProblem.projectId)}`}>
                 {result.matchedProblem.projectName} ({result.matchedProblem.year})
               </Link>

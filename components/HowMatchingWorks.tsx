@@ -60,7 +60,7 @@ export default function HowMatchingWorks() {
           </figure>
         </div>
         <p className="mt-6 text-xs text-ink/55">
-          Gemini embeddings (gemini-embedding-001) are precomputed once per record and cached; a search embeds only the query. If Gemini is slow or unavailable, matching falls back to keyword search within a few seconds, and nothing else changes. Semantic similarity never draws a connection line and is never treated as proof of a skill. <Link href="/stuck" className="font-semibold text-navy underline decoration-gold underline-offset-4">Get Unstuck</Link> uses the same graph to find who solved a problem.
+          Gemini embeddings (gemini-embedding-001) are precomputed once per record and cached; a search embeds only the query. If Gemini is slow or unavailable, matching falls back to keyword search within a few seconds, and nothing else changes. Semantic similarity never draws a connection line and is never treated as proof of a skill. <Link href="/stuck" className="font-semibold text-navy underline decoration-gold underline-offset-4">Get Unstuck</Link> uses the same graph to find who can help with a problem.
         </p>
       </div>
     </section>
