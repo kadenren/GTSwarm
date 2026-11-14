@@ -27,6 +27,7 @@ export async function runSearch(viewerId: string, req: SearchRequest) {
     role: req.kind === 'stuck' ? null : role,
     audience,
     mode: out.mode,
+    matcher: out.matcher,
     results,
     edges: edgesAmong(results.map((r) => r.personId)),
   };

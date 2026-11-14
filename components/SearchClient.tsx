@@ -196,7 +196,7 @@ export default function SearchClient({
                   {expanded ? `${data.results.find((r) => r.personId === expanded)?.name ?? 'Their'} network` : `${data.results.length} builders ranked for "${data.query}"`}
                 </h2>
                 <p className="text-xs text-ink/60">
-                  {expanded ? 'Second-degree view: people this builder has worked with or knows.' : 'Ranked by graph evidence: what people built and solved, shared ties, role fit and availability. Click a person for details.'}
+                  {expanded ? 'Second-degree view: people this builder has worked with or knows.' : data.matcher === 'gemini' ? 'The graph shortlisted candidates; Gemini read each record against your request and scored the fit. Shared ties, role fit and availability still count. Click a person for details.' : 'Ranked by graph evidence: what people built and solved, shared ties, role fit and availability. Click a person for details.'}
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -248,6 +248,7 @@ export default function SearchClient({
             <div className="lg:sticky lg:top-20 lg:self-start">
               <PersonPanel
                 aiPolish={aiPolish}
+                matcher={data.matcher}
                 result={selectedResult} kind={kind} role={data.role} query={data.query} viewerName={viewerName} viewerProjects={viewerProjects}
                 onClose={() => setSelected(null)} onExpand={(id) => { setExpanded(id); setView('web'); }}
               />

@@ -54,8 +54,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <span>Demo data: people are fictional. The graph and its algorithms are the product; AI is only a helper.</span>
             </span>
             <span data-testid="search-mode" className="flex items-center gap-1.5">
-              <span className={`h-2 w-2 rounded-full ${mode === 'semantic' ? 'bg-teal' : 'bg-gold'}`} aria-hidden="true" />
-              Search mode: {mode === 'semantic' ? 'semantic (local MiniLM embeddings + BM25)' : 'keyword (BM25 fallback)'} · runs fully offline
+              <span className={`h-2 w-2 rounded-full ${mode === 'keyword' ? 'bg-gold' : 'bg-teal'}`} aria-hidden="true" />
+              {mode === 'gemini' ? 'Matching: Gemini embeddings + Gemini matchmaker, cached' : `Search mode: ${mode === 'semantic' ? 'semantic (local MiniLM embeddings + BM25)' : 'keyword (BM25 fallback)'} · runs fully offline`}
             </span>
           </div>
         </footer>

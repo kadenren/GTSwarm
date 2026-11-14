@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "seed": "tsx scripts/seed.ts",
+    "ai:warm": "tsx scripts/ai-warm.ts",
+    "demo:files": "tsx scripts/make-demo-files.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },

@@ -29,6 +29,23 @@ Open http://localhost:3000.
   - **Add project:** Claude fills in the fields from a description, uploaded files (PDF, Word, text, Markdown) and links (GitHub links import the README). Without a key, a keyword extractor does.
   - **Polished wording:** in a person's panel, Claude rephrases the fact-built connection description. The rewrite is fact-checked against the original (no new names, numbers or terms, no gendered pronouns) and cached, and the cache survives `/demo/reset`. To pre-warm it for the demo, open each hero's panel once before presenting.
 
+## Gemini (optional, recommended for the demo)
+
+Put `GEMINI_API_KEY=...` in `.env.local`, then run `npm run ai:warm` and restart `npm run dev`. With a key:
+
+- **Matching is done by Gemini.** Every person, project and solved problem gets a Gemini embedding, so search matches meaning rather than keywords. The graph then shortlists about 16 candidates, and a Gemini matchmaker reads each candidate's record against the request and scores the fit, with a one-sentence reason shown in the panel. Shared ties, role fit and availability still count. `ai:warm` pre-computes the embeddings and every demo search, so the live demo never waits on the network.
+- **Gemini reads messy input:** a phone photo of a poster or a scanned PDF in **Add project**, a resume (or LinkedIn's Save to PDF) in **Join / Profile**, and a screenshot of an error in **I'm stuck**.
+
+Without a key, all of this falls back to the graph plus keyword matching and local file parsing, and is covered by the tests.
+
+## People add themselves
+
+Alumni and students create their own profiles at **/join** (or **Profile**): resume upload, plus GitHub (public repositories become optional projects), personal website, LinkedIn and Google Scholar links (shown on the profile, never scraped). They review every field and choose what they are open to before anything is saved.
+
+## Full show-through
+
+See **[DEMO.md](DEMO.md)** for the 8-minute presenter script with talking points, the sample files in **demo-files/** (regenerate with `npm run demo:files`) and answers to likely questions.
+
 ## Demo script (about 5 minutes)
 
 Before you start, open **http://localhost:3000/demo/reset** to restore the seeded state. The gold **Demo guide** button (bottom right) walks through every step below with one click each, switching the viewer for you, and has its own **Reset data** button.

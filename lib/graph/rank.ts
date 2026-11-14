@@ -2,6 +2,8 @@ import { snapshot, lineageRoot, personLabel, type Audience, type Person, type Ro
 import { similarity, type SearchMode } from '../search';
 import { warmPath, type WarmPath } from './path';
 import { describeFromEvidence, type Description } from './describe';
+import { geminiMatch } from '../matchmaker';
+import { geminiEnabled } from '../gemini';
 
 /**
  * Ranking = a transparent weighted sum of five normalized components.
@@ -36,10 +38,24 @@ export interface RankedPerson {
   evidence: Evidence[];
   matchedProblem: { id: string; description: string; solution: string; projectId: string; projectName: string; year: number; credit: 'solved' | 'helped' } | null;
   description: Description;
+  aiReason: string | null;
   path: WarmPath | null;
   openTo: Role[];
 }
-export interface RankOutput { query: string; role: Role | null; audience: Audience; mode: SearchMode; results: RankedPerson[] }
+export interface RankOutput { query: string; role: Role | null; audience: Audience; mode: SearchMode; matcher: 'gemini' | 'graph'; results: RankedPerson[] }
+
+const MATCH_POOL = 16;
+
+/** Compact, factual record of a candidate for the Gemini matchmaker. */
+function candidateSummary(s: Snapshot, p: Person): string {
+  const lines = [
+    `${p.type === 'alum' ? `Alum, ${p.major} ${p.grad_year}` : `${p.major} student, class of ${p.grad_year}`}${p.current_role ? `; ${p.current_role}` : ''}. Open to: ${p.open_to.join(', ') || 'not set'}. ${p.availability_hours} h/week.`,
+    `Bio: ${p.bio}`,
+    ...(s.projectsOf.get(p.id) ?? []).slice(0, 5).map((m) => { const pr = s.project.get(m.project_id)!; return `Project (${m.role}, ${pr.year}): ${pr.name}: ${pr.summary}${pr.outcome ? ` Outcome: ${pr.outcome}.` : ''}`; }),
+    ...(s.problemsBy.get(p.id) ?? []).slice(0, 4).map((pb) => `Solved: ${pb.description}. Fix: ${pb.solution}`),
+  ];
+  return lines.join('\n').slice(0, 1800);
+}
 
 interface Ctx { s: Snapshot; sims: Map<string, number>; viewerId: string; topDocs: Set<string> }
 
@@ -106,7 +122,7 @@ function describeEvidence(s: Snapshot, e: Evidence, query: string): string {
 async function rank(kind: 'expertise' | 'problem', query: string, role: Role | null, viewerId: string, audience: Audience): Promise<RankOutput> {
   const s = snapshot();
   const q = query.trim();
-  if (!q) return { query: q, role, audience, mode: s.searchMode, results: [] };
+  if (!q) return { query: q, role, audience, mode: s.searchMode, matcher: 'graph', results: [] };
   const { sims, mode } = await similarity(q);
   const docs = [...s.projects.map((p) => p.id), ...s.problems.map((p) => p.id)]
     .map((id) => [id, sims.get(id) ?? 0] as const)
@@ -139,14 +155,35 @@ async function rank(kind: 'expertise' | 'problem', query: string, role: Role | n
   });
 
   const eMax = Math.max(...rows.map((r) => r.eRaw)), eMin = Math.min(...rows.map((r) => r.eRaw));
-  if (eMax <= 0) return { query: q, role, audience, mode, results: [] };
-  const scored = rows.map((r) => {
+  if (eMax <= 0) return { query: q, role, audience, mode, matcher: 'graph', results: [] };
+  let scored = rows.map((r) => {
     const E = eMax > eMin ? (r.eRaw - eMin) / (eMax - eMin) : 0;
     const c: Components = { E, X: r.X, T: r.T, R: r.R, A: r.A };
     const score = WEIGHTS.E * c.E + WEIGHTS.X * c.X + WEIGHTS.T * c.T + WEIGHTS.R * c.R + WEIGHTS.A * c.A;
     return { ...r, c, score };
   });
   scored.sort((a, b) => b.score - a.score || a.p.name.localeCompare(b.p.name));
+
+  // Gemini matchmaker: rescore the graph's shortlist by reading each candidate's record against the request
+  let matcher: 'gemini' | 'graph' = 'graph';
+  const aiReasons = new Map<string, string>();
+  if (geminiEnabled()) {
+    const pool = scored.slice(0, MATCH_POOL).filter((r) => r.eRaw > 0);
+    const verdicts = await geminiMatch({ request: q, role: kind === 'problem' ? null : role, kind, candidates: pool.map((r) => ({ id: r.p.id, name: r.p.name, summary: candidateSummary(s, r.p) })) });
+    if (verdicts) {
+      matcher = 'gemini';
+      for (const r of pool) {
+        const v = verdicts.get(r.p.id);
+        if (!v) continue;
+        r.c = { ...r.c, E: v.fit };
+        r.score = WEIGHTS.E * r.c.E + WEIGHTS.X * r.c.X + WEIGHTS.T * r.c.T + WEIGHTS.R * r.c.R + WEIGHTS.A * r.c.A;
+        if (v.reason) aiReasons.set(r.p.id, v.reason);
+      }
+      pool.sort((a, b) => b.score - a.score || a.p.name.localeCompare(b.p.name));
+      const inPool = new Set(pool.map((r) => r.p.id));
+      scored = [...pool, ...scored.filter((r) => !inPool.has(r.p.id))];
+    }
+  }
   const top = scored.slice(0, RESULT_COUNT).filter((r) => r.eRaw > 0);
 
   const results: RankedPerson[] = top.map((r, i) => {
@@ -174,10 +211,10 @@ async function rank(kind: 'expertise' | 'problem', query: string, role: Role | n
       personId: r.p.id, name: r.p.name, type: r.p.type, label: personLabel(r.p), major: r.p.major, gradYear: r.p.grad_year, currentRole: r.p.current_role,
       score: Math.round(r.score * 1000) / 1000, rank: i + 1, ring: i < 3 ? 1 : i < 7 ? 2 : 3,
       components: r.c, reasons, evidence: r.evidence.slice(0, 5), matchedProblem: kind === 'problem' ? matchedProblem : matchedProblem && problemEv!.sim > 0.4 ? matchedProblem : null,
-      description, path, openTo: r.p.open_to,
+      description, path, openTo: r.p.open_to, aiReason: aiReasons.get(r.p.id) ?? null,
     };
   });
-  return { query: q, role, audience, mode, results };
+  return { query: q, role, audience, mode, matcher, results };
 }
 
 export function rankForExpertise(query: string, role: Role, viewerId: string, audience: Audience = 'both') {

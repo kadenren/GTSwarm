@@ -1,5 +1,7 @@
 import { snapshot, type Snapshot } from './data';
 import { embedText, cosine, loadEmbedder } from './embed';
+import { geminiEnabled } from './gemini';
+import { geminiVectors, geminiQueryVector } from './geminiVec';
 
 /**
  * Text similarity over three document kinds: people (bio + skills), projects and solved problems.
@@ -100,11 +102,33 @@ function bm25(s: Snapshot, query: string): Map<string, number> {
   return scores;
 }
 
-export type SearchMode = 'semantic' | 'keyword';
+export type SearchMode = 'gemini' | 'semantic' | 'keyword';
+
+/** Gemini vectors are used once most of the swarm has been embedded (`npm run ai:warm`). */
+function geminiReady(s: Snapshot) {
+  if (!geminiEnabled()) return false;
+  const total = s.people.filter((p) => p.claimed).length + s.projects.length + s.problems.length;
+  return geminiVectors(s).size >= total * 0.8;
+}
 
 export async function similarity(query: string): Promise<{ sims: Map<string, number>; mode: SearchMode }> {
   const s = snapshot();
   const kw = bm25(s, query);
+  if (geminiReady(s)) {
+    const qv = await geminiQueryVector(query);
+    if (qv) {
+      const vecs = geminiVectors(s);
+      const cos = new Map<string, number>();
+      let max = 0, min = 1;
+      for (const [id, v] of vecs) { const c = cosine(qv, v); cos.set(id, c); if (c > max) max = c; if (c < min) min = c; }
+      // Gemini meaning-based similarity leads; exact terms (part numbers, acronyms) still count a little
+      const sims = new Map<string, number>();
+      for (const [id, c] of cos) sims.set(id, 0.8 * (max > min ? (c - min) / (max - min) : 0) + 0.2 * (kw.get(id) ?? 0));
+      // records added moments ago may not be embedded yet: score them by keywords so they are still found
+      for (const [id, k] of kw) if (!vecs.has(id)) sims.set(id, k);
+      return { sims, mode: 'gemini' };
+    }
+  }
   if (s.searchMode !== 'semantic') return { sims: kw, mode: 'keyword' };
   const qv = await embedText(query);
   if (!qv) return { sims: kw, mode: 'keyword' };
@@ -126,6 +150,7 @@ export async function similarity(query: string): Promise<{ sims: Map<string, num
 
 export async function currentSearchMode(): Promise<SearchMode> {
   const s = snapshot();
+  if (geminiReady(s)) return 'gemini';
   if (s.searchMode !== 'semantic') return 'keyword';
   return (await loadEmbedder()) ? 'semantic' : 'keyword';
 }

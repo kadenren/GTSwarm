@@ -14,10 +14,10 @@ const COMPONENT_INFO: Record<string, { label: string; weight: number; help: stri
 export interface ViewerProject { id: string; name: string; year: number }
 
 export default function PersonPanel({
-  result, kind, role, query, viewerName, viewerProjects, onClose, onExpand, aiPolish = false,
+  result, kind, role, query, viewerName, viewerProjects, onClose, onExpand, aiPolish = false, matcher = 'graph',
 }: {
   result: SearchResult; kind: 'expertise' | 'stuck'; role: string | null; query: string; viewerName: string;
-  viewerProjects: ViewerProject[]; onClose: () => void; onExpand?: (id: string) => void; aiPolish?: boolean;
+  viewerProjects: ViewerProject[]; onClose: () => void; onExpand?: (id: string) => void; aiPolish?: boolean; matcher?: 'gemini' | 'graph';
 }) {
   const first = result.name.split(' ')[0];
   const [composing, setComposing] = useState(false);
@@ -142,6 +142,12 @@ export default function PersonPanel({
 
         <section>
           <h3 className="label">Why {first} matched</h3>
+          {result.aiReason && (
+            <div className="mb-3 rounded-lg border border-teal/30 bg-teal-light/40 p-3" data-testid="ai-reason">
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-teal">Gemini&apos;s read of {first}&apos;s record</div>
+              <p className="mt-0.5 text-sm text-ink/85">{result.aiReason}</p>
+            </div>
+          )}
           <ul className="space-y-1 text-sm text-ink/85">
             {result.reasons.map((r) => (
               <li key={r} className="flex gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" aria-hidden="true" />{r}</li>
@@ -150,7 +156,7 @@ export default function PersonPanel({
           <div className="mt-3 space-y-1.5" aria-label="Score breakdown">
             {Object.entries(result.components).map(([k, v]) => (
               <div key={k} className="grid grid-cols-[9.5rem_1fr_3.5rem] items-center gap-2 text-xs" title={COMPONENT_INFO[k].help}>
-                <span className="text-ink/70">{COMPONENT_INFO[k].label} <span className="text-ink/40">×{COMPONENT_INFO[k].weight}</span></span>
+                <span className="text-ink/70">{k === 'E' && matcher === 'gemini' ? 'AI fit (Gemini)' : COMPONENT_INFO[k].label} <span className="text-ink/40">×{COMPONENT_INFO[k].weight}</span></span>
                 <span className="h-2 overflow-hidden rounded-full bg-navy/10">
                   <span className="block h-full rounded-full bg-navy" style={{ width: `${Math.round(v * 100)}%` }} />
                 </span>
