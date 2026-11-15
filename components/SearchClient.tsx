@@ -135,7 +135,7 @@ export default function SearchClient({
         <section className="mt-6 grid gap-4 md:grid-cols-3" aria-label="How Get Unstuck works" data-testid="stuck-how">
           {[
             ['1', 'Describe the problem', 'Plain words are fine: a bug, a security review, a fundraising question.'],
-            ['2', 'See who can help, and why', 'Alumni and students are ranked on relevant experience from their record: projects, roles and problems they have worked through.'],
+            ['2', 'See who has worked on similar issues', 'Alumni and students are ranked on similar past work from their record: projects, roles and problems they have worked through.'],
             ['3', 'Use the map, then connect', 'See how you are connected to each person through people you already know, then reach out. If they accept, you can contact each other directly.'],
           ].map(([n, t, d]) => (
             <div key={n} className="card flex gap-4 p-5">

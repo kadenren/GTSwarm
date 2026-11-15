@@ -16,8 +16,8 @@ The demo shows instead of explains: every step is a moment that can't happen at 
 | 4 | The alumni web | **View network** | Closer = more relevant; lines = people who built together |
 | 5 | Is there a way in? | Click Dana on the map | Elena → Diego Park → Dana: a warm introduction |
 | 6 | Reach out | **Invite to connect → Send invite** | Sent with the reason; Dana decides |
-| 7 | Get Unstuck | Example "FDA 510(k) for a wearable" | A connection map of who can help, ranked on their record and experience |
-| 8 | Who can help, and how is she connected? | Click Priya on the map | Priya ('11), VP of Regulatory Affairs, worked through a wearable 510(k); Elena reaches her through Diego Park |
+| 7 | Get Unstuck | Example "FDA 510(k) for a wearable" | A connection map of alumni and students who have worked on similar issues before |
+| 8 | Who has worked on this before? | Click Priya on the map | Priya ('11), VP of Regulatory Affairs, worked through a wearable 510(k); Elena reaches her through Diego Park |
 | 9 | Connect with Priya | **Connect with Priya → Send request** | Request goes to Priya with the problem attached |
 | 10 | Priya's inbox | As Priya: **Accept** | Nothing is shared until she says yes |
 | 11 | Connected | **Next** | Elena sees Priya's contact details (and Priya sees Elena's): they can talk directly |

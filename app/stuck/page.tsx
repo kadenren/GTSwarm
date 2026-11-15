@@ -22,7 +22,7 @@ export default async function StuckPage({ searchParams }: { searchParams: Promis
   return (
     <>
       <PageHero eyebrow="Get unstuck" title={<>Stuck? <span className="text-gold">Find who can help you solve it.</span></>}
-        subtitle={`Describe the problem in plain words. GT Swarm reads what alumni and students have actually done (projects, roles and ${s.problems.length} problems worked through on GT projects) to find who can help, then maps how you're connected to them.`} />
+        subtitle={`Describe the problem in plain words. GT Swarm finds alumni and students who have worked on similar issues before (in their projects, roles and ${s.problems.length} problems on record) and maps how you're connected, so the connection starts from shared experience.`} />
       <div className="pt-6">
         <SearchClient kind="stuck" viewerName={me.name} viewerProjects={projects}
           suggestions={STUCK_EXAMPLES}

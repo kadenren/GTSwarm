@@ -71,7 +71,7 @@ const STEPS: Step[] = [
     action: 'Click “View network”.',
     done: '[data-testid="relevance-web"]', skipClick: '[data-testid="view-network"]',
     doneBody: 'Every dot is a Yellow Jacket; closer to the center means more relevant. Every line is two people who actually built something together.' },
-  { as: ELENA, url: '/match', target: '[data-testid="person-panel"] || [data-testid="relevance-web"]', corner: true, who: 'The alumni web',
+  { as: ELENA, url: '/match', target: '[data-testid="person-panel"] || [data-testid="relevance-web"]', prepare: '[data-testid="view-network"]', corner: true, who: 'The alumni web',
     title: 'Is there a way in?', body: '',
     action: 'Click Dana, the gold-ringed node nearest the center.',
     done: '[data-testid="person-panel"]', skipClick: '[data-testid="relevance-web"] g.node[data-id="person:p005"]',
@@ -86,19 +86,19 @@ const STEPS: Step[] = [
     title: 'Next hurdle: FDA clearance', body: 'Restwell needs an FDA 510(k) submission, and no one on Elena’s team has done one. Who in the GT network could help?',
     action: 'Click “FDA 510(k) for a wearable”.',
     done: '[data-testid="relevance-web"]', skipUrl: STUCK_FDA_Q,
-    doneBody: 'GT Swarm reads everyone’s record (projects, roles, problems worked through) and maps the people who can help. Closer to the center means more relevant experience; lines are people who built together.' },
+    doneBody: 'GT Swarm looks for alumni and students who have worked on similar issues before, in their projects, roles and past problems, and maps them. Closer to the center means closer experience; lines are people who built together.' },
   { as: ELENA, url: '/stuck', target: '[data-testid="person-panel"] || [data-testid="relevance-web"]', corner: true, who: 'Get Unstuck',
-    title: 'Who can help, and how is she connected?', body: '',
+    title: 'Who has worked on this before?', body: '',
     action: 'Click Priya Natarajan, the gold-ringed node nearest the center.',
     done: '[data-testid="person-panel"]', skipClick: `[data-testid="relevance-web"] g.node[data-id="${PRIYA}"]`,
-    doneBody: 'Priya, class of ’11, leads regulatory affairs at a medical device company and has worked through a wearable 510(k) on a GT project. And Elena can reach her: Elena → Diego Park → Priya.' },
-  { as: ELENA, url: '/stuck', target: '[data-testid="request-status"] || [data-testid="request-send"] || [data-testid="person-panel"] [data-testid="request-button"]', corner: true, who: 'Get Unstuck',
+    doneBody: 'Priya, class of ’11, worked through a wearable 510(k) on a GT project and now leads regulatory affairs at a medical device company. That shared problem is the reason to connect, and Elena can reach her through someone she knows: Elena → Diego Park → Priya.' },
+  { as: ELENA, url: '/stuck', target: '[data-testid="request-status"] || [data-testid="request-send"] || [data-testid="person-panel"] [data-testid="request-button"]', prepare: '[data-testid="best-match-why"]', corner: true, who: 'Get Unstuck',
     title: 'Connect with Priya', body: '',
     action: 'Click “Connect with Priya”, then “Send request”.',
     done: '[data-testid="request-status"]', skipClick: '[data-testid="person-panel"] [data-testid="request-button"] && [data-testid="request-send"]',
-    doneBody: 'The request goes to Priya with the problem attached.' },
+    doneBody: 'The request goes to Priya with the problem attached, so she knows exactly why Elena reached out.' },
   { as: PRIYA, url: '/inbox', target: ELENA_TO_PRIYA, who: 'Priya’s inbox',
-    title: 'Priya sees why a fellow alum reached out', body: 'She can accept or decline. Nothing is shared until she says yes.',
+    title: 'Priya sees a fellow alum facing a problem she knows', body: 'She can accept or decline. Nothing is shared until she says yes.',
     action: 'Click Accept.',
     done: `${ELENA_TO_PRIYA}[data-status="accepted"]`, skipClick: `${ELENA_TO_PRIYA} button`,
     doneBody: 'Accepted.' },
@@ -119,6 +119,7 @@ const STEPS: Step[] = [
 ];
 
 const KEY = 'gtswarm-tour';
+const PROGRESS_KEY = 'gtswarm-tour-progress';
 const START_EVENT = 'gtswarm:tour-start';
 const CARD_W = 340;
 
@@ -145,20 +146,29 @@ export default function DemoTour({ current }: { current: string }) {
   currentRef.current = current;
 
   const save = (s: number | null) => { try { if (s === null) localStorage.removeItem(KEY); else localStorage.setItem(KEY, String(s)); } catch { /* storage unavailable */ } };
-  useEffect(() => { try { const v = localStorage.getItem(KEY); if (v !== null) setStep(Number(v)); } catch { /* ignore */ } }, []);
+  // Back support: remember where each step ended (its results live in the URL) and how far the visitor got,
+  // so going back reopens that page and shows a finished step as finished instead of asking to redo it
+  type Progress = { urls: Record<number, string>; reached: number };
+  const readProgress = (): Progress => { try { return JSON.parse(localStorage.getItem(PROGRESS_KEY) ?? '') as Progress; } catch { return { urls: {}, reached: -1 }; } };
+  const writeProgress = (p: Progress | null) => { try { if (p) localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); else localStorage.removeItem(PROGRESS_KEY); } catch { /* storage unavailable */ } };
+  useEffect(() => { try { const v = localStorage.getItem(KEY); if (v !== null) { const n = Number(v); setStep(n); if (n <= readProgress().reached && STEPS[n] && isHandsOn(STEPS[n])) setDone(true); } } catch { /* ignore */ } }, []);
 
-  const go = useCallback(async (i: number, viewer: string) => {
+  const go = useCallback(async (i: number, viewer: string, from: number | null = null) => {
     const s = STEPS[i];
-    setBusy(true); setRect(null); setDone(false); setStep(i); save(i);
+    const prog = readProgress();
+    if (from !== null) { prog.urls[from] = window.location.pathname + window.location.search; prog.reached = Math.max(prog.reached, from); writeProgress(prog); }
+    const revisit = i <= prog.reached; // already finished: show its result, don't ask again
+    const url = (revisit && prog.urls[i]) || s.url;
+    setBusy(true); setRect(null); setDone(revisit && isHandsOn(s)); setStep(i); save(i);
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })); // close any dialog or menu a previous step opened
     if (s.as !== viewer) {
       await fetch('/api/viewer', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: s.as }) });
-      window.location.assign(s.url); // a new persona needs a full load so every server component renders as them
+      window.location.assign(url); // a new persona needs a full load so every server component renders as them
       return;
     }
     // hands-on pages keep their state (results, filters): only navigate when on a different page
-    const here = s.url.includes('?') ? window.location.pathname + window.location.search : window.location.pathname;
-    if (here !== s.url) router.push(s.url);
+    const here = url.includes('?') ? window.location.pathname + window.location.search : window.location.pathname;
+    if (here !== url) router.push(url);
     setBusy(false);
   }, [router]);
 
@@ -166,6 +176,7 @@ export default function DemoTour({ current }: { current: string }) {
     const onStart = async () => {
       setBusy(true);
       await fetch('/api/demo/reset', { method: 'POST' });
+      writeProgress(null);
       await go(0, '');
     };
     window.addEventListener(START_EVENT, onStart);
@@ -240,9 +251,9 @@ export default function DemoTour({ current }: { current: string }) {
   const last = step === STEPS.length - 1;
   const handsOn = isHandsOn(s);
   const waiting = handsOn && !done;
-  const exit = () => { setStep(null); save(null); setRect(null); };
-  const next = () => (last ? (exit(), router.push('/')) : go(step + 1, currentRef.current));
-  const back = () => step > 0 && go(step - 1, currentRef.current);
+  const exit = () => { setStep(null); save(null); writeProgress(null); setRect(null); };
+  const next = () => (last ? (exit(), router.push('/')) : go(step + 1, currentRef.current, step));
+  const back = () => step > 0 && go(step - 1, currentRef.current, step);
   async function skip() {
     if (!s) return;
     if (s.skipAs) {
