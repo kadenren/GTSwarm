@@ -42,7 +42,7 @@ export function describeFromEvidence({ s, person, viewerId, query, role, lead, e
     }
     return null;
   };
-  const verbFor = (role?: string) => (role === 'advisor' ? 'advised' : role === 'founder' ? 'founded' : role === 'maintainer' ? 'maintains' : role === 'helped' ? 'helped solve' : 'built');
+  const verbFor = (role?: string) => (role === 'advisor' ? 'advised' : role === 'founder' ? 'founded' : role === 'maintainer' ? 'maintains' : role === 'helped' ? 'helped work through' : 'built');
   const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
 
   // narrative lead: the matched problem, else the best-matching project, else the profile
@@ -52,10 +52,10 @@ export function describeFromEvidence({ s, person, viewerId, query, role, lead, e
   if (narrativeLead.kind === 'problem') {
     const pb = s.problem.get(narrativeLead.id)!;
     const pr = s.project.get(pb.project_id)!;
-    const verb = narrativeLead.role === 'helped' ? 'helped solve' : 'solved';
+    const verb = narrativeLead.role === 'helped' ? 'helped work through' : 'worked through';
     short = `${cap(verb)} "${pb.description}" (${pr.name}, ${pr.year})`;
     sentences.push(`${name} ${verb} "${pb.description}" on ${pr.name} (${pr.team_name}, ${pr.year}).`);
-    sentences.push(`The fix: ${lowerFirst(stripDot(pb.solution))}.`);
+    sentences.push(`What ${name} did: ${lowerFirst(stripDot(pb.solution))}.`);
     facts.push(pb.id, pr.id);
     const ln = lineageNote(pr.id);
     if (ln) sentences.push(ln);

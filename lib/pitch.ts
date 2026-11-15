@@ -22,9 +22,9 @@ export const PROGRAMS = [
   { name: 'Startup Exchange', today: 'Events and meetups bring founders and builders together.',
     adds: 'Attendees keep a profile, so a good conversation at an event turns into a match afterward.' },
   { name: 'Alumni Association', today: 'Alumni volunteer through mentoring programs.',
-    adds: 'Alumni choose the roles and hours they can give, and founders find the alumni who already solved their problem.' },
+    adds: 'Alumni choose the roles and hours they can give, and founders find the alumni whose experience fits their problem.' },
   { name: 'Capstone, VIP and Invention Studio', today: 'Project know-how leaves when each team graduates.',
-    adds: 'Teams log the problems they solved, so the next team can find who solved them.' },
+    adds: 'Teams log the problems they worked through, so the next team can find people with that experience.' },
 ] as const;
 
 /** The three phases, with SGA as the owner from day one. */
@@ -62,7 +62,7 @@ export const REAL = [
   'Knowledge graph of people, projects, skills and solved problems',
   'Resume and document reading that drafts profiles and startups',
   'Consent-based invites, requests and inbox',
-  'Get Unstuck search over solved problems',
+  'Get Unstuck: find who has worked on similar issues, with a connection map',
   'A private demo session for every visitor',
 ] as const;
 

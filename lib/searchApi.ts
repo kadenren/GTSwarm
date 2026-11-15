@@ -23,7 +23,7 @@ function explainPerson(s: Snapshot, r: RankedPerson, asked: Set<string>, role: R
   const first = r.name.split(' ')[0];
   const strength = r.score >= 0.7 ? 'Strong match' : r.score >= 0.5 ? 'Good match' : 'Possible match';
   const lead = r.matchedProblem
-    ? `${r.matchedProblem.credit === 'helped' ? 'helped solve' : 'solved'} "${r.matchedProblem.description}" on ${r.matchedProblem.projectName} (${r.matchedProblem.year})`
+    ? `${r.matchedProblem.credit === 'helped' ? 'helped work through' : 'worked through'} "${r.matchedProblem.description}" on ${r.matchedProblem.projectName} (${r.matchedProblem.year})`
     : /^Profile and skills match/.test(r.reasons[0] ?? '') ? projectLead(s, r) : (r.reasons[0] ?? '').replace(/, a close match for ".*"$/, '');
   const leadText = lead ? lead.charAt(0).toLowerCase() + lead.slice(1) : 'has related work on record';
   const parts = [`${first} ${leadText}`];

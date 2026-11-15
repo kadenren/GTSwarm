@@ -161,7 +161,7 @@ describe('Get Unstuck: problem solving beyond hiring', () => {
   it('asking for help sends a request with the problem attached, which the helper can accept', () => {
     const elena = byName('Elena Brooks'), tara = byName('Tara Holloway');
     const before = count("SELECT COUNT(*) n FROM requests WHERE kind = 'stuck'");
-    const r = sendRequest({ from: elena, to: tara, kind: 'stuck', role: 'Helper', message: 'I saw you solved "Hospital IT security review stalled our pilot". Could you spare 15 minutes?', projectId: projectByName('Restwell Patch') });
+    const r = sendRequest({ from: elena, to: tara, kind: 'stuck', role: 'Helper', message: 'Your experience with "Hospital IT security review stalled our pilot" looks really relevant. I would love to connect.', projectId: projectByName('Restwell Patch') });
     expect(count("SELECT COUNT(*) n FROM requests WHERE kind = 'stuck'")).toBe(before + 1);
     acceptRequest(r.id, tara);
     expect(count("SELECT COUNT(*) n FROM requests WHERE id = ? AND status = 'accepted'", r.id)).toBe(1);
