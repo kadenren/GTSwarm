@@ -49,7 +49,7 @@ export default async function Home() {
             Georgia Tech has the talent. <span className="text-gold">GT Swarm makes the connections.</span>
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/80">
-            An intelligent network connecting Georgia Tech students and alumni by what they’ve actually built. Find a cofounder, an advisor, someone who’s worked through your exact problem, or a startup where your skills matter.
+            An intelligent entrepreneurship network matching Georgia Tech founders with the students and alumni who have the expertise they need, while helping builders discover startups where their skills matter.
           </p>
           <div className="mt-8 grid max-w-3xl gap-3 sm:grid-cols-2">
             <Link href="/match?mode=people" className="group rounded-xl bg-gold px-5 py-4 text-navy-900 shadow-lg transition hover:bg-gold-light" data-testid="find-match-cta">
