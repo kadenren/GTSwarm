@@ -23,7 +23,7 @@ export default async function ImpactPage() {
   return (
     <div>
       <PageHero eyebrow="Impact for GT" title="What Georgia Tech gets"
-        subtitle="Live numbers from opt-in profiles and accepted connections, the kind of report SGA would review during a pilot. Counts here come from the fictional demo data." />
+        subtitle="Live numbers from opt-in profiles and accepted connections: who is helping whom across Georgia Tech. Counts here come from the fictional demo data." />
 
       <div className="mx-auto max-w-7xl space-y-10 px-4 py-10">
         <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

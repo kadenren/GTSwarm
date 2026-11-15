@@ -2,7 +2,7 @@
 
 **Live site:** https://gtswarm.vercel.app. Click **Demo** (top right) for a hands-on tour: the judge clicks the real site (navigation, example buttons, Find People, Find Startups, invites, the persona menu, Accept) and the tour moves on when they do. Every step also has **Skip, do it for me**. Every person, startup and request is **fictional**.
 
-**Who runs it:** the Student Government Association, as a one-semester opt-in pilot, with CREATE-X, Startup Exchange, the Alumni Association and project courses bringing people in (proposed; no existing partnership). Details at `/pilot`.
+**Where it fits:** alongside CREATE-X, Startup Exchange, the Alumni Association and project courses, using only what people choose to share.
 
 **The point to land:** Georgia Tech already has the people and the answers startups need, but founders, alumni and students can't see each other, so connections happen by luck. GT Swarm learns what each person has built and solved, matches them in both directions with reasons, and turns matches into real, consented connections. Connection is not only hiring: when a founder hits a wall (a bug, a hospital security review, a fundraising question), GT Swarm finds the alumni and students whose record and experience can help, maps how you're connected to them, and shares contact details once both say yes.
 
@@ -22,8 +22,8 @@ The demo shows instead of explains: every step is a moment that can't happen at 
 | 10 | Priya's inbox | As Priya: **Accept** | Nothing is shared until she says yes |
 | 11 | Connected | **Next** | Elena sees Priya's contact details (and Priya sees Elena's): they can talk directly |
 | 12 | Students too | As Maya: **Find Your Startup** | Elena's startup, matched to a student from what she has built |
-| 13 | For SGA | **Next** | Impact for GT: alum-to-alum and student-to-alum connections counted live |
-| 14 | Next semester | **Finish** | "These connections happen at GT today, by luck. GT Swarm makes them happen on purpose." |
+| 13 | Impact for GT | **Next** | Impact for GT: alum-to-alum and student-to-alum connections counted live |
+| 14 | Close | **Finish** | Back on the homepage: "These connections happen at GT today, by luck. GT Swarm makes them happen on purpose." |
 
 The tour opens pages and switches personas itself (about two minutes). Every action has **Skip, do it for me**.
 

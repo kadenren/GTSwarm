@@ -6,7 +6,6 @@ import { HeroPattern } from '@/components/PageHero';
 import { listBuilds } from '@/lib/builds';
 import { snapshot } from '@/lib/data';
 import { roleLabel } from '@/lib/roles';
-import { PHASES, PRIVACY, REAL, SIMULATED, PROGRAMS, PROPOSED_NOTE } from '@/lib/pitch';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +21,7 @@ const PROBLEM = [
 ];
 
 
-/** Home: the problem, what makes GT Swarm different, the two ways it works, how GT could pilot it, then the startup feed. */
+/** Home: the problem, what makes GT Swarm different, the two ways it works, then the startup feed. */
 export default async function Home() {
   const viewerId = await getViewerId(); // also loads this visitor's demo session
   const builds = listBuilds();
@@ -188,57 +187,7 @@ export default async function Home() {
         </p>
       </section>
 
-      {/* 5. Feasibility */}
-      <section className="bg-navy-900 text-white" aria-labelledby="plan-h">
-        <div className="mx-auto max-w-7xl px-4 py-14">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">Implementation plan</p>
-          <h2 id="plan-h" className="mt-2 text-3xl font-bold">Built for Georgia Tech. Designed to grow.</h2>
-          <p className="mt-2 max-w-2xl text-white/70">The Student Government Association runs it as a one-semester, opt-in pilot. Existing programs bring the people. It needs no university records and no new university systems to start.</p>
-          <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="How GT Swarm fits existing programs (proposed)">
-            {PROGRAMS.map((p) => (
-              <li key={p.name} className="rounded-xl border border-gold/30 bg-gold/[0.07] p-4">
-                <p className="font-display font-bold text-gold-light">{p.name}</p>
-                <p className="mt-1 text-sm text-white/75">{p.adds}</p>
-              </li>
-            ))}
-          </ul>
-          <ol className="mt-6 grid gap-4 md:grid-cols-3">
-            {PHASES.map((p) => (
-              <li key={p.n} className="relative rounded-xl border border-white/10 bg-white/[0.04] p-5">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gold font-display font-bold text-navy-900">{p.n}</span>
-                  <div>
-                    <h3 className="font-display font-bold">{p.title}</h3>
-                    <p className="text-[11px] uppercase tracking-wide text-white/45">{p.when}</p>
-                  </div>
-                </div>
-                <ul className="mt-4 space-y-2 text-sm text-white/75">{p.items.map((x) => <li key={x} className="flex gap-2"><span className="text-gold" aria-hidden="true">·</span>{x}</li>)}</ul>
-              </li>
-            ))}
-          </ol>
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-xs text-white/50">{PROPOSED_NOTE}</p>
-            <Link href="/pilot" className="btn-gold" data-testid="pilot-link">See the full SGA pilot plan →</Link>
-          </div>
-
-          <div className="mt-8 grid gap-4 lg:grid-cols-3">
-            <div className="rounded-xl bg-white p-5 text-ink">
-              <h3 className="font-display font-bold text-navy">Privacy by design</h3>
-              <ul className="mt-3 space-y-2 text-sm">{PRIVACY.map((x) => <li key={x} className="flex gap-2"><span className="font-bold text-teal" aria-hidden="true">✓</span>{x}</li>)}</ul>
-            </div>
-            <div className="rounded-xl bg-white p-5 text-ink" data-testid="built-today">
-              <h3 className="font-display font-bold text-navy">Working in this demo</h3>
-              <ul className="mt-3 space-y-2 text-sm">{REAL.map((x) => <li key={x} className="flex gap-2"><span className="font-bold text-teal" aria-hidden="true">✓</span>{x}</li>)}</ul>
-            </div>
-            <div className="rounded-xl bg-white p-5 text-ink" data-testid="simulated">
-              <h3 className="font-display font-bold text-navy">Simulated for the demo</h3>
-              <ul className="mt-3 space-y-2 text-sm">{SIMULATED.map((x) => <li key={x} className="flex gap-2"><span className="font-bold text-gold-dark" aria-hidden="true">○</span>{x}</li>)}</ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 6. Browse */}
+      {/* 5. Browse */}
       <div className="mx-auto max-w-7xl px-4 py-12">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
           <div>

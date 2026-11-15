@@ -50,8 +50,7 @@ Without a key (or when Gemini is busy), everything falls back to the graph plus 
 
 | Page | What it does |
 |---|---|
-| Home `/` | The problem, Find Your People / Find Your Startup, how GT Swarm differs from directories (with a real example from the data), the two-way flow, the pilot plan with privacy and what is real vs simulated, and the startup feed |
-| SGA pilot plan `/pilot` | Who runs it (SGA), how it fits CREATE-X, Startup Exchange, the Alumni Association and project courses (proposed), a one-semester timeline, success measures, resources, risks, privacy, and what is real vs simulated |
+| Home `/` | The problem, Find Your People / Find Your Startup, how GT Swarm differs from directories (with a real example from the data), the two-way flow, and the startup feed |
 | Find Matches `/match` | **Find Your People** (role and students/alumni filters, match cards, Why this match?, View network) and **Find Your Startup** (from text or your saved profile, Request to join), plus a "How the intelligence works" section explaining every scoring factor and the knowledge graph |
 | Get Unstuck `/stuck` | Describe a problem (technical, security, regulatory, fundraising, equity); see a connection map of the alumni and students who can help, based on their record and experience, and how you're connected to them; connect with them, and once they accept, contact details are shared both ways |
 | My Profile `/profile` | Your record, interests, roles you are open to, hours, what you want to work on, your startups, startups that could use you |

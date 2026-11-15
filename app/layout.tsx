@@ -51,7 +51,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <span>Independent student project for the GT Campus Solutions Challenge. Not affiliated with or endorsed by Georgia Tech. All demo data is fictional.</span>
             </span>
             <nav aria-label="More" className="flex flex-wrap items-center gap-x-4 gap-y-1">
-              {[["/pilot", "SGA pilot plan"], ["/add", "Post a startup"], ["/join", "Join GT Swarm"], ["/impact", "Impact for GT"]].map(([h, l]) => (
+              {[["/add", "Post a startup"], ["/join", "Join GT Swarm"], ["/impact", "Impact for GT"]].map(([h, l]) => (
                 <Link key={h} href={h} className="hover:text-navy hover:underline">{l}</Link>
               ))}
             </nav>

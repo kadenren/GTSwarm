@@ -49,7 +49,7 @@ const PRIYA_CONNECTED = `[data-testid="request-sent"][data-to="${PRIYA}"][data-s
  * The judge story (about two minutes): Georgia Tech alumni finding other alumni, then students.
  * Elena (alum founder) finds an alumni cofounder she'd never heard of and the warm path to her; then Get Unstuck maps
  * who can help with her FDA submission, she connects with Priya through a mutual teammate, and gets her contact once Priya says yes. Maya (student) is
- * matched to Elena's startup. Impact for GT counts it; the pilot shows how GT runs it.
+ * matched to Elena's startup. Impact for GT counts it, and the tour closes on the homepage.
  */
 const STEPS: Step[] = [
   { as: ELENA, url: '/', target: RESTWELL_CARD, who: 'Meet Elena',
@@ -111,11 +111,11 @@ const STEPS: Step[] = [
     done: RESTWELL_MATCH, skipClick: '[data-testid="mode-startups"]',
     doneBody: 'Elena’s startup, found for her from what she has already built. Alumni find each other, and students find the alumni building things they can join.' },
 
-  { as: ELENA, url: '/impact', target: '[data-tour="impact"]', who: 'For SGA',
-    title: 'Every connection is counted', body: 'Alum-to-alum, student-to-alum, problems solved through the network. Live numbers from this demo, ready for an SGA report.' },
-  { as: ELENA, url: '/pilot', target: '[data-tour="pilot-timeline"]', who: 'Next semester',
+  { as: ELENA, url: '/impact', target: '[data-tour="impact"]', who: 'Impact for GT',
+    title: 'Every connection is counted', body: 'Alum-to-alum and student-to-alum introductions, and problems worked through with help from the network, all counted live from this demo.' },
+  { as: ELENA, url: '/', target: '[data-tour="problem"]', who: 'GT Swarm',
     title: 'These connections happen at GT today, by luck.',
-    body: 'GT Swarm makes them happen on purpose. One opt-in semester with CREATE-X and the Alumni Association (proposed), no university records, and it already runs: you just used it.' },
+    body: 'GT Swarm makes them happen on purpose, using only what people choose to share, alongside the programs Georgia Tech already has. And it already runs: you just used it.' },
 ];
 
 const KEY = 'gtswarm-tour';
